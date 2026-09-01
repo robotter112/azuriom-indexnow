@@ -5,16 +5,16 @@ return [
     'permission' => 'Sitemap verwalten',
 
     'url' => 'Deine Sitemap',
-    'url-hint' => 'Diese Adresse in der Google Search Console und den Bing Webmaster Tools einreichen und in public/robots.txt als „Sitemap: :url" eintragen.',
+    'url-hint' => 'Diese Adresse bei Google und Bing einreichen.',
     'count' => '{0}Noch keine URL|{1}1 URL|[2,*]:count URLs',
     'cached' => 'Zwischengespeichert, wird nach :minutes Minuten neu aufgebaut.',
     'not-cached' => 'Nicht zwischengespeichert, der nächste Aufruf baut sie neu auf.',
 
     'settings' => 'Einstellungen',
     'cache-minutes' => 'Haltbarkeit des Zwischenspeichers (Minuten)',
-    'cache-minutes-hint' => 'Wie lange die URL-Liste gehalten wird, bevor sie neu gebaut wird. Suchmaschinen rufen die Sitemap deutlich seltener ab.',
+    'cache-minutes-hint' => 'Wie lange die Liste gespeichert bleibt. 60 ist ein guter Wert.',
     'exclude' => 'Ausgeschlossene Pfade',
-    'exclude-hint' => 'Ein Muster pro Zeile, ohne Domain, z.B. „shop/*". Seiten hinter einer Anmeldung fallen automatisch heraus – diese Liste ist für Seiten, deren Plugin Gäste erst im eigenen Code wegleitet.',
+    'exclude-hint' => 'Ein Pfad pro Zeile, ohne Domain. Hier eintragen, was „URLs prüfen“ bemängelt.',
 
     'save' => 'Speichern',
     'saved' => 'Einstellungen gespeichert, die Sitemap wurde neu aufgebaut.',
@@ -22,13 +22,13 @@ return [
     'refreshed' => 'Sitemap neu aufgebaut, :count URLs.',
 
     'check' => 'URLs prüfen',
-    'check-hint' => 'Ruft jede URL so ab, wie ein nicht angemeldeter Besucher sie sieht. In eine Sitemap gehören nur Seiten, die wirklich mit 200 antworten – Weiterleitungen und Anmeldeschranken melden Suchmaschinen als Fehler.',
+    'check-hint' => 'Prüft, ob jede Adresse für Besucher ohne Konto erreichbar ist.',
     'check-ok' => 'Alle :count URLs antworten mit 200.',
     'check-bad' => ':count von :total URLs antworten nicht mit 200. Trage ihren Pfad oben bei den ausgeschlossenen Pfaden ein.',
     'check-capped' => 'Es wurden nur die ersten :limit URLs geprüft. Für alle: „php artisan seo:check".',
 
     'issues-title' => 'Auffälligkeiten auf der Seite',
-    'issues-hint' => 'Diese Seiten gehören in die Sitemap, aber eine Suchmaschine rechnet ihnen Folgendes an.',
+    'issues-hint' => 'Diese Seiten bleiben in der Sitemap. Du kannst sie verbessern, musst aber nicht.',
     'check-all-ok' => 'Alle :count URLs antworten mit 200 und bestehen die Seitenprüfung.',
 
     'issue' => [
@@ -43,19 +43,19 @@ return [
 
     'robots-title' => 'robots.txt',
     'robots-ok' => 'Deine robots.txt verweist Suchmaschinen auf die Sitemap.',
-    'robots-missing' => 'Deine robots.txt erwähnt die Sitemap nicht. Suchmaschinen finden sie dann nur, wenn du sie in einer Webmaster-Konsole eingereicht hast.',
+    'robots-missing' => 'Suchmaschinen finden deine Sitemap so nicht von allein.',
     'robots-write' => 'Sitemap-Zeile eintragen',
     'robots-written' => 'Die Sitemap-Zeile wurde in die robots.txt eingetragen.',
     'robots-not-writable' => 'Die robots.txt ist nicht beschreibbar (:path). Trage die Zeile von Hand ein.',
     'canonical-title' => 'Kanonische Adresse',
     'canonical-enable' => 'Kanonische Adresse zu Seiten hinzufügen, die keine haben',
-    'canonical-hint' => 'Dieselbe Seite mit Tracking- oder Cache-Parametern wirkt auf eine Suchmaschine wie eine eigene Adresse, was ihre Bewertung aufteilt. Dies ergänzt die saubere Adresse. Eine vorhandene Angabe aus dem Theme wird nie überschrieben.',
+    'canonical-hint' => 'Verhindert, dass Suchmaschinen dieselbe Seite doppelt zählen, wenn sie über einen Werbe- oder Trackinglink aufgerufen wird.',
     'canonical-keep' => 'Zu erhaltende Abfrageparameter',
-    'canonical-keep-hint' => 'Mit Komma getrennt. Diese verändern den Inhalt der Seite und müssen erhalten bleiben. Ohne „page" würde Suchmaschinen mitgeteilt, Seite 2 sei eine Kopie von Seite 1 – Seite 2 fiele aus dem Index.',
+    'canonical-keep-hint' => 'Nur ändern, wenn du weißt, was du tust. Ohne „page“ verschwinden Unterseiten aus der Suche.',
 
     'indexnow-title' => 'IndexNow',
-    'indexnow-hint' => 'IndexNow meldet Suchmaschinen sofort, dass sich Seiten geändert haben, statt auf den nächsten Besuch zu warten. Bing, Yandex, Seznam und Naver machen mit. Google nicht – dort bleibt die Sitemap der Weg.',
-    'indexnow-off' => 'Nicht aktiviert.',
+    'indexnow-hint' => 'Meldet Bing und Yandex sofort, wenn sich etwas geändert hat. Google macht nicht mit.',
+    'indexnow-off' => 'Noch nicht eingerichtet. Ein Klick genügt.',
     'indexnow-on' => 'Aktiviert. Deine Schlüsseldatei ist erreichbar unter :url',
     'indexnow-enable' => 'IndexNow aktivieren',
     'indexnow-disable' => 'Abschalten',

@@ -5,16 +5,16 @@ return [
     'permission' => 'Manage the sitemap',
 
     'url' => 'Your sitemap',
-    'url-hint' => 'Submit this address in Google Search Console and Bing Webmaster Tools, and add it to public/robots.txt as "Sitemap: :url".',
+    'url-hint' => 'Submit this address to Google and Bing.',
     'count' => '{0}No URL yet|{1}1 URL|[2,*]:count URLs',
     'cached' => 'Cached, rebuilt automatically after :minutes minutes.',
     'not-cached' => 'Not cached, the next visit rebuilds it.',
 
     'settings' => 'Settings',
     'cache-minutes' => 'Cache lifetime (minutes)',
-    'cache-minutes-hint' => 'How long the URL list is kept before it is rebuilt. Crawlers fetch far less often than this.',
+    'cache-minutes-hint' => 'How long the list is kept. 60 is a good value.',
     'exclude' => 'Excluded paths',
-    'exclude-hint' => 'One pattern per line, without the domain, e.g. "shop/*". Pages behind a login are skipped automatically — this list is for pages whose plugin redirects guests from inside its own code.',
+    'exclude-hint' => 'One path per line, without the domain. Add what "Check URLs" reports here.',
 
     'save' => 'Save',
     'saved' => 'Settings saved, the sitemap was rebuilt.',
@@ -22,13 +22,13 @@ return [
     'refreshed' => 'Sitemap rebuilt, :count URLs.',
 
     'check' => 'Check URLs',
-    'check-hint' => 'Fetches every URL as a logged-out visitor. A sitemap should only list pages that really answer with 200 — search engines report redirects and login walls as errors.',
+    'check-hint' => 'Checks whether every address works for visitors without an account.',
     'check-ok' => 'All :count URLs answer with 200.',
     'check-bad' => ':count of :total URLs do not answer with 200. Add their path to the excluded paths above.',
     'check-capped' => 'Only the first :limit URLs were checked. Use "php artisan seo:check" for all of them.',
 
     'issues-title' => 'On-page issues',
-    'issues-hint' => 'These pages belong in the sitemap, but a search engine will hold the following against them.',
+    'issues-hint' => 'These pages stay in the sitemap. You can improve them, but you do not have to.',
     'check-all-ok' => 'All :count URLs answer with 200 and pass the on-page checks.',
 
     'issue' => [
@@ -43,19 +43,19 @@ return [
 
     'robots-title' => 'robots.txt',
     'robots-ok' => 'Your robots.txt points crawlers at the sitemap.',
-    'robots-missing' => 'Your robots.txt does not mention the sitemap. Search engines then only find it if you submitted it in a webmaster console.',
+    'robots-missing' => 'Search engines will not find your sitemap on their own this way.',
     'robots-write' => 'Add the Sitemap line',
     'robots-written' => 'The Sitemap line was added to robots.txt.',
     'robots-not-writable' => 'robots.txt is not writable (:path). Add the line by hand.',
     'canonical-title' => 'Canonical URL',
     'canonical-enable' => 'Add a canonical URL to pages that have none',
-    'canonical-hint' => 'The same page reached with tracking or cache-busting parameters looks like a separate address to a search engine, which splits its ranking. This adds the clean address to the page. An existing canonical from your theme is never overwritten.',
+    'canonical-hint' => 'Stops search engines from counting the same page twice when it is opened through an ad or tracking link.',
     'canonical-keep' => 'Query parameters to keep',
-    'canonical-keep-hint' => 'Comma separated. These change what the page shows and must survive. Removing "page" would tell search engines that page 2 is a copy of page 1, and page 2 would drop out of the index.',
+    'canonical-keep-hint' => 'Only change this if you know what you are doing. Without "page", sub-pages disappear from search.',
 
     'indexnow-title' => 'IndexNow',
-    'indexnow-hint' => 'IndexNow tells search engines immediately that your pages changed, instead of waiting for the next crawl. Bing, Yandex, Seznam and Naver support it. Google does not - for Google the sitemap remains the way.',
-    'indexnow-off' => 'Not enabled.',
+    'indexnow-hint' => 'Tells Bing and Yandex right away when something changed. Google does not take part.',
+    'indexnow-off' => 'Not set up yet. One click is enough.',
     'indexnow-on' => 'Enabled. Your key file is reachable at :url',
     'indexnow-enable' => 'Enable IndexNow',
     'indexnow-disable' => 'Disable',

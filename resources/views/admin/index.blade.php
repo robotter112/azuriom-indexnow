@@ -29,19 +29,21 @@
                 </span>
             </p>
 
-            <form action="{{ route('seo.admin.refresh') }}" method="POST" class="d-inline me-2">
-                @csrf
-                <button type="submit" class="btn btn-secondary">
-                    <i class="bi bi-arrow-clockwise"></i> @lang('seo::admin.refresh')
-                </button>
-            </form>
+            <div class="d-flex flex-wrap gap-2">
+                <form action="{{ route('seo.admin.refresh') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="bi bi-arrow-clockwise"></i> @lang('seo::admin.refresh')
+                    </button>
+                </form>
 
-            <form action="{{ route('seo.admin.check') }}" method="POST" class="d-inline">
-                @csrf
-                <button type="submit" class="btn btn-secondary">
-                    <i class="bi bi-check2-circle"></i> @lang('seo::admin.check')
-                </button>
-            </form>
+                <form action="{{ route('seo.admin.check') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="bi bi-check2-circle"></i> @lang('seo::admin.check')
+                    </button>
+                </form>
+            </div>
 
             <p class="text-muted small mt-2 mb-0">@lang('seo::admin.check-hint')</p>
         </div>
@@ -58,19 +60,21 @@
                     @lang('seo::admin.indexnow-on', ['url' => $indexNow['keyUrl']])
                 </div>
 
-                <form action="{{ route('seo.admin.indexnow.submit') }}" method="POST" class="d-inline me-2">
-                    @csrf
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-send"></i> @lang('seo::admin.indexnow-submit')
-                    </button>
-                </form>
+                <div class="d-flex flex-wrap gap-2">
+                    <form action="{{ route('seo.admin.indexnow.submit') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> @lang('seo::admin.indexnow-submit')
+                        </button>
+                    </form>
 
-                <form action="{{ route('seo.admin.indexnow.disable') }}" method="POST" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-outline-secondary">
-                        @lang('seo::admin.indexnow-disable')
-                    </button>
-                </form>
+                    <form action="{{ route('seo.admin.indexnow.disable') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-secondary">
+                            @lang('seo::admin.indexnow-disable')
+                        </button>
+                    </form>
+                </div>
             @else
                 <p class="text-muted">@lang('seo::admin.indexnow-off')</p>
 
