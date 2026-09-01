@@ -1,0 +1,10 @@
+{
+    "name": "azuriom/sitemap",
+    "type": "azuriom-plugin",
+    "description": "Sitemap plugin for Azuriom",
+    "autoload": {
+        "psr-4": {
+            "Azuriom\\Plugin\\Sitemap\\": "src/"
+        }
+    }
+}

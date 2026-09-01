@@ -1,0 +1,15 @@
+{
+    "id": "sitemap",
+    "name": "Sitemap",
+    "description": "Serves a sitemap.xml with every publicly visible URL of your site, so search engines can index all of it.",
+    "version": "1.0.0",
+    "url": "https://git.fastm.de/Max/azuriom-sitemap",
+    "authors": [
+        "Max (Verplant-Studio)"
+    ],
+    "azuriom_api": "1.2.0",
+    "providers": [
+        "\\Azuriom\\Plugin\\Sitemap\\Providers\\SitemapServiceProvider",
+        "\\Azuriom\\Plugin\\Sitemap\\Providers\\RouteServiceProvider"
+    ]
+}
