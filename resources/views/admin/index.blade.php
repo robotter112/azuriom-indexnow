@@ -49,24 +49,48 @@
 
     @if(session('checked'))
         @php($ergebnis = session('checked'))
+        @php($statusFehler = collect($ergebnis['bad'])->where('status', '!=', 200))
+        @php($seoFaelle = collect($ergebnis['bad'])->where('status', 200)->filter(fn ($e) => ! empty($e['issues'])))
+
         <div class="card shadow mb-4">
             <div class="card-body">
-                @if(empty($ergebnis['bad']))
+                @if($statusFehler->isEmpty() && $seoFaelle->isEmpty())
                     <div class="alert alert-success mb-0">
-                        @lang('sitemap::admin.check-ok', ['count' => $ergebnis['total']])
+                        @lang('sitemap::admin.check-all-ok', ['count' => $ergebnis['total']])
                     </div>
-                @else
+                @endif
+
+                @if($statusFehler->isNotEmpty())
                     <div class="alert alert-warning">
                         @lang('sitemap::admin.check-bad', [
-                            'count' => count($ergebnis['bad']),
+                            'count' => $statusFehler->count(),
                             'total' => $ergebnis['total'],
                         ])
                     </div>
-                    <ul class="list-group">
-                        @foreach($ergebnis['bad'] as $eintrag)
+                    <ul class="list-group mb-4">
+                        @foreach($statusFehler as $eintrag)
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <span class="text-break">{{ $eintrag['url'] }}</span>
                                 <span class="badge bg-danger">{{ $eintrag['status'] ?: '—' }}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+
+                @if($seoFaelle->isNotEmpty())
+                    <h3 class="h6">@lang('sitemap::admin.issues-title')</h3>
+                    <p class="text-muted small">@lang('sitemap::admin.issues-hint')</p>
+                    <ul class="list-group">
+                        @foreach($seoFaelle as $eintrag)
+                            <li class="list-group-item">
+                                <div class="text-break mb-1">{{ $eintrag['url'] }}</div>
+                                <ul class="mb-0 small text-muted">
+                                    @foreach($eintrag['issues'] as $issue)
+                                        <li>
+                                            @lang('sitemap::admin.issue.'.$issue['key'], ['count' => $issue['count'] ?? 0])
+                                        </li>
+                                    @endforeach
+                                </ul>
                             </li>
                         @endforeach
                     </ul>

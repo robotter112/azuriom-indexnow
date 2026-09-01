@@ -26,4 +26,18 @@ return [
     'check-ok' => 'All :count URLs answer with 200.',
     'check-bad' => ':count of :total URLs do not answer with 200. Add their path to the excluded paths above.',
     'check-capped' => 'Only the first :limit URLs were checked. Use "php artisan sitemap:check" for all of them.',
+
+    'issues-title' => 'On-page issues',
+    'issues-hint' => 'These pages belong in the sitemap, but a search engine will hold the following against them.',
+    'check-all-ok' => 'All :count URLs answer with 200 and pass the on-page checks.',
+
+    'issue' => [
+        'h1-missing' => 'No h1 heading',
+        'h1-multiple' => ':count h1 headings - a page should have exactly one',
+        'description-missing' => 'No meta description',
+        'description-short' => 'Meta description very short (:count characters)',
+        'description-long' => 'Meta description too long (:count characters, cut off around 160)',
+        'title-missing' => 'No page title',
+        'images-without-alt' => ':count image(s) without a usable alt attribute',
+    ],
 ];

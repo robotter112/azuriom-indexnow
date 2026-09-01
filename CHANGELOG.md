@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-01
+
+### Added
+
+- On-page checks during the URL check: missing or duplicate `h1`, missing meta
+  description or one that is too short or too long, missing page title, and
+  images without a usable `alt` attribute. The pages are fetched for the status
+  check anyway, so this costs no extra requests.
+- Self-check for the HTML analysis, runnable with `php tests/SeoCheckTest.php`.
+
+### Changed
+
+- The check result now separates URLs that fail to answer `200` from URLs that
+  answer fine but have on-page issues — only the former belong in the excluded
+  paths.
+
 ## [1.0.0] - 2026-09-01
 
 ### Added
@@ -27,5 +43,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `SitemapBuilding` event so other plugins can contribute their own URLs.
 - English, French and German translations for the admin page.
 
-[Unreleased]: https://git.fastm.de/Max/azuriom-sitemap/compare/v1.0.0...HEAD
+[Unreleased]: https://git.fastm.de/Max/azuriom-sitemap/compare/v1.1.0...HEAD
+[1.1.0]: https://git.fastm.de/Max/azuriom-sitemap/releases/tag/v1.1.0
 [1.0.0]: https://git.fastm.de/Max/azuriom-sitemap/releases/tag/v1.0.0

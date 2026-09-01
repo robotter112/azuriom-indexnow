@@ -26,4 +26,18 @@ return [
     'check-ok' => 'Les :count URLs répondent toutes en 200.',
     'check-bad' => ':count URLs sur :total ne répondent pas en 200. Ajoutez leur chemin aux chemins exclus ci-dessus.',
     'check-capped' => 'Seules les :limit premières URLs ont été vérifiées. Utilisez « php artisan sitemap:check » pour toutes les vérifier.',
+
+    'issues-title' => 'Problèmes sur la page',
+    'issues-hint' => 'Ces pages ont leur place dans le sitemap, mais un moteur de recherche leur reprochera ce qui suit.',
+    'check-all-ok' => 'Les :count URLs répondent en 200 et passent les vérifications de page.',
+
+    'issue' => [
+        'h1-missing' => 'Aucun titre h1',
+        'h1-multiple' => ':count titres h1 - une page ne devrait en avoir qu\'un seul',
+        'description-missing' => 'Aucune méta-description',
+        'description-short' => 'Méta-description très courte (:count caractères)',
+        'description-long' => 'Méta-description trop longue (:count caractères, coupée vers 160)',
+        'title-missing' => 'Aucun titre de page',
+        'images-without-alt' => ':count image(s) sans attribut alt exploitable',
+    ],
 ];

@@ -5,6 +5,7 @@ namespace Azuriom\Plugin\Sitemap\Controllers\Admin;
 use Azuriom\Http\Controllers\Controller;
 use Azuriom\Models\Setting;
 use Azuriom\Plugin\Sitemap\Controllers\SitemapController;
+use Azuriom\Plugin\Sitemap\SeoCheck;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -70,13 +71,17 @@ class AdminController extends Controller
 
         foreach ($urls as $url) {
             try {
-                $status = Http::withoutRedirecting()->timeout(10)->get($url)->status();
+                $antwort = Http::withoutRedirecting()->timeout(10)->get($url);
+                $status = $antwort->status();
+                // The body is already here, so the on-page checks cost nothing.
+                $issues = $status === 200 ? SeoCheck::issues($antwort->body()) : [];
             } catch (\Throwable $e) {
                 $status = 0;
+                $issues = [];
             }
 
-            if ($status !== 200) {
-                $bad[] = ['url' => $url, 'status' => $status];
+            if ($status !== 200 || $issues !== []) {
+                $bad[] = ['url' => $url, 'status' => $status, 'issues' => $issues];
             }
         }
 

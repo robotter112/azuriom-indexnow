@@ -86,6 +86,29 @@ a large site use the command, which has no cap:
 php artisan sitemap:check
 ```
 
+### On-page checks
+
+The pages are fetched anyway, so the same run also reports problems search
+engines complain about, at no extra request:
+
+* no `h1` heading, or more than one
+* missing meta description, or one that is very short or gets truncated
+* missing page title
+* images without a usable `alt` attribute (an empty `alt` counts, since it tells
+  a screen reader "decorative")
+
+These pages still belong in the sitemap — the report tells you where to improve
+them, it does not exclude anything.
+
+## Tests
+
+The HTML analysis works with regular expressions, which break quietly, so it
+carries a self-check that needs no test framework:
+
+```bash
+php tests/SeoCheckTest.php
+```
+
 ## Adding your own URLs
 
 Other plugins can contribute URLs by listening to the `SitemapBuilding` event:

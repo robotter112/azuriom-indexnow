@@ -26,4 +26,18 @@ return [
     'check-ok' => 'Alle :count URLs antworten mit 200.',
     'check-bad' => ':count von :total URLs antworten nicht mit 200. Trage ihren Pfad oben bei den ausgeschlossenen Pfaden ein.',
     'check-capped' => 'Es wurden nur die ersten :limit URLs geprüft. Für alle: „php artisan sitemap:check".',
+
+    'issues-title' => 'Auffälligkeiten auf der Seite',
+    'issues-hint' => 'Diese Seiten gehören in die Sitemap, aber eine Suchmaschine rechnet ihnen Folgendes an.',
+    'check-all-ok' => 'Alle :count URLs antworten mit 200 und bestehen die Seitenprüfung.',
+
+    'issue' => [
+        'h1-missing' => 'Keine h1-Überschrift',
+        'h1-multiple' => ':count h1-Überschriften – eine Seite sollte genau eine haben',
+        'description-missing' => 'Keine Meta-Beschreibung',
+        'description-short' => 'Meta-Beschreibung sehr kurz (:count Zeichen)',
+        'description-long' => 'Meta-Beschreibung zu lang (:count Zeichen, abgeschnitten wird bei etwa 160)',
+        'title-missing' => 'Kein Seitentitel',
+        'images-without-alt' => ':count Bild(er) ohne brauchbares alt-Attribut',
+    ],
 ];
