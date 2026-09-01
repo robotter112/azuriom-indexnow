@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0] - 2026-09-01
+## [2.0.0] - 2026-09-01
 
 ### Added
 
@@ -32,5 +32,5 @@ This plugin grew out of a broader SEO plugin. Since
 canonical URLs, robots.txt and structured data — but not IndexNow — everything
 overlapping was removed and only the missing piece kept.
 
-[Unreleased]: https://github.com/Robotter112/azuriom-indexnow/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/Robotter112/azuriom-indexnow/releases/tag/v1.0.0
+[Unreleased]: https://github.com/Robotter112/azuriom-indexnow/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/Robotter112/azuriom-indexnow/releases/tag/v2.0.0
