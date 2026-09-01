@@ -33,6 +33,7 @@ return [
     'auto-hint' => '页面一保存就上报。IndexNow 就是为此而生，等人点按钮反而失去了意义。',
     'sitemap' => '站点地图地址',
     'sitemap-hint' => '{0}没有找到网址。地址对吗？|[1,*]找到 :count 个网址。',
-    'no-sitemap' => '在 :url 未找到网址。请检查地址。',
+    'no-urls' => '没有找到可提交的页面。',
+    'source-core' => '{0}未找到站点地图，也没有页面。|[1,*]未找到站点地图 — 改用本站的 :count 个页面。',
     'sitemap-foreign' => '站点地图必须位于本站。IndexNow 只接受你自己域名下的地址。',
 ];

@@ -33,6 +33,7 @@ return [
     'auto-hint' => 'Reports a page as soon as it is saved. That is what IndexNow is for - waiting for a button defeats the purpose.',
     'sitemap' => 'Sitemap address',
     'sitemap-hint' => '{0}No URL found here. Is the address right?|[1,*]:count URLs found here.',
-    'no-sitemap' => 'No URLs found at :url. Check the address.',
+    'no-urls' => 'No pages found to submit.',
+    'source-core' => '{0}No sitemap found, and no pages either.|[1,*]No sitemap found — using the :count pages of this site instead.',
     'sitemap-foreign' => 'The sitemap must be on this site. IndexNow only accepts addresses of your own domain.',
 ];

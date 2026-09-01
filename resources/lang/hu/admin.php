@@ -33,6 +33,7 @@ return [
     'auto-hint' => 'Mentés után azonnal jelenti az oldalt. Pontosan erre való az IndexNow - gombnyomásra várni elveszi az értelmét.',
     'sitemap' => 'Az oldaltérkép címe',
     'sitemap-hint' => '{0}Nem található URL. Helyes a cím?|[1,*]:count URL található.',
-    'no-sitemap' => 'A :url címen nem található URL. Ellenőrizd a címet.',
+    'no-urls' => 'Nem található beküldhető oldal.',
+    'source-core' => '{0}Nem található sem oldaltérkép, sem oldal.|[1,*]Nem található oldaltérkép — helyette az oldal :count lapja kerül felhasználásra.',
     'sitemap-foreign' => 'Az oldaltérképnek ezen az oldalon kell lennie. Az IndexNow csak a saját domain címeit fogadja el.',
 ];

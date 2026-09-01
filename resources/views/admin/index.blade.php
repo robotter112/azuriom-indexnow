@@ -65,7 +65,11 @@
                         <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
                     <small class="form-text text-muted">
-                        {{ trans_choice('indexnow::admin.sitemap-hint', $sitemapCount, ['count' => $sitemapCount]) }}
+                        @if($urlSource === 'sitemap')
+                            {{ trans_choice('indexnow::admin.sitemap-hint', $sitemapCount, ['count' => $sitemapCount]) }}
+                        @else
+                            {{ trans_choice('indexnow::admin.source-core', $sitemapCount, ['count' => $sitemapCount]) }}
+                        @endif
                     </small>
                 </div>
 

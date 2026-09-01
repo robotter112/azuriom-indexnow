@@ -34,8 +34,13 @@ down, and a failure there can never disturb the save that triggered it.
 ## Submitting everything at once
 
 *Submit all URLs* reads your existing **`sitemap.xml`** and submits what it finds.
-The address is configurable, so it works with any plugin that produces one —
-this plugin deliberately does not build a second sitemap of its own.
+The address is configurable, so it works with any plugin that produces one.
+
+**No sitemap on your site?** Then the plugin falls back to Azuriom's own pages
+and published posts. It gathers that list internally and hands it to IndexNow —
+it never serves it as a `sitemap.xml` of its own. Producing that file is the job
+of a sitemap or SEO plugin, and a second one would only disagree with the first.
+The admin page tells you which of the two it is using.
 
 The answer comes back in plain words rather than as a status code: accepted,
 still validating, key rejected, host mismatch, rate limited.
@@ -43,7 +48,9 @@ still validating, key rejected, host mismatch, rate limited.
 ## Requirements
 
 - Azuriom **1.2.0** or newer
-- A `sitemap.xml` for the bulk submission — the per-page reporting works without one
+- **No other plugin required.** A `sitemap.xml` is used when present; without one
+  the bulk submission falls back to Azuriom's pages and posts, and the per-page
+  reporting never needed it in the first place
 - No migrations, no dependencies
 
 ## Translations

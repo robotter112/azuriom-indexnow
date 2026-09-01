@@ -33,6 +33,7 @@ return [
     'auto-hint' => 'Melaporkan halaman begitu disimpan. Untuk itulah IndexNow ada - menunggu klik justru menghilangkan gunanya.',
     'sitemap' => 'Alamat peta situs',
     'sitemap-hint' => '{0}Tidak ada URL ditemukan. Apakah alamatnya benar?|[1,*]:count URL ditemukan.',
-    'no-sitemap' => 'Tidak ada URL ditemukan di :url. Periksa alamatnya.',
+    'no-urls' => 'Tidak ada halaman untuk dikirim.',
+    'source-core' => '{0}Peta situs tidak ditemukan, halaman juga tidak.|[1,*]Peta situs tidak ditemukan — menggunakan :count halaman situs ini.',
     'sitemap-foreign' => 'Peta situs harus berada di situs ini. IndexNow hanya menerima alamat domain Anda sendiri.',
 ];

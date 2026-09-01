@@ -33,6 +33,7 @@ return [
     'auto-hint' => 'Ilmoittaa sivusta heti tallennuksen jälkeen. Juuri sitä varten IndexNow on - napin odottaminen vesittää idean.',
     'sitemap' => 'Sivustokartan osoite',
     'sitemap-hint' => '{0}Osoitteita ei löytynyt. Onko osoite oikein?|[1,*]Löytyi :count osoitetta.',
-    'no-sitemap' => 'Osoitteesta :url ei löytynyt osoitteita. Tarkista osoite.',
+    'no-urls' => 'Lähetettäviä sivuja ei löytynyt.',
+    'source-core' => '{0}Sivustokarttaa ei löytynyt, eikä sivujakaan.|[1,*]Sivustokarttaa ei löytynyt — käytetään sen sijaan tämän sivuston :count sivua.',
     'sitemap-foreign' => 'Sivustokartan on oltava tällä sivustolla. IndexNow hyväksyy vain oman verkkotunnuksen osoitteita.',
 ];

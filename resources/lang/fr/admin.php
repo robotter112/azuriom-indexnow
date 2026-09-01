@@ -33,6 +33,7 @@ return [
     'auto-hint' => 'Signale une page dès son enregistrement. C\'est tout l\'intérêt d\'IndexNow - attendre un clic va à l\'encontre du but.',
     'sitemap' => 'Adresse du sitemap',
     'sitemap-hint' => '{0}Aucune URL trouvée ici. L\'adresse est-elle correcte ?|[1,*]:count URLs trouvées.',
-    'no-sitemap' => 'Aucune URL trouvée à :url. Vérifiez l\'adresse.',
+    'no-urls' => 'Aucune page à soumettre.',
+    'source-core' => '{0}Aucun sitemap trouvé, ni aucune page.|[1,*]Aucun sitemap trouvé — les :count pages de ce site sont utilisées à la place.',
     'sitemap-foreign' => 'Le sitemap doit se trouver sur ce site. IndexNow n\'accepte que les adresses de votre propre domaine.',
 ];

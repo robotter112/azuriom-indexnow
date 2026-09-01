@@ -2,6 +2,8 @@
 
 namespace Azuriom\Plugin\Indexnow;
 
+use Azuriom\Models\Page;
+use Azuriom\Models\Post;
 use Illuminate\Support\Facades\Http;
 
 /**
@@ -59,6 +61,54 @@ class UrlSource
             fn ($url) => html_entity_decode($url, ENT_QUOTES | ENT_XML1, 'UTF-8'),
             $matches[1] ?? []
         )));
+    }
+
+    /**
+     * The URLs to submit: the sitemap if there is one, the site's own pages
+     * otherwise.
+     *
+     * @return array{urls: array<int, string>, source: string}
+     */
+    public static function collect(string $sitemapUrl): array
+    {
+        $urls = self::fromSitemap($sitemapUrl);
+
+        if ($urls !== []) {
+            return ['urls' => $urls, 'source' => 'sitemap'];
+        }
+
+        return ['urls' => self::fromCore(), 'source' => 'core'];
+    }
+
+    /**
+     * Pages and posts straight from Azuriom, for sites without a sitemap.
+     *
+     * Deliberately only what the core itself provides, and deliberately not
+     * served as a sitemap.xml of its own: producing that file is the job of a
+     * sitemap or SEO plugin, and a second one would only disagree with the
+     * first. This list never leaves the server - it exists solely to be handed
+     * to IndexNow.
+     *
+     * @return array<int, string>
+     */
+    public static function fromCore(): array
+    {
+        $urls = [url('/')];
+
+        try {
+            foreach (Page::enabled()->doesntHave('roles')->get() as $page) {
+                $urls[] = route('pages.show', $page->slug);
+            }
+
+            foreach (Post::published()->get() as $post) {
+                $urls[] = route('posts.show', $post->slug);
+            }
+        } catch (\Throwable $e) {
+            // A missing table or a renamed route must not break the submission;
+            // whatever was collected so far is still worth sending.
+        }
+
+        return array_values(array_unique($urls));
     }
 
     /**

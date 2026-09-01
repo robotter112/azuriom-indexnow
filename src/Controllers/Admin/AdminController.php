@@ -14,12 +14,14 @@ class AdminController extends Controller
     {
         $key = setting('indexnow.key');
         $sitemapUrl = setting('indexnow.sitemap') ?: UrlSource::defaultSitemapUrl();
+        $collected = UrlSource::collect($sitemapUrl);
 
         return view('indexnow::admin.index', [
             'enabled' => (bool) $key,
             'keyUrl' => $key ? url(Client::keyFileName($key)) : null,
             'sitemapUrl' => $sitemapUrl,
-            'sitemapCount' => count(UrlSource::fromSitemap($sitemapUrl)),
+            'sitemapCount' => count($collected['urls']),
+            'urlSource' => $collected['source'],
             'auto' => (bool) setting('indexnow.auto', true),
         ]);
     }
@@ -84,11 +86,11 @@ class AdminController extends Controller
         }
 
         $sitemapUrl = setting('indexnow.sitemap') ?: UrlSource::defaultSitemapUrl();
-        $urls = UrlSource::fromSitemap($sitemapUrl);
+        $urls = UrlSource::collect($sitemapUrl)['urls'];
 
         if ($urls === []) {
             return to_route('indexnow.admin.index')
-                ->with('error', trans('indexnow::admin.no-sitemap', ['url' => $sitemapUrl]));
+                ->with('error', trans('indexnow::admin.no-urls'));
         }
 
         $result = Client::submit(

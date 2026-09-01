@@ -33,6 +33,7 @@ return [
     'auto-hint' => 'Bir sayfa kaydedilir kaydedilmez bildirir. IndexNow tam bunun içindir - düğmeye basılmasını beklemek amacı boşa çıkarır.',
     'sitemap' => 'Site haritası adresi',
     'sitemap-hint' => '{0}Hiç adres bulunamadı. Adres doğru mu?|[1,*]:count adres bulundu.',
-    'no-sitemap' => ':url adresinde adres bulunamadı. Adresi kontrol edin.',
+    'no-urls' => 'Gönderilecek sayfa bulunamadı.',
+    'source-core' => '{0}Ne site haritası ne de sayfa bulundu.|[1,*]Site haritası bulunamadı — bunun yerine bu sitenin :count sayfası kullanılıyor.',
     'sitemap-foreign' => 'Site haritası bu sitede olmalı. IndexNow yalnızca kendi alan adınızın adreslerini kabul eder.',
 ];

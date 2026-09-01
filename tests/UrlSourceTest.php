@@ -88,6 +88,14 @@ check('a foreign sitemap is not fetched', [],
 check('a loopback sitemap is not fetched', [],
     UrlSource::fromSitemap('http://127.0.0.1:8123/sitemap.xml'));
 
+// Without a sitemap the plugin falls back to the site's own pages. It never
+// serves that list as a sitemap.xml - producing that file is another plugin's
+// job, and a second one would only disagree with the first.
+$collected = UrlSource::collect('https://evil.example/sitemap.xml');
+check('an unusable sitemap falls back to the core', 'core', $collected['source']);
+check('the fallback yields at least the home page', true, count($collected['urls']) >= 1);
+check('the fallback starts at the home page', 'https://example.com/', $collected['urls'][0]);
+
 echo "\n";
 
 if ($failures > 0) {

@@ -33,6 +33,7 @@ return [
     'auto-hint' => 'Praneša apie puslapį iškart jį įrašius. Būtent tam IndexNow ir skirtas - laukti paspaudimo nebetenka prasmės.',
     'sitemap' => 'Svetainės žemėlapio adresas',
     'sitemap-hint' => '{0}Nerasta nė vieno adreso. Ar adresas teisingas?|[1,*]Rasta adresų: :count.',
-    'no-sitemap' => 'Adresu :url adresų nerasta. Patikrinkite adresą.',
+    'no-urls' => 'Nerasta puslapių, kuriuos būtų galima pateikti.',
+    'source-core' => '{0}Nerasta nei svetainės žemėlapio, nei puslapių.|[1,*]Svetainės žemėlapis nerastas — vietoj jo naudojami šios svetainės puslapiai: :count.',
     'sitemap-foreign' => 'Svetainės žemėlapis turi būti šioje svetainėje. IndexNow priima tik savo domeno adresus.',
 ];

@@ -33,6 +33,7 @@ return [
     'auto-hint' => 'Rapporterar en sida så snart den sparas. Det är hela poängen med IndexNow - att vänta på en knapptryckning motverkar syftet.',
     'sitemap' => 'Webbplatskartans adress',
     'sitemap-hint' => '{0}Ingen adress hittades. Stämmer adressen?|[1,*]:count adresser hittades.',
-    'no-sitemap' => 'Inga adresser hittades på :url. Kontrollera adressen.',
+    'no-urls' => 'Inga sidor att skicka in hittades.',
+    'source-core' => '{0}Ingen webbplatskarta hittades, och inga sidor heller.|[1,*]Ingen webbplatskarta hittades — den här webbplatsens :count sidor används i stället.',
     'sitemap-foreign' => 'Webbplatskartan måste ligga på den här webbplatsen. IndexNow godtar bara adresser på din egen domän.',
 ];

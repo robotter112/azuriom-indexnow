@@ -33,6 +33,7 @@ return [
     'auto-hint' => 'Avisa de una página en cuanto se guarda. Para eso está IndexNow: esperar a un clic desvirtúa su propósito.',
     'sitemap' => 'Dirección del sitemap',
     'sitemap-hint' => '{0}No se encontró ninguna URL. ¿Es correcta la dirección?|[1,*]:count URLs encontradas.',
-    'no-sitemap' => 'No se encontraron URLs en :url. Revisa la dirección.',
+    'no-urls' => 'No se encontraron páginas que enviar.',
+    'source-core' => '{0}No se encontró sitemap ni páginas.|[1,*]No se encontró sitemap: se usan en su lugar las :count páginas de este sitio.',
     'sitemap-foreign' => 'El sitemap debe estar en este sitio. IndexNow solo acepta direcciones de tu propio dominio.',
 ];

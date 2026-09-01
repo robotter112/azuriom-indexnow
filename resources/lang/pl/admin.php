@@ -33,6 +33,7 @@ return [
     'auto-hint' => 'Zgłasza stronę zaraz po zapisaniu. Po to jest IndexNow - czekanie na kliknięcie mija się z celem.',
     'sitemap' => 'Adres mapy witryny',
     'sitemap-hint' => '{0}Nie znaleziono adresu. Czy adres jest poprawny?|[1,*]Znaleziono adresów: :count.',
-    'no-sitemap' => 'Pod :url nie znaleziono adresów. Sprawdź adres.',
+    'no-urls' => 'Nie znaleziono stron do przesłania.',
+    'source-core' => '{0}Nie znaleziono mapy witryny ani stron.|[1,*]Nie znaleziono mapy witryny — użyto :count stron tej witryny.',
     'sitemap-foreign' => 'Mapa witryny musi znajdować się w tej witrynie. IndexNow przyjmuje tylko adresy własnej domeny.',
 ];

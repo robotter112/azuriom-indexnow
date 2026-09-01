@@ -33,6 +33,7 @@ return [
     'auto-hint' => 'Meldet eine Seite, sobald sie gespeichert wird. Genau dafür ist IndexNow da – auf einen Knopfdruck zu warten verfehlt den Zweck.',
     'sitemap' => 'Adresse der Sitemap',
     'sitemap-hint' => '{0}Hier wurde keine Adresse gefunden. Stimmt die Adresse?|[1,*]:count Adressen gefunden.',
-    'no-sitemap' => 'Unter :url wurden keine Adressen gefunden. Prüfe die Adresse.',
+    'no-urls' => 'Keine Seiten zum Übermitteln gefunden.',
+    'source-core' => '{0}Keine Sitemap gefunden, und auch keine Seiten.|[1,*]Keine Sitemap gefunden – es werden stattdessen die :count Seiten dieser Website verwendet.',
     'sitemap-foreign' => 'Die Sitemap muss auf dieser Seite liegen. IndexNow nimmt nur Adressen der eigenen Domain an.',
 ];

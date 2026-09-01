@@ -33,6 +33,7 @@ return [
     'auto-hint' => 'Nahlásí stránku hned po uložení. Přesně k tomu IndexNow slouží - čekat na kliknutí míjí smysl.',
     'sitemap' => 'Adresa mapy stránek',
     'sitemap-hint' => '{0}Nenalezena žádná adresa. Je adresa správná?|[1,*]Nalezeno adres: :count.',
-    'no-sitemap' => 'Na :url nebyly nalezeny žádné adresy. Zkontrolujte adresu.',
+    'no-urls' => 'Nebyly nalezeny žádné stránky k odeslání.',
+    'source-core' => '{0}Nebyla nalezena mapa stránek ani žádné stránky.|[1,*]Mapa stránek nenalezena — použije se :count stránek tohoto webu.',
     'sitemap-foreign' => 'Mapa stránek musí být na tomto webu. IndexNow přijímá jen adresy vlastní domény.',
 ];

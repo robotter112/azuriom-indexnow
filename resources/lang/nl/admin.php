@@ -33,6 +33,7 @@ return [
     'auto-hint' => 'Meldt een pagina zodra die wordt opgeslagen. Daar is IndexNow voor - wachten op een klik gaat voorbij aan het doel.',
     'sitemap' => 'Adres van de sitemap',
     'sitemap-hint' => '{0}Hier is geen URL gevonden. Klopt het adres?|[1,*]:count URLs gevonden.',
-    'no-sitemap' => 'Geen URLs gevonden op :url. Controleer het adres.',
+    'no-urls' => 'Geen pagina\'s gevonden om in te dienen.',
+    'source-core' => '{0}Geen sitemap gevonden, en ook geen pagina\'s.|[1,*]Geen sitemap gevonden — in plaats daarvan worden de :count pagina\'s van deze site gebruikt.',
     'sitemap-foreign' => 'De sitemap moet op deze site staan. IndexNow accepteert alleen adressen van je eigen domein.',
 ];

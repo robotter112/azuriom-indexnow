@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Bulk submission works without a sitemap. If none is found, the plugin falls
+  back to Azuriom's own pages and published posts, gathered internally and handed
+  straight to IndexNow — it is never served as a `sitemap.xml`, because producing
+  that file belongs to a sitemap or SEO plugin. The admin page shows which source
+  is in use.
+
 ## [2.0.1] - 2026-09-01
 
 ### Security

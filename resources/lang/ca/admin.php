@@ -33,6 +33,7 @@ return [
     'auto-hint' => 'Avisa d\'una pàgina tan bon punt es desa. Per això serveix IndexNow: esperar un clic en desvirtua el propòsit.',
     'sitemap' => 'Adreça del sitemap',
     'sitemap-hint' => '{0}No s\'hi ha trobat cap URL. És correcta l\'adreça?|[1,*]:count URLs trobades.',
-    'no-sitemap' => 'No s\'han trobat URLs a :url. Comprova l\'adreça.',
+    'no-urls' => 'No s\'ha trobat cap pàgina per enviar.',
+    'source-core' => '{0}No s\'ha trobat cap sitemap ni cap pàgina.|[1,*]No s\'ha trobat cap sitemap: s\'usen les :count pàgines d\'aquest lloc.',
     'sitemap-foreign' => 'El sitemap ha de ser en aquest lloc. IndexNow només accepta adreces del teu propi domini.',
 ];
