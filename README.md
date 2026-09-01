@@ -5,7 +5,7 @@ site needs: a **sitemap**, **canonical URLs**, **robots.txt**, **IndexNow** and
 **on-page checks** — in one place, with no configuration required to get
 started.
 
-Repository: <https://git.fastm.de/Max/azuriom-seo>
+Repository: <https://github.com/Robotter112/azuriom-sitemap>
 
 ## What ends up in the sitemap
 
@@ -192,7 +192,7 @@ your site is that big, please open an issue.
 ## Contributing
 
 Issues and pull requests are welcome at
-<https://git.fastm.de/Max/azuriom-seo>. Please keep the code in the style of
+<https://github.com/Robotter112/azuriom-sitemap>. Please keep the code in the style of
 the surrounding files: comments in English, no new dependencies, and a note in
 `CHANGELOG.md` for anything users can notice.
 

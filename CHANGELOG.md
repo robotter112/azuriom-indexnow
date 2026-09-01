@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-09-01
+
+### Fixed
+
+- The plugin link in the admin plugin list pointed at a private repository,
+  where visitors only get a 404. It points at the public repository now.
+- The buttons of the IndexNow and sitemap cards sat flush against each other
+  with no gap.
+
 ## [1.3.0] - 2026-09-01
 
 ### Added
@@ -75,7 +84,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `SitemapBuilding` event so other plugins can contribute their own URLs.
 - English, French and German translations for the admin page.
 
-[Unreleased]: https://git.fastm.de/Max/azuriom-seo/compare/v1.2.0...HEAD
-[1.2.0]: https://git.fastm.de/Max/azuriom-seo/releases/tag/v1.2.0
-[1.1.0]: https://git.fastm.de/Max/azuriom-seo/releases/tag/v1.1.0
-[1.0.0]: https://git.fastm.de/Max/azuriom-seo/releases/tag/v1.0.0
+[Unreleased]: https://github.com/Robotter112/azuriom-sitemap/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/Robotter112/azuriom-sitemap/releases/tag/v1.2.0
+[1.1.0]: https://github.com/Robotter112/azuriom-sitemap/releases/tag/v1.1.0
+[1.0.0]: https://github.com/Robotter112/azuriom-sitemap/releases/tag/v1.0.0

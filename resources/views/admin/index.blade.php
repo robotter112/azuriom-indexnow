@@ -29,7 +29,7 @@
                 </span>
             </p>
 
-            <form action="{{ route('seo.admin.refresh') }}" method="POST" class="d-inline">
+            <form action="{{ route('seo.admin.refresh') }}" method="POST" class="d-inline me-2">
                 @csrf
                 <button type="submit" class="btn btn-secondary">
                     <i class="bi bi-arrow-clockwise"></i> @lang('seo::admin.refresh')
@@ -58,7 +58,7 @@
                     @lang('seo::admin.indexnow-on', ['url' => $indexNow['keyUrl']])
                 </div>
 
-                <form action="{{ route('seo.admin.indexnow.submit') }}" method="POST" class="d-inline">
+                <form action="{{ route('seo.admin.indexnow.submit') }}" method="POST" class="d-inline me-2">
                     @csrf
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-send"></i> @lang('seo::admin.indexnow-submit')
