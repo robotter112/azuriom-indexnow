@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Translations for all 19 languages Azuriom supports: Catalan, Czech, Spanish,
+  Finnish, Hungarian, Indonesian, Korean, Lithuanian, Dutch, Polish, Brazilian
+  Portuguese, Russian, Swedish, Turkish, Ukrainian and Simplified Chinese, on
+  top of the existing English, French and German. Key parity, placeholder parity
+  and plural forms are verified against the English reference.
+
 ## [1.3.1] - 2026-09-01
 
 ### Fixed

@@ -172,13 +172,19 @@ Only add URLs a logged-out visitor can open.
 
 ## Translations
 
-The admin page ships in **English, French and German** and follows the language
-configured in Azuriom, falling back to English for any other locale. The public
-`sitemap.xml` contains no text at all and is language-neutral.
+The admin page ships in **all 19 languages Azuriom itself supports** and follows
+the language configured there:
 
-Adding a language is text work, no code: copy `resources/lang/en/admin.php` to
-`resources/lang/<locale>/admin.php` and translate the 21 strings. Pull requests
-for further locales are welcome — Azuriom itself ships 19.
+`ca` `cs` `de` `en` `es_ES` `fi` `fr` `hu` `id` `ko` `lt` `nl` `pl` `pt_BR` `ru`
+`sv_SE` `tr` `uk` `zh_CN`
+
+Anything else falls back to English. The public `sitemap.xml` contains no text at
+all and is language-neutral.
+
+Every file carries the same 65 keys, verified against the English reference for
+key parity, placeholder parity and plural forms — a missing `:count` would break
+the sentence it sits in. Corrections from native speakers are very welcome; the
+translations outside English, French and German were not reviewed by one.
 
 Console output of `php artisan seo:check` is English only, matching
 Azuriom's own commands.
