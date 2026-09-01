@@ -36,4 +36,8 @@ return [
     'no-urls' => 'No pages found to submit.',
     'source-core' => '{0}No sitemap found, and no pages either.|[1,*]No sitemap found — using the :count pages of this site instead.',
     'sitemap-foreign' => 'The sitemap must be on this site. IndexNow only accepts addresses of your own domain.',
+    'serve-sitemap' => 'Serve a sitemap myself',
+    'serve-sitemap-hint' => 'Only for sites that have no sitemap at all. A sitemap or SEO plugin does this better — and Google, which ignores IndexNow, needs one. Lists the pages and posts of this site.',
+    'serve-sitemap-taken' => 'Another plugin already answers :url. Yours is not being served — switch this off or uninstall the other plugin.',
+    'serve-sitemap-live' => 'Your sitemap is live at :url. Submit it in Google Search Console.',
 ];

@@ -37,10 +37,22 @@ down, and a failure there can never disturb the save that triggered it.
 The address is configurable, so it works with any plugin that produces one.
 
 **No sitemap on your site?** Then the plugin falls back to Azuriom's own pages
-and published posts. It gathers that list internally and hands it to IndexNow —
-it never serves it as a `sitemap.xml` of its own. Producing that file is the job
-of a sitemap or SEO plugin, and a second one would only disagree with the first.
-The admin page tells you which of the two it is using.
+and published posts, gathered internally and handed straight to IndexNow. The
+admin page tells you which of the two sources it is using.
+
+## Optionally serving a sitemap — off by default
+
+IndexNow itself never needs a sitemap. There is exactly one reason this option
+exists: **Google does not take part in IndexNow**, so on a site with no sitemap
+at all, Google has nothing to go on.
+
+Switching it on serves a plain sitemap at `/sitemap.xml` listing this site's
+pages and published posts — nothing more. It is **off by default and should stay
+off** wherever a sitemap or SEO plugin is installed: those do the job far better,
+covering wiki pages, forums and everything else this one deliberately leaves out.
+
+If another plugin already answers `/sitemap.xml`, that plugin wins and the admin
+page says so plainly, rather than leaving you to wonder why nothing changed.
 
 The answer comes back in plain words rather than as a status code: accepted,
 still validating, key rejected, host mismatch, rate limited.

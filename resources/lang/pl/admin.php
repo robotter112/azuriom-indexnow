@@ -36,4 +36,8 @@ return [
     'no-urls' => 'Nie znaleziono stron do przesłania.',
     'source-core' => '{0}Nie znaleziono mapy witryny ani stron.|[1,*]Nie znaleziono mapy witryny — użyto :count stron tej witryny.',
     'sitemap-foreign' => 'Mapa witryny musi znajdować się w tej witrynie. IndexNow przyjmuje tylko adresy własnej domeny.',
+    'serve-sitemap' => 'Udostępniać własną mapę witryny',
+    'serve-sitemap-hint' => 'Tylko dla witryn bez żadnej mapy. Wtyczka mapy witryny lub SEO zrobi to lepiej — a Google, które ignoruje IndexNow, jej potrzebuje. Wypisuje strony i wpisy tej witryny.',
+    'serve-sitemap-taken' => 'Na :url odpowiada już inna wtyczka. Twoja nie jest udostępniana — wyłącz to albo odinstaluj tamtą wtyczkę.',
+    'serve-sitemap-live' => 'Twoja mapa witryny jest pod :url. Prześlij ją w Google Search Console.',
 ];

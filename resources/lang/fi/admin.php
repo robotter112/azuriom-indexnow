@@ -36,4 +36,8 @@ return [
     'no-urls' => 'Lähetettäviä sivuja ei löytynyt.',
     'source-core' => '{0}Sivustokarttaa ei löytynyt, eikä sivujakaan.|[1,*]Sivustokarttaa ei löytynyt — käytetään sen sijaan tämän sivuston :count sivua.',
     'sitemap-foreign' => 'Sivustokartan on oltava tällä sivustolla. IndexNow hyväksyy vain oman verkkotunnuksen osoitteita.',
+    'serve-sitemap' => 'Tarjoa sivustokartta itse',
+    'serve-sitemap-hint' => 'Vain sivustoille, joilla ei ole lainkaan sivustokarttaa. Sivustokartta- tai SEO-lisäosa tekee tämän paremmin — ja Google, joka ei tue IndexNow\'ta, tarvitsee sellaisen. Listaa tämän sivuston sivut ja artikkelit.',
+    'serve-sitemap-taken' => 'Osoitteeseen :url vastaa jo toinen lisäosa. Omaasi ei tarjoilla — kytke tämä pois tai poista toinen lisäosa.',
+    'serve-sitemap-live' => 'Sivustokarttasi on osoitteessa :url. Lähetä se Google Search Consoleen.',
 ];

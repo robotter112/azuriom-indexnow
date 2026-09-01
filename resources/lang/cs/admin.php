@@ -36,4 +36,8 @@ return [
     'no-urls' => 'Nebyly nalezeny žádné stránky k odeslání.',
     'source-core' => '{0}Nebyla nalezena mapa stránek ani žádné stránky.|[1,*]Mapa stránek nenalezena — použije se :count stránek tohoto webu.',
     'sitemap-foreign' => 'Mapa stránek musí být na tomto webu. IndexNow přijímá jen adresy vlastní domény.',
+    'serve-sitemap' => 'Poskytovat vlastní mapu stránek',
+    'serve-sitemap-hint' => 'Jen pro weby, které žádnou mapu stránek nemají. Plugin pro mapu stránek nebo SEO to zvládne lépe — a Google, který IndexNow ignoruje, ji potřebuje. Vypíše stránky a příspěvky tohoto webu.',
+    'serve-sitemap-taken' => 'Na :url už odpovídá jiný plugin. Vaše se neposkytuje — vypněte to nebo odinstalujte druhý plugin.',
+    'serve-sitemap-live' => 'Vaše mapa stránek je na :url. Zadejte ji v Google Search Console.',
 ];

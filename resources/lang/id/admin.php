@@ -36,4 +36,8 @@ return [
     'no-urls' => 'Tidak ada halaman untuk dikirim.',
     'source-core' => '{0}Peta situs tidak ditemukan, halaman juga tidak.|[1,*]Peta situs tidak ditemukan — menggunakan :count halaman situs ini.',
     'sitemap-foreign' => 'Peta situs harus berada di situs ini. IndexNow hanya menerima alamat domain Anda sendiri.',
+    'serve-sitemap' => 'Sajikan peta situs sendiri',
+    'serve-sitemap-hint' => 'Hanya untuk situs yang sama sekali tidak punya peta situs. Plugin peta situs atau SEO melakukannya lebih baik — dan Google, yang mengabaikan IndexNow, membutuhkannya. Mendaftar halaman dan pos situs ini.',
+    'serve-sitemap-taken' => 'Plugin lain sudah menjawab :url. Milik Anda tidak disajikan — matikan ini atau hapus plugin tersebut.',
+    'serve-sitemap-live' => 'Peta situs Anda tersedia di :url. Kirimkan di Google Search Console.',
 ];

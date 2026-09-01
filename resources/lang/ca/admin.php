@@ -36,4 +36,8 @@ return [
     'no-urls' => 'No s\'ha trobat cap pàgina per enviar.',
     'source-core' => '{0}No s\'ha trobat cap sitemap ni cap pàgina.|[1,*]No s\'ha trobat cap sitemap: s\'usen les :count pàgines d\'aquest lloc.',
     'sitemap-foreign' => 'El sitemap ha de ser en aquest lloc. IndexNow només accepta adreces del teu propi domini.',
+    'serve-sitemap' => 'Oferir un sitemap propi',
+    'serve-sitemap-hint' => 'Només per a llocs que no tenen cap sitemap. Un connector de sitemap o SEO ho fa millor, i Google, que ignora IndexNow, en necessita un. Llista les pàgines i entrades d\'aquest lloc.',
+    'serve-sitemap-taken' => 'Un altre connector ja respon :url. El teu no se serveix: desactiva això o desinstal·la l\'altre connector.',
+    'serve-sitemap-live' => 'El teu sitemap és a :url. Envia\'l a la Google Search Console.',
 ];

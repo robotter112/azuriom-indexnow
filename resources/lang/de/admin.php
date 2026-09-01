@@ -36,4 +36,8 @@ return [
     'no-urls' => 'Keine Seiten zum Übermitteln gefunden.',
     'source-core' => '{0}Keine Sitemap gefunden, und auch keine Seiten.|[1,*]Keine Sitemap gefunden – es werden stattdessen die :count Seiten dieser Website verwendet.',
     'sitemap-foreign' => 'Die Sitemap muss auf dieser Seite liegen. IndexNow nimmt nur Adressen der eigenen Domain an.',
+    'serve-sitemap' => 'Sitemap selbst ausliefern',
+    'serve-sitemap-hint' => 'Nur für Seiten, die gar keine Sitemap haben. Ein Sitemap- oder SEO-Plugin macht das besser – und Google, das IndexNow ignoriert, braucht eine. Listet die Seiten und Beiträge dieser Website.',
+    'serve-sitemap-taken' => 'Ein anderes Plugin beantwortet :url bereits. Deine wird nicht ausgeliefert – schalte dies ab oder deinstalliere das andere Plugin.',
+    'serve-sitemap-live' => 'Deine Sitemap ist unter :url erreichbar. Reiche sie in der Google Search Console ein.',
 ];

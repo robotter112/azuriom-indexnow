@@ -36,4 +36,8 @@ return [
     'no-urls' => 'Geen pagina\'s gevonden om in te dienen.',
     'source-core' => '{0}Geen sitemap gevonden, en ook geen pagina\'s.|[1,*]Geen sitemap gevonden — in plaats daarvan worden de :count pagina\'s van deze site gebruikt.',
     'sitemap-foreign' => 'De sitemap moet op deze site staan. IndexNow accepteert alleen adressen van je eigen domein.',
+    'serve-sitemap' => 'Zelf een sitemap aanbieden',
+    'serve-sitemap-hint' => 'Alleen voor sites zonder enige sitemap. Een sitemap- of SEO-plugin doet dit beter — en Google, dat IndexNow negeert, heeft er een nodig. Toont de pagina\'s en berichten van deze site.',
+    'serve-sitemap-taken' => 'Een andere plugin beantwoordt :url al. De jouwe wordt niet aangeboden: zet dit uit of verwijder de andere plugin.',
+    'serve-sitemap-live' => 'Je sitemap staat op :url. Dien hem in bij Google Search Console.',
 ];

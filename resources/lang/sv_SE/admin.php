@@ -36,4 +36,8 @@ return [
     'no-urls' => 'Inga sidor att skicka in hittades.',
     'source-core' => '{0}Ingen webbplatskarta hittades, och inga sidor heller.|[1,*]Ingen webbplatskarta hittades — den här webbplatsens :count sidor används i stället.',
     'sitemap-foreign' => 'Webbplatskartan måste ligga på den här webbplatsen. IndexNow godtar bara adresser på din egen domän.',
+    'serve-sitemap' => 'Tillhandahåll en egen webbplatskarta',
+    'serve-sitemap-hint' => 'Bara för webbplatser som saknar webbplatskarta helt. Ett webbplatskarte- eller SEO-tillägg gör det bättre — och Google, som ignorerar IndexNow, behöver en. Listar sidorna och inläggen på den här webbplatsen.',
+    'serve-sitemap-taken' => 'Ett annat tillägg svarar redan på :url. Din tillhandahålls inte — stäng av det här eller avinstallera det andra tillägget.',
+    'serve-sitemap-live' => 'Din webbplatskarta finns på :url. Skicka in den i Google Search Console.',
 ];

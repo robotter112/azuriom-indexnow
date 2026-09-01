@@ -36,4 +36,8 @@ return [
     'no-urls' => 'Aucune page à soumettre.',
     'source-core' => '{0}Aucun sitemap trouvé, ni aucune page.|[1,*]Aucun sitemap trouvé — les :count pages de ce site sont utilisées à la place.',
     'sitemap-foreign' => 'Le sitemap doit se trouver sur ce site. IndexNow n\'accepte que les adresses de votre propre domaine.',
+    'serve-sitemap' => 'Fournir un sitemap moi-même',
+    'serve-sitemap-hint' => 'Uniquement pour les sites sans aucun sitemap. Un plugin sitemap ou SEO le fait mieux — et Google, qui ignore IndexNow, en a besoin. Liste les pages et articles de ce site.',
+    'serve-sitemap-taken' => 'Un autre plugin répond déjà à :url. Le vôtre n\'est pas servi — désactivez ceci ou désinstallez l\'autre plugin.',
+    'serve-sitemap-live' => 'Votre sitemap est disponible à :url. Soumettez-le dans la Google Search Console.',
 ];

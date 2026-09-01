@@ -36,4 +36,8 @@ return [
     'no-urls' => 'Nerasta puslapių, kuriuos būtų galima pateikti.',
     'source-core' => '{0}Nerasta nei svetainės žemėlapio, nei puslapių.|[1,*]Svetainės žemėlapis nerastas — vietoj jo naudojami šios svetainės puslapiai: :count.',
     'sitemap-foreign' => 'Svetainės žemėlapis turi būti šioje svetainėje. IndexNow priima tik savo domeno adresus.',
+    'serve-sitemap' => 'Pačiam teikti svetainės žemėlapį',
+    'serve-sitemap-hint' => 'Tik svetainėms, kurios visai neturi žemėlapio. Svetainės žemėlapio ar SEO papildinys tai padaro geriau — o Google, kuris IndexNow nepalaiko, jo reikalauja. Išvardija šios svetainės puslapius ir įrašus.',
+    'serve-sitemap-taken' => 'Į :url jau atsako kitas papildinys. Jūsų neteikiamas — išjunkite tai arba pašalinkite kitą papildinį.',
+    'serve-sitemap-live' => 'Jūsų svetainės žemėlapis pasiekiamas adresu :url. Pateikite jį Google Search Console.',
 ];

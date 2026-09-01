@@ -36,4 +36,8 @@ return [
     'no-urls' => 'Nem található beküldhető oldal.',
     'source-core' => '{0}Nem található sem oldaltérkép, sem oldal.|[1,*]Nem található oldaltérkép — helyette az oldal :count lapja kerül felhasználásra.',
     'sitemap-foreign' => 'Az oldaltérképnek ezen az oldalon kell lennie. Az IndexNow csak a saját domain címeit fogadja el.',
+    'serve-sitemap' => 'Saját oldaltérkép kiszolgálása',
+    'serve-sitemap-hint' => 'Csak olyan oldalakhoz, amelyeknek egyáltalán nincs oldaltérképe. Egy oldaltérkép- vagy SEO-bővítmény ezt jobban csinálja — és a Google, amely az IndexNow-t figyelmen kívül hagyja, igényel egyet. Felsorolja az oldal lapjait és bejegyzéseit.',
+    'serve-sitemap-taken' => 'A :url címre már egy másik bővítmény válaszol. A tiéd nem kerül kiszolgálásra — kapcsold ki ezt, vagy távolítsd el a másikat.',
+    'serve-sitemap-live' => 'Az oldaltérképed elérhető itt: :url. Küldd be a Google Search Console-ba.',
 ];

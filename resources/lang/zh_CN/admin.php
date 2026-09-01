@@ -36,4 +36,8 @@ return [
     'no-urls' => '没有找到可提交的页面。',
     'source-core' => '{0}未找到站点地图，也没有页面。|[1,*]未找到站点地图 — 改用本站的 :count 个页面。',
     'sitemap-foreign' => '站点地图必须位于本站。IndexNow 只接受你自己域名下的地址。',
+    'serve-sitemap' => '自行提供站点地图',
+    'serve-sitemap-hint' => '仅适用于完全没有站点地图的网站。站点地图或 SEO 插件做得更好，而不支持 IndexNow 的谷歌需要它。列出本站的页面和文章。',
+    'serve-sitemap-taken' => ':url 已由其他插件响应。你的不会被提供 — 关闭此项或卸载那个插件。',
+    'serve-sitemap-live' => '你的站点地图位于 :url。请在 Google Search Console 中提交。',
 ];

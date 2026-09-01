@@ -36,4 +36,8 @@ return [
     'no-urls' => 'No se encontraron páginas que enviar.',
     'source-core' => '{0}No se encontró sitemap ni páginas.|[1,*]No se encontró sitemap: se usan en su lugar las :count páginas de este sitio.',
     'sitemap-foreign' => 'El sitemap debe estar en este sitio. IndexNow solo acepta direcciones de tu propio dominio.',
+    'serve-sitemap' => 'Servir un sitemap propio',
+    'serve-sitemap-hint' => 'Solo para sitios que no tienen ningún sitemap. Un plugin de sitemap o SEO lo hace mejor, y Google, que ignora IndexNow, necesita uno. Lista las páginas y entradas de este sitio.',
+    'serve-sitemap-taken' => 'Otro plugin ya responde a :url. El tuyo no se sirve: desactiva esto o desinstala el otro plugin.',
+    'serve-sitemap-live' => 'Tu sitemap está disponible en :url. Envíalo en Google Search Console.',
 ];

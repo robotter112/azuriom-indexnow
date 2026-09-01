@@ -5,8 +5,10 @@ namespace Azuriom\Plugin\Indexnow\Controllers\Admin;
 use Azuriom\Http\Controllers\Controller;
 use Azuriom\Models\Setting;
 use Azuriom\Plugin\Indexnow\Client;
+use Azuriom\Plugin\Indexnow\Controllers\SitemapController;
 use Azuriom\Plugin\Indexnow\UrlSource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class AdminController extends Controller
 {
@@ -23,6 +25,9 @@ class AdminController extends Controller
             'sitemapCount' => count($collected['urls']),
             'urlSource' => $collected['source'],
             'auto' => (bool) setting('indexnow.auto', true),
+            'serveSitemap' => (bool) setting('indexnow.serve_sitemap'),
+            'sitemapServedBy' => SitemapController::servedBy(),
+            'ownSitemapUrl' => url('/sitemap.xml'),
         ]);
     }
 
@@ -118,12 +123,16 @@ class AdminController extends Controller
                 }
             }],
             'auto' => ['nullable', 'boolean'],
+            'serve_sitemap' => ['nullable', 'boolean'],
         ]);
 
         Setting::updateSettings([
             'indexnow.sitemap' => $validated['sitemap'] ?: null,
             'indexnow.auto' => $request->boolean('auto') ? '1' : '0',
+            'indexnow.serve_sitemap' => $request->boolean('serve_sitemap') ? '1' : '0',
         ]);
+
+        Cache::forget('indexnow.sitemap');
 
         return to_route('indexnow.admin.index')->with('success', trans('indexnow::admin.saved'));
     }

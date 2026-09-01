@@ -36,4 +36,8 @@ return [
     'no-urls' => 'Gönderilecek sayfa bulunamadı.',
     'source-core' => '{0}Ne site haritası ne de sayfa bulundu.|[1,*]Site haritası bulunamadı — bunun yerine bu sitenin :count sayfası kullanılıyor.',
     'sitemap-foreign' => 'Site haritası bu sitede olmalı. IndexNow yalnızca kendi alan adınızın adreslerini kabul eder.',
+    'serve-sitemap' => 'Kendi site haritamı sun',
+    'serve-sitemap-hint' => 'Yalnızca hiç site haritası olmayan siteler için. Bir site haritası veya SEO eklentisi bunu daha iyi yapar — ve IndexNow\'u yok sayan Google buna ihtiyaç duyar. Bu sitenin sayfalarını ve yazılarını listeler.',
+    'serve-sitemap-taken' => ':url adresine zaten başka bir eklenti yanıt veriyor. Seninki sunulmuyor — bunu kapat ya da diğer eklentiyi kaldır.',
+    'serve-sitemap-live' => 'Site haritan :url adresinde. Google Search Console\'a gönder.',
 ];
