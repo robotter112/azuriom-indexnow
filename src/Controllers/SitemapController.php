@@ -64,9 +64,9 @@ class SitemapController extends Controller
      */
     public static function cacheMinutes(): int
     {
-        $wert = setting('seo.cache_minutes');
+        $value = setting('seo.cache_minutes');
 
-        return $wert !== null ? (int) $wert : (self::fileConfig()['cache_minutes'] ?? 60);
+        return $value !== null ? (int) $value : (self::fileConfig()['cache_minutes'] ?? 60);
     }
 
     /**
@@ -74,10 +74,10 @@ class SitemapController extends Controller
      */
     public static function excludePatterns(): array
     {
-        $gespeichert = setting('seo.exclude');
+        $stored = setting('seo.exclude');
 
-        if ($gespeichert !== null) {
-            return json_decode($gespeichert, true) ?: [];
+        if ($stored !== null) {
+            return json_decode($stored, true) ?: [];
         }
 
         return self::fileConfig()['exclude'] ?? [];
@@ -85,10 +85,10 @@ class SitemapController extends Controller
 
     public static function canonicalEnabled(): bool
     {
-        $wert = setting('seo.canonical');
+        $value = setting('seo.canonical');
 
-        return $wert !== null
-            ? (bool) $wert
+        return $value !== null
+            ? (bool) $value
             : (self::fileConfig()['canonical'] ?? true);
     }
 
@@ -99,10 +99,10 @@ class SitemapController extends Controller
      */
     public static function canonicalKeptParameters(): array
     {
-        $gespeichert = setting('seo.canonical_keep');
+        $stored = setting('seo.canonical_keep');
 
-        if ($gespeichert !== null) {
-            return json_decode($gespeichert, true) ?: [];
+        if ($stored !== null) {
+            return json_decode($stored, true) ?: [];
         }
 
         return self::fileConfig()['canonical_keep'] ?? CanonicalUrl::DEFAULT_KEPT;

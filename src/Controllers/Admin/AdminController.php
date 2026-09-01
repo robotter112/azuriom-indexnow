@@ -86,10 +86,10 @@ class AdminController extends Controller
 
         foreach ($urls as $url) {
             try {
-                $antwort = Http::withoutRedirecting()->timeout(10)->get($url);
-                $status = $antwort->status();
+                $response = Http::withoutRedirecting()->timeout(10)->get($url);
+                $status = $response->status();
                 // The body is already here, so the on-page checks cost nothing.
-                $issues = $status === 200 ? SeoCheck::issues($antwort->body()) : [];
+                $issues = $status === 200 ? SeoCheck::issues($response->body()) : [];
             } catch (\Throwable $e) {
                 $status = 0;
                 $issues = [];
@@ -116,21 +116,21 @@ class AdminController extends Controller
      */
     public function robots()
     {
-        $pfad = public_path('robots.txt');
-        $zeile = 'Sitemap: '.route('seo.index');
+        $path = public_path('robots.txt');
+        $line = 'Sitemap: '.route('seo.index');
 
-        if (! is_writable($pfad) && file_exists($pfad)) {
+        if (! is_writable($path) && file_exists($path)) {
             return to_route('seo.admin.index')
-                ->with('error', trans('seo::admin.robots-not-writable', ['path' => $pfad]));
+                ->with('error', trans('seo::admin.robots-not-writable', ['path' => $path]));
         }
 
-        $inhalt = file_exists($pfad) ? rtrim(file_get_contents($pfad), "\r\n") : "User-agent: *\nDisallow:";
+        $inhalt = file_exists($path) ? rtrim(file_get_contents($path), "\r\n") : "User-agent: *\nDisallow:";
 
-        if (! str_contains($inhalt, $zeile)) {
-            $inhalt .= "\n\n".$zeile;
+        if (! str_contains($inhalt, $line)) {
+            $inhalt .= "\n\n".$line;
         }
 
-        file_put_contents($pfad, $inhalt."\n");
+        file_put_contents($path, $inhalt."\n");
 
         return to_route('seo.admin.index')
             ->with('success', trans('seo::admin.robots-written'));
@@ -141,15 +141,15 @@ class AdminController extends Controller
      */
     protected function robotsState(): array
     {
-        $pfad = public_path('robots.txt');
-        $vorhanden = file_exists($pfad);
+        $path = public_path('robots.txt');
+        $exists = file_exists($path);
 
         return [
-            'exists' => $vorhanden,
-            'hasSitemap' => $vorhanden
-                && str_contains(file_get_contents($pfad), 'Sitemap: '.route('seo.index')),
-            'writable' => $vorhanden ? is_writable($pfad) : is_writable(dirname($pfad)),
-            'path' => $pfad,
+            'exists' => $exists,
+            'hasSitemap' => $exists
+                && str_contains(file_get_contents($path), 'Sitemap: '.route('seo.index')),
+            'writable' => $exists ? is_writable($path) : is_writable(dirname($path)),
+            'path' => $path,
         ];
     }
 
@@ -162,25 +162,25 @@ class AdminController extends Controller
     public function indexNowEnable()
     {
         $key = IndexNow::generateKey();
-        $datei = public_path(IndexNow::keyFileName($key));
+        $file = public_path(IndexNow::keyFileName($key));
 
-        if (! is_writable(dirname($datei))) {
+        if (! is_writable(dirname($file))) {
             return to_route('seo.admin.index')
-                ->with('error', trans('seo::admin.indexnow-not-writable', ['path' => dirname($datei)]));
+                ->with('error', trans('seo::admin.indexnow-not-writable', ['path' => dirname($file)]));
         }
 
-        file_put_contents($datei, $key);
+        file_put_contents($file, $key);
 
         $url = url(IndexNow::keyFileName($key));
-        $pruefung = IndexNow::verifyKeyFile($key, $url);
+        $verification = IndexNow::verifyKeyFile($key, $url);
 
-        if (! $pruefung['ok']) {
+        if (! $verification['ok']) {
             // Do not leave a stray file behind for a setup that did not work.
-            @unlink($datei);
+            @unlink($file);
 
             return to_route('seo.admin.index')->with('error', trans(
-                'seo::admin.indexnow-verify-'.$pruefung['reason'],
-                ['url' => $url, 'status' => $pruefung['status'] ?? 0]
+                'seo::admin.indexnow-verify-'.$verification['reason'],
+                ['url' => $url, 'status' => $verification['status'] ?? 0]
             ));
         }
 
@@ -217,20 +217,20 @@ class AdminController extends Controller
         }
 
         $sitemapUrl = route('seo.index');
-        $ergebnis = IndexNow::submit(
+        $result = IndexNow::submit(
             IndexNow::hostFor($sitemapUrl),
             $key,
             url(IndexNow::keyFileName($key)),
             collect($this->urls())->pluck('loc')->all()
         );
 
-        $text = trans('seo::admin.indexnow-result-'.$ergebnis['reason'], [
-            'count' => $ergebnis['count'],
-            'status' => $ergebnis['status'],
+        $text = trans('seo::admin.indexnow-result-'.$result['reason'], [
+            'count' => $result['count'],
+            'status' => $result['status'],
         ]);
 
         return to_route('seo.admin.index')
-            ->with($ergebnis['ok'] ? 'success' : 'error', $text);
+            ->with($result['ok'] ? 'success' : 'error', $text);
     }
 
     /**

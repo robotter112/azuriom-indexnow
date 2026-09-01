@@ -25,56 +25,56 @@ require __DIR__.'/../src/IndexNow.php';
 
 use Azuriom\Plugin\Seo\IndexNow;
 
-$fehler = 0;
+$failures = 0;
 
-function pruefe(string $name, $erwartet, $tatsaechlich): void
+function check(string $name, $expected, $actual): void
 {
-    global $fehler;
+    global $failures;
 
-    if ($erwartet === $tatsaechlich) {
+    if ($expected === $actual) {
         echo "  ok    {$name}\n";
 
         return;
     }
 
-    $fehler++;
+    $failures++;
     echo "  FAIL  {$name}\n";
-    echo '        erwartet:     '.var_export($erwartet, true)."\n";
-    echo '        tatsaechlich: '.var_export($tatsaechlich, true)."\n";
+    echo '        expected: '.var_export($expected, true)."\n";
+    echo '        actual:   '.var_export($actual, true)."\n";
 }
 
 $key = IndexNow::generateKey();
 
-pruefe('Schluessel ist hexadezimal', 1, preg_match('/^[a-f0-9]+$/', $key));
-pruefe('Schluessellaenge liegt im erlaubten Bereich 8-128', true,
+check('key is hexadecimal', 1, preg_match('/^[a-f0-9]+$/', $key));
+check('key length is within the allowed 8-128', true,
     strlen($key) >= 8 && strlen($key) <= 128);
-pruefe('zwei Schluessel sind verschieden', true, IndexNow::generateKey() !== IndexNow::generateKey());
-pruefe('Dateiname haengt .txt an', $key.'.txt', IndexNow::keyFileName($key));
+check('two keys differ', true, IndexNow::generateKey() !== IndexNow::generateKey());
+check('file name appends .txt', $key.'.txt', IndexNow::keyFileName($key));
 
-pruefe('Host ohne Schema und Pfad', 'example.com',
+check('host without scheme and path', 'example.com',
     IndexNow::hostFor('https://example.com/sitemap.xml'));
-pruefe('Host wird kleingeschrieben', 'example.com',
+check('host is lowercased', 'example.com',
     IndexNow::hostFor('https://EXAMPLE.com/'));
-pruefe('Host mit Subdomain', 'www.example.com',
+check('host with subdomain', 'www.example.com',
     IndexNow::hostFor('https://www.example.com/a/b?c=d'));
-pruefe('kaputte URL gibt leeren Host', '', IndexNow::hostFor('kein-url'));
+check('broken URL yields an empty host', '', IndexNow::hostFor('not-a-url'));
 
-pruefe('200 heisst angenommen', 'accepted', IndexNow::reasonFor(200));
-pruefe('202 heisst Pruefung ausstehend', 'pending', IndexNow::reasonFor(202));
-pruefe('403 heisst Schluessel ungueltig', 'key-invalid', IndexNow::reasonFor(403));
-pruefe('422 heisst Adressen passen nicht zum Host', 'mismatch', IndexNow::reasonFor(422));
-pruefe('429 heisst zu viele Anfragen', 'too-many', IndexNow::reasonFor(429));
-pruefe('unbekannter Code faellt auf unknown', 'unknown', IndexNow::reasonFor(500));
+check('200 means accepted', 'accepted', IndexNow::reasonFor(200));
+check('202 means validation pending', 'pending', IndexNow::reasonFor(202));
+check('403 means key invalid', 'key-invalid', IndexNow::reasonFor(403));
+check('422 means URLs do not match the host', 'mismatch', IndexNow::reasonFor(422));
+check('429 means too many requests', 'too-many', IndexNow::reasonFor(429));
+check('unknown code falls back to unknown', 'unknown', IndexNow::reasonFor(500));
 
-pruefe('leere Liste wird gar nicht erst gesendet',
+check('an empty list is not sent at all',
     ['ok' => false, 'reason' => 'empty', 'status' => 0, 'count' => 0],
     IndexNow::submit('example.com', $key, 'https://example.com/k.txt', []));
 
 echo "\n";
 
-if ($fehler > 0) {
-    echo "{$fehler} Pruefung(en) fehlgeschlagen.\n";
+if ($failures > 0) {
+    echo "{$failures} check(s) failed.\n";
     exit(1);
 }
 
-echo "Alle Pruefungen bestanden.\n";
+echo "All checks passed.\n";

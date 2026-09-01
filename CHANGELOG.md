@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Variable names, comments and test output are English throughout. The Azuriom
+  market requires everything outside the `lang` folder to be in English, and
+  parts of the code still carried German identifiers from development.
+
 ## [1.4.0] - 2026-09-01
 
 ### Added

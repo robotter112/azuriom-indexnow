@@ -13,81 +13,81 @@ require __DIR__.'/../src/CanonicalUrl.php';
 
 use Azuriom\Plugin\Seo\CanonicalUrl;
 
-$fehler = 0;
+$failures = 0;
 
-function pruefe(string $name, $erwartet, $tatsaechlich): void
+function check(string $name, $expected, $actual): void
 {
-    global $fehler;
+    global $failures;
 
-    if ($erwartet === $tatsaechlich) {
+    if ($expected === $actual) {
         echo "  ok    {$name}\n";
 
         return;
     }
 
-    $fehler++;
+    $failures++;
     echo "  FAIL  {$name}\n";
-    echo "        erwartet:     ".var_export($erwartet, true)."\n";
-    echo "        tatsaechlich: ".var_export($tatsaechlich, true)."\n";
+    echo "        expected: ".var_export($expected, true)."\n";
+    echo "        actual:   ".var_export($actual, true)."\n";
 }
 
-pruefe('URL ohne Parameter bleibt',
+check('URL without parameters is unchanged',
     'https://example.com/news',
     CanonicalUrl::build('https://example.com/news'));
 
-pruefe('Startseite behaelt ihren Schraegstrich',
+check('home page keeps its trailing slash',
     'https://example.com/',
     CanonicalUrl::build('https://example.com/'));
 
-pruefe('Tracking-Parameter faellt weg',
+check('tracking parameter is dropped',
     'https://example.com/',
     CanonicalUrl::build('https://example.com/?ref=abc123'));
 
-pruefe('Cache-Buster faellt weg',
+check('cache buster is dropped',
     'https://example.com/news',
     CanonicalUrl::build('https://example.com/news?cb=99'));
 
-pruefe('utm-Parameter fallen weg',
+check('utm parameters are dropped',
     'https://example.com/wiki/faq',
     CanonicalUrl::build('https://example.com/wiki/faq?utm_source=x&utm_medium=y'));
 
-pruefe('Seitenzahl bleibt erhalten',
+check('page number is kept',
     'https://example.com/forum?page=2',
     CanonicalUrl::build('https://example.com/forum?page=2'));
 
-pruefe('Seitenzahl bleibt, Rest faellt weg',
+check('page number kept, rest dropped',
     'https://example.com/forum?page=3',
     CanonicalUrl::build('https://example.com/forum?page=3&ref=abc&utm_source=x'));
 
-pruefe('Reihenfolge der Parameter ist egal',
+check('parameter order does not matter',
     CanonicalUrl::build('https://example.com/a?page=2&sort=x', ['page', 'sort']),
     CanonicalUrl::build('https://example.com/a?sort=x&page=2', ['page', 'sort']));
 
-pruefe('Schraegstrich am Ende eines Unterpfads faellt weg',
+check('trailing slash on a sub path is dropped',
     'https://example.com/news',
     CanonicalUrl::build('https://example.com/news/'));
 
-pruefe('Port bleibt erhalten',
+check('port is kept',
     'https://example.com:8443/news',
     CanonicalUrl::build('https://example.com:8443/news?ref=a'));
 
-pruefe('http bleibt http',
+check('http stays http',
     'http://example.com/news',
     CanonicalUrl::build('http://example.com/news'));
 
-pruefe('leere Whitelist wirft alle Parameter weg',
+check('empty allow list drops every parameter',
     'https://example.com/forum',
     CanonicalUrl::build('https://example.com/forum?page=2', []));
 
-pruefe('Unsinn wird unveraendert durchgereicht',
-    'kein-url',
-    CanonicalUrl::build('kein-url'));
+check('nonsense is passed through unchanged',
+    'not-a-url',
+    CanonicalUrl::build('not-a-url'));
 
 echo "\n";
 
-if ($fehler > 0) {
-    echo "{$fehler} Pruefung(en) fehlgeschlagen.\n";
+if ($failures > 0) {
+    echo "{$failures} check(s) failed.\n";
     exit(1);
 }
 
-echo "Alle Pruefungen bestanden.\n";
+echo "All checks passed.\n";

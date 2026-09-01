@@ -70,8 +70,8 @@ class SeoCheck
             // A missing alt and an empty one both count: alt="" tells a screen
             // reader "decorative", which is wrong for a logo that is the only
             // content of a link.
-            $hasAlt = preg_match('/\balt\s*=\s*(["\'])(.*?)\1/is', $tag, $treffer)
-                && trim($treffer[2]) !== '';
+            $hasAlt = preg_match('/\balt\s*=\s*(["\'])(.*?)\1/is', $tag, $matches)
+                && trim($matches[2]) !== '';
 
             if (! $hasAlt) {
                 $withoutAlt++;
@@ -90,11 +90,11 @@ class SeoCheck
      */
     public static function title(string $html): ?string
     {
-        if (! preg_match('/<title[^>]*>(.*?)<\/title>/is', $html, $treffer)) {
+        if (! preg_match('/<title[^>]*>(.*?)<\/title>/is', $html, $matches)) {
             return null;
         }
 
-        $title = trim(html_entity_decode(strip_tags($treffer[1]), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+        $title = trim(html_entity_decode(strip_tags($matches[1]), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 
         return mb_strlen($title) > self::TITLE_MAX
             ? mb_substr($title, 0, self::TITLE_MAX).'…'
@@ -105,7 +105,7 @@ class SeoCheck
     {
         $pattern = '/<meta[^>]*name=(["\'])'.preg_quote($name, '/').'\1[^>]*content=(["\'])(.*?)\2/is';
 
-        return preg_match($pattern, $html, $treffer) ? $treffer[3] : null;
+        return preg_match($pattern, $html, $matches) ? $matches[3] : null;
     }
 
     /**
@@ -113,8 +113,8 @@ class SeoCheck
      */
     protected static function matchAll(string $pattern, string $subject): array
     {
-        preg_match_all($pattern, $subject, $treffer);
+        preg_match_all($pattern, $subject, $matches);
 
-        return $treffer[0] ?? [];
+        return $matches[0] ?? [];
     }
 }

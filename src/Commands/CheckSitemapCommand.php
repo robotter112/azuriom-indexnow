@@ -30,9 +30,9 @@ class CheckSitemapCommand extends Command
 
         foreach ($urls as $url) {
             try {
-                $antwort = Http::withoutRedirecting()->timeout(10)->get($url);
-                $status = $antwort->status();
-                $issues = $status === 200 ? SeoCheck::issues($antwort->body()) : [];
+                $response = Http::withoutRedirecting()->timeout(10)->get($url);
+                $status = $response->status();
+                $issues = $status === 200 ? SeoCheck::issues($response->body()) : [];
             } catch (\Throwable $e) {
                 $status = 0;
                 $issues = [];
@@ -50,8 +50,8 @@ class CheckSitemapCommand extends Command
                 $this->line("  <fg=yellow>SEO</> {$url}");
 
                 foreach ($issues as $issue) {
-                    $zahl = isset($issue['count']) ? ' ('.$issue['count'].')' : '';
-                    $this->line('        - '.$issue['key'].$zahl);
+                    $number = isset($issue['count']) ? ' ('.$issue['count'].')' : '';
+                    $this->line('        - '.$issue['key'].$number);
                 }
             }
         }

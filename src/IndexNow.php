@@ -46,16 +46,16 @@ class IndexNow
     public static function verifyKeyFile(string $key, string $url): array
     {
         try {
-            $antwort = Http::timeout(15)->get($url);
+            $response = Http::timeout(15)->get($url);
         } catch (\Throwable $e) {
             return ['ok' => false, 'reason' => 'unreachable'];
         }
 
-        if ($antwort->status() !== 200) {
-            return ['ok' => false, 'reason' => 'status', 'status' => $antwort->status()];
+        if ($response->status() !== 200) {
+            return ['ok' => false, 'reason' => 'status', 'status' => $response->status()];
         }
 
-        return trim($antwort->body()) === $key
+        return trim($response->body()) === $key
             ? ['ok' => true, 'reason' => 'ok']
             : ['ok' => false, 'reason' => 'content'];
     }
@@ -75,7 +75,7 @@ class IndexNow
         }
 
         try {
-            $antwort = Http::timeout(30)->post(self::ENDPOINT, [
+            $response = Http::timeout(30)->post(self::ENDPOINT, [
                 'host' => $host,
                 'key' => $key,
                 'keyLocation' => $keyLocation,
@@ -86,9 +86,9 @@ class IndexNow
         }
 
         return [
-            'ok' => in_array($antwort->status(), [200, 202], true),
-            'reason' => self::reasonFor($antwort->status()),
-            'status' => $antwort->status(),
+            'ok' => in_array($response->status(), [200, 202], true),
+            'reason' => self::reasonFor($response->status()),
+            'status' => $response->status(),
             'count' => count($urls),
         ];
     }

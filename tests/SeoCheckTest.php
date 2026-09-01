@@ -13,22 +13,22 @@ require __DIR__.'/../src/SeoCheck.php';
 
 use Azuriom\Plugin\Seo\SeoCheck;
 
-$fehler = 0;
+$failures = 0;
 
-function pruefe(string $name, $erwartet, $tatsaechlich): void
+function check(string $name, $expected, $actual): void
 {
-    global $fehler;
+    global $failures;
 
-    if ($erwartet === $tatsaechlich) {
+    if ($expected === $actual) {
         echo "  ok    {$name}\n";
 
         return;
     }
 
-    $fehler++;
+    $failures++;
     echo "  FAIL  {$name}\n";
-    echo '        erwartet:     '.json_encode($erwartet)."\n";
-    echo '        tatsaechlich: '.json_encode($tatsaechlich)."\n";
+    echo '        expected: '.json_encode($expected)."\n";
+    echo '        actual:   '.json_encode($actual)."\n";
 }
 
 /** @return array<int, string> */
@@ -37,66 +37,66 @@ function keys(string $html): array
     return array_column(SeoCheck::issues($html), 'key');
 }
 
-$gut = '<html><head><title>Eine Seite</title>'
+$good = '<html><head><title>A page</title>'
     .'<meta name="description" content="'.str_repeat('a', 120).'"></head>'
     .'<body><h1>Titel</h1><img src="a.png" alt="Ein Bild"></body></html>';
 
-pruefe('saubere Seite meldet nichts', [], keys($gut));
+check('clean page reports nothing', [], keys($good));
 
-pruefe('kein h1', ['h1-missing'], keys(
+check('no h1', ['h1-missing'], keys(
     '<title>T</title><meta name="description" content="'.str_repeat('a', 120).'">'
 ));
 
-pruefe('mehrere h1', ['h1-multiple'], keys(
+check('multiple h1', ['h1-multiple'], keys(
     '<title>T</title><meta name="description" content="'.str_repeat('a', 120).'">'
     .'<h1>A</h1><h1 class="x">B</h1>'
 ));
 
-pruefe('h1-Anzahl wird mitgeliefert', 3, SeoCheck::issues(
+check('h1 count is included', 3, SeoCheck::issues(
     '<title>T</title><meta name="description" content="'.str_repeat('a', 120).'">'
     .'<h1>A</h1><h1>B</h1><h1>C</h1>'
 )[0]['count']);
 
-pruefe('Beschreibung fehlt', ['description-missing'], keys('<title>T</title><h1>A</h1>'));
+check('description missing', ['description-missing'], keys('<title>T</title><h1>A</h1>'));
 
-pruefe('Beschreibung zu kurz', ['description-short'], keys(
+check('description too short', ['description-short'], keys(
     '<title>T</title><meta name="description" content="Zu kurz"><h1>A</h1>'
 ));
 
-pruefe('Beschreibung zu lang', ['description-long'], keys(
+check('description too long', ['description-long'], keys(
     '<title>T</title><meta name="description" content="'.str_repeat('a', 200).'"><h1>A</h1>'
 ));
 
-pruefe('Titel fehlt', ['title-missing'], keys(
+check('title missing', ['title-missing'], keys(
     '<meta name="description" content="'.str_repeat('a', 120).'"><h1>A</h1>'
 ));
 
-pruefe('leerer Titel zaehlt als fehlend', ['title-missing'], keys(
+check('blank title counts as missing', ['title-missing'], keys(
     '<title>   </title><meta name="description" content="'.str_repeat('a', 120).'"><h1>A</h1>'
 ));
 
 $ohneAlt = '<title>T</title><meta name="description" content="'.str_repeat('a', 120).'"><h1>A</h1>'
-    .'<img src="1.png">'                 // alt fehlt ganz
-    .'<img src="2.png" alt="">'          // alt leer
-    .'<img src="3.png" alt="   ">'       // alt nur Leerzeichen
-    .'<img src="4.png" alt="Gut">';      // in Ordnung
+    .'<img src="1.png">'                 // alt missing entirely
+    .'<img src="2.png" alt="">'          // alt empty
+    .'<img src="3.png" alt="   ">'       // alt is whitespace only
+    .'<img src="4.png" alt="Gut">';      // fine
 
-pruefe('Bilder ohne brauchbares alt', ['images-without-alt'], keys($ohneAlt));
-pruefe('davon genau drei', 3, SeoCheck::issues($ohneAlt)[0]['count']);
+check('images without a usable alt', ['images-without-alt'], keys($ohneAlt));
+check('exactly three of them', 3, SeoCheck::issues($ohneAlt)[0]['count']);
 
-pruefe('einfache Anfuehrungszeichen im alt', [], keys(
+check('single quotes around alt', [], keys(
     "<title>T</title><meta name='description' content='".str_repeat('a', 120)."'><h1>A</h1>"
     ."<img src='1.png' alt='Gut'>"
 ));
 
-pruefe('Titel wird gekuerzt geliefert', 'Eine Seite', SeoCheck::title($gut));
-pruefe('kein Titel gibt null', null, SeoCheck::title('<h1>A</h1>'));
+check('title comes back trimmed', 'A page', SeoCheck::title($good));
+check('no title returns null', null, SeoCheck::title('<h1>A</h1>'));
 
 echo "\n";
 
-if ($fehler > 0) {
-    echo "{$fehler} Pruefung(en) fehlgeschlagen.\n";
+if ($failures > 0) {
+    echo "{$failures} check(s) failed.\n";
     exit(1);
 }
 
-echo "Alle Pruefungen bestanden.\n";
+echo "All checks passed.\n";

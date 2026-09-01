@@ -116,44 +116,44 @@
     </div>
 
     @if(session('checked'))
-        @php($ergebnis = session('checked'))
-        @php($statusFehler = collect($ergebnis['bad'])->where('status', '!=', 200))
-        @php($seoFaelle = collect($ergebnis['bad'])->where('status', 200)->filter(fn ($e) => ! empty($e['issues'])))
+        @php($result = session('checked'))
+        @php($statusFailures = collect($result['bad'])->where('status', '!=', 200))
+        @php($seoIssues = collect($result['bad'])->where('status', 200)->filter(fn ($e) => ! empty($e['issues'])))
 
         <div class="card shadow mb-4">
             <div class="card-body">
-                @if($statusFehler->isEmpty() && $seoFaelle->isEmpty())
+                @if($statusFailures->isEmpty() && $seoIssues->isEmpty())
                     <div class="alert alert-success mb-0">
-                        @lang('seo::admin.check-all-ok', ['count' => $ergebnis['total']])
+                        @lang('seo::admin.check-all-ok', ['count' => $result['total']])
                     </div>
                 @endif
 
-                @if($statusFehler->isNotEmpty())
+                @if($statusFailures->isNotEmpty())
                     <div class="alert alert-warning">
                         @lang('seo::admin.check-bad', [
-                            'count' => $statusFehler->count(),
-                            'total' => $ergebnis['total'],
+                            'count' => $statusFailures->count(),
+                            'total' => $result['total'],
                         ])
                     </div>
                     <ul class="list-group mb-4">
-                        @foreach($statusFehler as $eintrag)
+                        @foreach($statusFailures as $entry)
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span class="text-break">{{ $eintrag['url'] }}</span>
-                                <span class="badge bg-danger">{{ $eintrag['status'] ?: '—' }}</span>
+                                <span class="text-break">{{ $entry['url'] }}</span>
+                                <span class="badge bg-danger">{{ $entry['status'] ?: '—' }}</span>
                             </li>
                         @endforeach
                     </ul>
                 @endif
 
-                @if($seoFaelle->isNotEmpty())
+                @if($seoIssues->isNotEmpty())
                     <h3 class="h6">@lang('seo::admin.issues-title')</h3>
                     <p class="text-muted small">@lang('seo::admin.issues-hint')</p>
                     <ul class="list-group">
-                        @foreach($seoFaelle as $eintrag)
+                        @foreach($seoIssues as $entry)
                             <li class="list-group-item">
-                                <div class="text-break mb-1">{{ $eintrag['url'] }}</div>
+                                <div class="text-break mb-1">{{ $entry['url'] }}</div>
                                 <ul class="mb-0 small text-muted">
-                                    @foreach($eintrag['issues'] as $issue)
+                                    @foreach($entry['issues'] as $issue)
                                         <li>
                                             @lang('seo::admin.issue.'.$issue['key'], ['count' => $issue['count'] ?? 0])
                                         </li>
@@ -164,9 +164,9 @@
                     </ul>
                 @endif
 
-                @if($ergebnis['capped'])
+                @if($result['capped'])
                     <p class="text-muted small mt-2 mb-0">
-                        @lang('seo::admin.check-capped', ['limit' => $ergebnis['total']])
+                        @lang('seo::admin.check-capped', ['limit' => $result['total']])
                     </p>
                 @endif
             </div>

@@ -23,41 +23,41 @@ class CanonicalUrl
      */
     public static function build(string $url, array $kept = self::DEFAULT_KEPT): string
     {
-        $teile = parse_url($url);
+        $parts = parse_url($url);
 
-        if ($teile === false || ! isset($teile['host'])) {
+        if ($parts === false || ! isset($parts['host'])) {
             return $url;
         }
 
-        $basis = ($teile['scheme'] ?? 'https').'://'.$teile['host']
-            .(isset($teile['port']) ? ':'.$teile['port'] : '')
-            .($teile['path'] ?? '/');
+        $base = ($parts['scheme'] ?? 'https').'://'.$parts['host']
+            .(isset($parts['port']) ? ':'.$parts['port'] : '')
+            .($parts['path'] ?? '/');
 
         // A trailing slash on a sub path makes the same page look like a second
         // address; the root keeps its slash because "https://example.com" alone
         // is not a path.
-        $pfad = parse_url($basis, PHP_URL_PATH);
+        $path = parse_url($base, PHP_URL_PATH);
 
-        if ($pfad !== null && $pfad !== '/' && str_ends_with($basis, '/')) {
-            $basis = rtrim($basis, '/');
+        if ($path !== null && $path !== '/' && str_ends_with($base, '/')) {
+            $base = rtrim($base, '/');
         }
 
-        if (! isset($teile['query']) || $kept === []) {
-            return $basis;
+        if (! isset($parts['query']) || $kept === []) {
+            return $base;
         }
 
-        parse_str($teile['query'], $parameter);
+        parse_str($parts['query'], $parameter);
 
-        $behalten = array_intersect_key($parameter, array_flip($kept));
+        $keptParams = array_intersect_key($parameter, array_flip($kept));
 
-        if ($behalten === []) {
-            return $basis;
+        if ($keptParams === []) {
+            return $base;
         }
 
         // Sorted, so ?page=2&sort=x and ?sort=x&page=2 do not become two
         // different canonicals.
-        ksort($behalten);
+        ksort($keptParams);
 
-        return $basis.'?'.http_build_query($behalten);
+        return $base.'?'.http_build_query($keptParams);
     }
 }
