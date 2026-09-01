@@ -34,4 +34,5 @@ return [
     'sitemap' => '站点地图地址',
     'sitemap-hint' => '{0}没有找到网址。地址对吗？|[1,*]找到 :count 个网址。',
     'no-sitemap' => '在 :url 未找到网址。请检查地址。',
+    'sitemap-foreign' => '站点地图必须位于本站。IndexNow 只接受你自己域名下的地址。',
 ];

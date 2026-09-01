@@ -9,10 +9,22 @@
 if (! class_exists('Illuminate\Support\Facades\Http')) {
     eval('namespace Illuminate\Support\Facades; class Http {}');
 }
+if (! class_exists('Illuminate\Support\Str')) {
+    eval('namespace Illuminate\Support; class Str { public static function of($v) { return new StrProxy($v); } }
+    class StrProxy { public function __construct(private $v) {} public function lower() { return strtolower($this->v); } public function __toString() { return (string) $this->v; } }');
+}
 
+require __DIR__.'/../src/Client.php';
 require __DIR__.'/../src/UrlSource.php';
 
 use Azuriom\Plugin\Indexnow\UrlSource;
+
+if (! function_exists('url')) {
+    function url(string $path = '/'): string
+    {
+        return 'https://example.com'.$path;
+    }
+}
 
 $failures = 0;
 
@@ -68,6 +80,13 @@ check('a sitemap index yields nothing', [], UrlSource::parse(
 
 check('empty input yields nothing', [], UrlSource::parse(''));
 check('nonsense yields nothing', [], UrlSource::parse('not xml at all'));
+
+// Security: a foreign address must not even be requested. fromSitemap() would
+// otherwise need the network, so this checks the guard that runs before it.
+check('a foreign sitemap is not fetched', [],
+    UrlSource::fromSitemap('https://evil.example/sitemap.xml'));
+check('a loopback sitemap is not fetched', [],
+    UrlSource::fromSitemap('http://127.0.0.1:8123/sitemap.xml'));
 
 echo "\n";
 

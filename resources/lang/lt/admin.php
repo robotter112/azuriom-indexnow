@@ -34,4 +34,5 @@ return [
     'sitemap' => 'Svetainės žemėlapio adresas',
     'sitemap-hint' => '{0}Nerasta nė vieno adreso. Ar adresas teisingas?|[1,*]Rasta adresų: :count.',
     'no-sitemap' => 'Adresu :url adresų nerasta. Patikrinkite adresą.',
+    'sitemap-foreign' => 'Svetainės žemėlapis turi būti šioje svetainėje. IndexNow priima tik savo domeno adresus.',
 ];

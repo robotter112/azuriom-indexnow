@@ -34,4 +34,5 @@ return [
     'sitemap' => 'Adresse du sitemap',
     'sitemap-hint' => '{0}Aucune URL trouvée ici. L\'adresse est-elle correcte ?|[1,*]:count URLs trouvées.',
     'no-sitemap' => 'Aucune URL trouvée à :url. Vérifiez l\'adresse.',
+    'sitemap-foreign' => 'Le sitemap doit se trouver sur ce site. IndexNow n\'accepte que les adresses de votre propre domaine.',
 ];

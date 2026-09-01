@@ -34,4 +34,5 @@ return [
     'sitemap' => 'Adreça del sitemap',
     'sitemap-hint' => '{0}No s\'hi ha trobat cap URL. És correcta l\'adreça?|[1,*]:count URLs trobades.',
     'no-sitemap' => 'No s\'han trobat URLs a :url. Comprova l\'adreça.',
+    'sitemap-foreign' => 'El sitemap ha de ser en aquest lloc. IndexNow només accepta adreces del teu propi domini.',
 ];

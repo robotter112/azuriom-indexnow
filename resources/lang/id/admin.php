@@ -34,4 +34,5 @@ return [
     'sitemap' => 'Alamat peta situs',
     'sitemap-hint' => '{0}Tidak ada URL ditemukan. Apakah alamatnya benar?|[1,*]:count URL ditemukan.',
     'no-sitemap' => 'Tidak ada URL ditemukan di :url. Periksa alamatnya.',
+    'sitemap-foreign' => 'Peta situs harus berada di situs ini. IndexNow hanya menerima alamat domain Anda sendiri.',
 ];

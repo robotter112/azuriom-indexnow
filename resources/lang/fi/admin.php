@@ -34,4 +34,5 @@ return [
     'sitemap' => 'Sivustokartan osoite',
     'sitemap-hint' => '{0}Osoitteita ei löytynyt. Onko osoite oikein?|[1,*]Löytyi :count osoitetta.',
     'no-sitemap' => 'Osoitteesta :url ei löytynyt osoitteita. Tarkista osoite.',
+    'sitemap-foreign' => 'Sivustokartan on oltava tällä sivustolla. IndexNow hyväksyy vain oman verkkotunnuksen osoitteita.',
 ];

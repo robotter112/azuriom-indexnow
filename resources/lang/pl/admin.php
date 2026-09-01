@@ -34,4 +34,5 @@ return [
     'sitemap' => 'Adres mapy witryny',
     'sitemap-hint' => '{0}Nie znaleziono adresu. Czy adres jest poprawny?|[1,*]Znaleziono adresów: :count.',
     'no-sitemap' => 'Pod :url nie znaleziono adresów. Sprawdź adres.',
+    'sitemap-foreign' => 'Mapa witryny musi znajdować się w tej witrynie. IndexNow przyjmuje tylko adresy własnej domeny.',
 ];

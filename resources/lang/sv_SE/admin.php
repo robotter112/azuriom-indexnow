@@ -34,4 +34,5 @@ return [
     'sitemap' => 'Webbplatskartans adress',
     'sitemap-hint' => '{0}Ingen adress hittades. Stämmer adressen?|[1,*]:count adresser hittades.',
     'no-sitemap' => 'Inga adresser hittades på :url. Kontrollera adressen.',
+    'sitemap-foreign' => 'Webbplatskartan måste ligga på den här webbplatsen. IndexNow godtar bara adresser på din egen domän.',
 ];

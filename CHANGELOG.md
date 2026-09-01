@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- The IndexNow key is validated before it is used as a file name. It ends up in
+  `public_path()` and from there in a write and a delete, and a stored setting is
+  not a trustworthy source for a file path. Only generated keys could reach it in
+  practice, but the method is public API.
+- The sitemap address must now be on your own site. IndexNow only accepts URLs of
+  the submitting host anyway, and an arbitrary address would have let someone
+  holding just this permission make the server fetch internal services.
+
 ## [2.0.0] - 2026-09-01
 
 ### Added

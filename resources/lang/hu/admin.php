@@ -34,4 +34,5 @@ return [
     'sitemap' => 'Az oldaltérkép címe',
     'sitemap-hint' => '{0}Nem található URL. Helyes a cím?|[1,*]:count URL található.',
     'no-sitemap' => 'A :url címen nem található URL. Ellenőrizd a címet.',
+    'sitemap-foreign' => 'Az oldaltérképnek ezen az oldalon kell lennie. Az IndexNow csak a saját domain címeit fogadja el.',
 ];

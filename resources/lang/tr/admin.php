@@ -34,4 +34,5 @@ return [
     'sitemap' => 'Site haritası adresi',
     'sitemap-hint' => '{0}Hiç adres bulunamadı. Adres doğru mu?|[1,*]:count adres bulundu.',
     'no-sitemap' => ':url adresinde adres bulunamadı. Adresi kontrol edin.',
+    'sitemap-foreign' => 'Site haritası bu sitede olmalı. IndexNow yalnızca kendi alan adınızın adreslerini kabul eder.',
 ];

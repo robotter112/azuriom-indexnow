@@ -35,6 +35,15 @@ class Client
 
     public static function keyFileName(string $key): string
     {
+        // The key ends up in public_path() and from there in file_put_contents()
+        // and unlink(). Today it can only come from generateKey(), but this is
+        // public API that other code may call, and a stored setting is not a
+        // trustworthy source of a file path - "../../.env" would otherwise become
+        // a write and a delete outside the document root.
+        if (! preg_match('/^[a-f0-9]{8,128}$/i', $key)) {
+            throw new \InvalidArgumentException('Invalid IndexNow key.');
+        }
+
         return $key.'.txt';
     }
 
@@ -162,5 +171,20 @@ class Client
     public static function hostFor(string $url): string
     {
         return (string) Str::of(parse_url($url, PHP_URL_HOST) ?? '')->lower();
+    }
+
+    /**
+     * Does this address belong to the site itself?
+     *
+     * IndexNow only accepts URLs of the submitting host and answers 422
+     * otherwise, so a sitemap elsewhere is useless - and fetching an arbitrary
+     * address on request would turn the setting into a way of making the server
+     * call internal services on someone's behalf.
+     */
+    public static function isOwnHost(string $url, ?string $siteUrl = null): bool
+    {
+        $host = self::hostFor($url);
+
+        return $host !== '' && $host === self::hostFor($siteUrl ?? url('/'));
     }
 }

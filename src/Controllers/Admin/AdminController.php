@@ -110,7 +110,11 @@ class AdminController extends Controller
     public function update(Request $request)
     {
         $validated = $request->validate([
-            'sitemap' => ['nullable', 'string', 'max:500', 'url'],
+            'sitemap' => ['nullable', 'string', 'max:500', 'url', function ($attribute, $value, $fail) {
+                if ($value && ! Client::isOwnHost($value)) {
+                    $fail(trans('indexnow::admin.sitemap-foreign'));
+                }
+            }],
             'auto' => ['nullable', 'boolean'],
         ]);
 

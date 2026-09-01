@@ -66,6 +66,35 @@ check('422 means URLs do not match the host', 'mismatch', Client::reasonFor(422)
 check('429 means too many requests', 'too-many', Client::reasonFor(429));
 check('unknown code falls back to unknown', 'unknown', Client::reasonFor(500));
 
+// Security: the key becomes a file path under public/. A stored setting is not
+// a trustworthy source for one.
+foreach (['../../.env', '../../../etc/passwd', 'a/b', 'key.txt', '', 'zz'] as $bad) {
+    $threw = false;
+
+    try {
+        Client::keyFileName($bad);
+    } catch (\InvalidArgumentException $e) {
+        $threw = true;
+    }
+
+    check("key file name rejects '{$bad}'", true, $threw);
+}
+
+check('key file name accepts a generated key', $key.'.txt', Client::keyFileName($key));
+
+// Security: an arbitrary sitemap address would let someone with only this
+// permission make the server fetch internal services.
+check('own host is accepted', true,
+    Client::isOwnHost('https://example.com/sitemap.xml', 'https://example.com/'));
+check('foreign host is refused', false,
+    Client::isOwnHost('https://evil.example/sitemap.xml', 'https://example.com/'));
+check('loopback is refused', false,
+    Client::isOwnHost('http://127.0.0.1:8123/', 'https://example.com/'));
+check('internal name is refused', false,
+    Client::isOwnHost('http://clickhouse:8123/', 'https://example.com/'));
+check('address without a host is refused', false,
+    Client::isOwnHost('not-a-url', 'https://example.com/'));
+
 check('an empty list is not sent at all',
     ['ok' => false, 'reason' => 'empty', 'status' => 0, 'count' => 0],
     Client::submit('example.com', $key, 'https://example.com/k.txt', []));

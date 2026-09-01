@@ -34,4 +34,5 @@ return [
     'sitemap' => 'Adresse der Sitemap',
     'sitemap-hint' => '{0}Hier wurde keine Adresse gefunden. Stimmt die Adresse?|[1,*]:count Adressen gefunden.',
     'no-sitemap' => 'Unter :url wurden keine Adressen gefunden. Prüfe die Adresse.',
+    'sitemap-foreign' => 'Die Sitemap muss auf dieser Seite liegen. IndexNow nimmt nur Adressen der eigenen Domain an.',
 ];

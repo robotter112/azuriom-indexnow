@@ -21,6 +21,13 @@ class UrlSource
      */
     public static function fromSitemap(string $sitemapUrl): array
     {
+        // Checked here as well as in the form: this is the point where the
+        // request actually goes out, and a setting written by anything other
+        // than that form would otherwise slip past.
+        if (! Client::isOwnHost($sitemapUrl)) {
+            return [];
+        }
+
         try {
             $response = Http::timeout(20)->get($sitemapUrl);
         } catch (\Throwable $e) {
