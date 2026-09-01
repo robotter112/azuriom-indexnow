@@ -1,235 +1,76 @@
 @extends('admin.layouts.admin')
 
-@section('title', trans('seo::admin.title'))
+@section('title', trans('indexnow::admin.title'))
 
 @section('content')
     <div class="card shadow mb-4">
         <div class="card-body">
-            <h2 class="h5">@lang('seo::admin.url')</h2>
+            <p class="text-muted">@lang('indexnow::admin.intro')</p>
 
-            <div class="input-group mb-2">
-                <input type="text" class="form-control" id="sitemap-url" value="{{ $sitemapUrl }}" readonly>
-                <a href="{{ $sitemapUrl }}" target="_blank" rel="noopener" class="btn btn-outline-secondary">
-                    <i class="bi bi-box-arrow-up-right"></i>
-                </a>
-            </div>
-
-            <p class="text-muted small mb-3">
-                @lang('seo::admin.url-hint', ['url' => $sitemapUrl])
-            </p>
-
-            <p class="mb-3">
-                <span class="badge bg-primary">{{ trans_choice('seo::admin.count', count($urls), ['count' => count($urls)]) }}</span>
-                <span class="text-muted small ms-2">
-                    @if($cached)
-                        @lang('seo::admin.cached', ['minutes' => $cacheMinutes])
-                    @else
-                        @lang('seo::admin.not-cached')
-                    @endif
-                </span>
-            </p>
-
-            <div class="d-flex flex-wrap gap-2">
-                <form action="{{ route('seo.admin.refresh') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="btn btn-secondary">
-                        <i class="bi bi-arrow-clockwise"></i> @lang('seo::admin.refresh')
-                    </button>
-                </form>
-
-                <form action="{{ route('seo.admin.check') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="btn btn-secondary">
-                        <i class="bi bi-check2-circle"></i> @lang('seo::admin.check')
-                    </button>
-                </form>
-            </div>
-
-            <p class="text-muted small mt-2 mb-0">@lang('seo::admin.check-hint')</p>
-        </div>
-    </div>
-
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <h2 class="h5">@lang('seo::admin.indexnow-title')</h2>
-            <p class="text-muted small">@lang('seo::admin.indexnow-hint')</p>
-
-            @if($indexNow['enabled'])
+            @if($enabled)
                 <div class="alert alert-success">
-                    <i class="bi bi-check-circle"></i>
-                    @lang('seo::admin.indexnow-on', ['url' => $indexNow['keyUrl']])
+                    <i class="bi bi-check-circle"></i> @lang('indexnow::admin.on', ['url' => $keyUrl])
                 </div>
 
                 <div class="d-flex flex-wrap gap-2">
-                    <form action="{{ route('seo.admin.indexnow.submit') }}" method="POST">
+                    <form action="{{ route('indexnow.admin.submit') }}" method="POST">
                         @csrf
                         <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-send"></i> @lang('seo::admin.indexnow-submit')
+                            <i class="bi bi-send"></i>
+                            {{ trans_choice('indexnow::admin.submit', $sitemapCount, ['count' => $sitemapCount]) }}
                         </button>
                     </form>
 
-                    <form action="{{ route('seo.admin.indexnow.disable') }}" method="POST">
+                    <form action="{{ route('indexnow.admin.disable') }}" method="POST">
                         @csrf
                         <button type="submit" class="btn btn-outline-secondary">
-                            @lang('seo::admin.indexnow-disable')
+                            @lang('indexnow::admin.disable')
                         </button>
                     </form>
                 </div>
             @else
-                <p class="text-muted">@lang('seo::admin.indexnow-off')</p>
+                <p>@lang('indexnow::admin.off')</p>
 
-                <form action="{{ route('seo.admin.indexnow.enable') }}" method="POST">
+                <form action="{{ route('indexnow.admin.enable') }}" method="POST">
                     @csrf
                     <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-lightning-charge"></i> @lang('seo::admin.indexnow-enable')
+                        <i class="bi bi-lightning-charge"></i> @lang('indexnow::admin.enable')
                     </button>
                 </form>
             @endif
         </div>
     </div>
 
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <h2 class="h5">@lang('seo::admin.robots-title')</h2>
-
-            @if($robots['hasSitemap'])
-                <div class="alert alert-success mb-0">
-                    <i class="bi bi-check-circle"></i> @lang('seo::admin.robots-ok')
-                </div>
-            @else
-                <div class="alert alert-warning">@lang('seo::admin.robots-missing')</div>
-
-                @if($robots['writable'])
-                    <form action="{{ route('seo.admin.robots') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-file-earmark-plus"></i> @lang('seo::admin.robots-write')
-                        </button>
-                    </form>
-                @else
-                    <p class="text-muted small mb-0">
-                        @lang('seo::admin.robots-not-writable', ['path' => $robots['path']])
-                    </p>
-                @endif
-            @endif
-        </div>
-    </div>
-
-    @if(session('checked'))
-        @php($result = session('checked'))
-        @php($statusFailures = collect($result['bad'])->where('status', '!=', 200))
-        @php($seoIssues = collect($result['bad'])->where('status', 200)->filter(fn ($e) => ! empty($e['issues'])))
-
-        <div class="card shadow mb-4">
-            <div class="card-body">
-                @if($statusFailures->isEmpty() && $seoIssues->isEmpty())
-                    <div class="alert alert-success mb-0">
-                        @lang('seo::admin.check-all-ok', ['count' => $result['total']])
-                    </div>
-                @endif
-
-                @if($statusFailures->isNotEmpty())
-                    <div class="alert alert-warning">
-                        @lang('seo::admin.check-bad', [
-                            'count' => $statusFailures->count(),
-                            'total' => $result['total'],
-                        ])
-                    </div>
-                    <ul class="list-group mb-4">
-                        @foreach($statusFailures as $entry)
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span class="text-break">{{ $entry['url'] }}</span>
-                                <span class="badge bg-danger">{{ $entry['status'] ?: '—' }}</span>
-                            </li>
-                        @endforeach
-                    </ul>
-                @endif
-
-                @if($seoIssues->isNotEmpty())
-                    <h3 class="h6">@lang('seo::admin.issues-title')</h3>
-                    <p class="text-muted small">@lang('seo::admin.issues-hint')</p>
-                    <ul class="list-group">
-                        @foreach($seoIssues as $entry)
-                            <li class="list-group-item">
-                                <div class="text-break mb-1">{{ $entry['url'] }}</div>
-                                <ul class="mb-0 small text-muted">
-                                    @foreach($entry['issues'] as $issue)
-                                        <li>
-                                            @lang('seo::admin.issue.'.$issue['key'], ['count' => $issue['count'] ?? 0])
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            </li>
-                        @endforeach
-                    </ul>
-                @endif
-
-                @if($result['capped'])
-                    <p class="text-muted small mt-2 mb-0">
-                        @lang('seo::admin.check-capped', ['limit' => $result['total']])
-                    </p>
-                @endif
-            </div>
-        </div>
-    @endif
-
     <div class="card shadow">
         <div class="card-body">
-            <h2 class="h5">@lang('seo::admin.settings')</h2>
+            <h2 class="h5">@lang('indexnow::admin.settings')</h2>
 
-            <form action="{{ route('seo.admin.update') }}" method="POST">
+            <form action="{{ route('indexnow.admin.update') }}" method="POST">
                 @csrf
 
-                <div class="mb-3">
-                    <label class="form-label" for="exclude">@lang('seo::admin.exclude')</label>
-                    <textarea class="form-control @error('exclude') is-invalid @enderror"
-                              id="exclude" name="exclude" rows="6"
-                              spellcheck="false">{{ old('exclude', $exclude) }}</textarea>
-                    @error('exclude')
-                        <span class="invalid-feedback">{{ $message }}</span>
-                    @enderror
-                    <small class="form-text text-muted">@lang('seo::admin.exclude-hint')</small>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label" for="cache_minutes">@lang('seo::admin.cache-minutes')</label>
-                    <input type="number" class="form-control @error('cache_minutes') is-invalid @enderror"
-                           id="cache_minutes" name="cache_minutes" min="1" max="10080"
-                           value="{{ old('cache_minutes', $cacheMinutes) }}" required>
-                    @error('cache_minutes')
-                        <span class="invalid-feedback">{{ $message }}</span>
-                    @enderror
-                    <small class="form-text text-muted">@lang('seo::admin.cache-minutes-hint')</small>
-                </div>
-
-                <hr class="my-4">
-
-                <h3 class="h6">@lang('seo::admin.canonical-title')</h3>
-
                 <div class="form-check form-switch mb-2">
-                    <input type="hidden" name="canonical" value="0">
+                    <input type="hidden" name="auto" value="0">
                     <input class="form-check-input" type="checkbox" role="switch"
-                           id="canonical" name="canonical" value="1"
-                           @checked(old('canonical', $canonical))>
-                    <label class="form-check-label" for="canonical">
-                        @lang('seo::admin.canonical-enable')
-                    </label>
+                           id="auto" name="auto" value="1" @checked(old('auto', $auto))>
+                    <label class="form-check-label" for="auto">@lang('indexnow::admin.auto')</label>
                 </div>
-                <p class="text-muted small">@lang('seo::admin.canonical-hint')</p>
+                <p class="text-muted small">@lang('indexnow::admin.auto-hint')</p>
 
                 <div class="mb-3">
-                    <label class="form-label" for="canonical_keep">@lang('seo::admin.canonical-keep')</label>
-                    <input type="text" class="form-control @error('canonical_keep') is-invalid @enderror"
-                           id="canonical_keep" name="canonical_keep"
-                           value="{{ old('canonical_keep', $canonicalKeep) }}" spellcheck="false">
-                    @error('canonical_keep')
+                    <label class="form-label" for="sitemap">@lang('indexnow::admin.sitemap')</label>
+                    <input type="url" class="form-control @error('sitemap') is-invalid @enderror"
+                           id="sitemap" name="sitemap" spellcheck="false"
+                           value="{{ old('sitemap', $sitemapUrl) }}">
+                    @error('sitemap')
                         <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
-                    <small class="form-text text-muted">@lang('seo::admin.canonical-keep-hint')</small>
+                    <small class="form-text text-muted">
+                        {{ trans_choice('indexnow::admin.sitemap-hint', $sitemapCount, ['count' => $sitemapCount]) }}
+                    </small>
                 </div>
 
                 <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-save"></i> @lang('seo::admin.save')
+                    <i class="bi bi-save"></i> @lang('indexnow::admin.save')
                 </button>
             </form>
         </div>

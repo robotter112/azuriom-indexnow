@@ -1,15 +1,15 @@
 {
-    "id": "seo",
-    "name": "SEO",
-    "description": "Sitemap, canonical URLs, robots.txt and on-page checks: the search engine basics an Azuriom site needs, in one plugin.",
-    "version": "1.4.0",
-    "url": "https://github.com/Robotter112/azuriom-sitemap",
+    "id": "indexnow",
+    "name": "IndexNow",
+    "description": "Tells Bing, Yandex, Seznam and Naver right away when a page changes, instead of waiting for the next crawl. One button to set up.",
+    "version": "1.0.0",
+    "url": "https://github.com/Robotter112/azuriom-indexnow",
     "authors": [
         "Robotter112"
     ],
     "azuriom_api": "1.2.0",
     "providers": [
-        "\\Azuriom\\Plugin\\Seo\\Providers\\SeoServiceProvider",
-        "\\Azuriom\\Plugin\\Seo\\Providers\\RouteServiceProvider"
+        "\\Azuriom\\Plugin\\Indexnow\\Providers\\IndexnowServiceProvider",
+        "\\Azuriom\\Plugin\\Indexnow\\Providers\\RouteServiceProvider"
     ]
 }

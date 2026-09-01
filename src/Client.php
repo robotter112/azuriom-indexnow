@@ -1,6 +1,6 @@
 <?php
 
-namespace Azuriom\Plugin\Seo;
+namespace Azuriom\Plugin\Indexnow;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -15,7 +15,7 @@ use Illuminate\Support\Str;
  * refused - which is why setup verifies the file over HTTP before writing
  * anything into the settings.
  */
-class IndexNow
+class Client
 {
     public const ENDPOINT = 'https://api.indexnow.org/indexnow';
 
@@ -108,6 +108,52 @@ class IndexNow
             429 => 'too-many',
             default => 'unknown',
         };
+    }
+
+    /**
+     * The public address of a saved record, or null if it has none.
+     */
+    public static function urlFor(object $record): ?string
+    {
+        try {
+            if ($record instanceof \Azuriom\Models\Post) {
+                return $record->published_at !== null && $record->published_at->isPast()
+                    ? route('posts.show', $record->slug)
+                    : null;
+            }
+
+            if ($record instanceof \Azuriom\Models\Page) {
+                return $record->is_enabled && $record->roles()->count() === 0
+                    ? route('pages.show', $record->slug)
+                    : null;
+            }
+        } catch (\Throwable $e) {
+            return null;
+        }
+
+        return null;
+    }
+
+    /**
+     * Report a single address. Used by the automatic reporting, where failure
+     * must never disturb the save that triggered it.
+     *
+     * @return array{ok: bool, reason: string, status: int, count: int}
+     */
+    public static function submitOne(string $url): array
+    {
+        $key = setting('indexnow.key');
+
+        if (! $key) {
+            return ['ok' => false, 'reason' => 'not-enabled', 'status' => 0, 'count' => 0];
+        }
+
+        return self::submit(
+            self::hostFor($url),
+            $key,
+            url(self::keyFileName($key)),
+            [$url]
+        );
     }
 
     /**

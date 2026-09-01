@@ -1,11 +1,11 @@
 {
-    "name": "azuriom/seo",
+    "name": "azuriom/indexnow",
     "type": "azuriom-plugin",
-    "description": "SEO plugin for Azuriom",
+    "description": "IndexNow plugin for Azuriom",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Azuriom\\Plugin\\Seo\\": "src/"
+            "Azuriom\\Plugin\\Indexnow\\": "src/"
         }
     }
 }
