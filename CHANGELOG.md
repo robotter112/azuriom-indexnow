@@ -14,10 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   straight to IndexNow — it is never served as a `sitemap.xml`, because producing
   that file belongs to a sitemap or SEO plugin. The admin page shows which source
   is in use.
-- Optional plain sitemap at `/sitemap.xml`, off by default. Exists only because
+- Optional sitemap at `/sitemap.xml`, off by default. Exists only because
   Google ignores IndexNow, so a site without any sitemap has nothing for it. Any
   sitemap or SEO plugin does this better and should be preferred; if one already
   answers that address, the admin page says so instead of failing silently.
+- Both the fallback list and that sitemap now cover everything reachable: wiki
+  pages, public forums and their discussions, changelog categories, suggestions,
+  and the index page of every enabled plugin, found through the route table
+  rather than a fixed list. Routes serving a file rather than a page — another
+  plugin's `sitemap.xml`, an `llms.txt` — are excluded.
 
 ## [2.0.1] - 2026-09-01
 

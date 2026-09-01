@@ -36,9 +36,10 @@ down, and a failure there can never disturb the save that triggered it.
 *Submit all URLs* reads your existing **`sitemap.xml`** and submits what it finds.
 The address is configurable, so it works with any plugin that produces one.
 
-**No sitemap on your site?** Then the plugin falls back to Azuriom's own pages
-and published posts, gathered internally and handed straight to IndexNow. The
-admin page tells you which of the two sources it is using.
+**No sitemap on your site?** Then the plugin gathers the addresses itself — the
+same complete list described under *Optionally serving a sitemap* below — and
+hands it straight to IndexNow. The admin page tells you which of the two sources
+is in use.
 
 ## Optionally serving a sitemap — off by default
 
@@ -46,10 +47,19 @@ IndexNow itself never needs a sitemap. There is exactly one reason this option
 exists: **Google does not take part in IndexNow**, so on a site with no sitemap
 at all, Google has nothing to go on.
 
-Switching it on serves a plain sitemap at `/sitemap.xml` listing this site's
-pages and published posts — nothing more. It is **off by default and should stay
-off** wherever a sitemap or SEO plugin is installed: those do the job far better,
-covering wiki pages, forums and everything else this one deliberately leaves out.
+Switching it on serves a sitemap at `/sitemap.xml` covering **everything a
+logged-out visitor can reach**: pages, news posts, wiki pages, public forums and
+their discussions, changelog categories, suggestions — plus the index page of
+every enabled plugin, discovered from the route table rather than a hardcoded
+list, so plugins this one has never heard of are included too.
+
+Left out on purpose: redirects, role-restricted pages, private forums, search
+forms, and routes serving a file rather than a page such as another plugin's
+`sitemap.xml` or `llms.txt`.
+
+It is **off by default**. If a sitemap or SEO plugin is installed, prefer that
+one — it will keep pace with its own features, and two files disagreeing about
+what is public helps nobody.
 
 If another plugin already answers `/sitemap.xml`, that plugin wins and the admin
 page says so plainly, rather than leaving you to wonder why nothing changed.

@@ -2,8 +2,6 @@
 
 namespace Azuriom\Plugin\Indexnow;
 
-use Azuriom\Models\Page;
-use Azuriom\Models\Post;
 use Illuminate\Support\Facades\Http;
 
 /**
@@ -81,34 +79,23 @@ class UrlSource
     }
 
     /**
-     * Pages and posts straight from Azuriom, for sites without a sitemap.
+     * Every publicly reachable address of this site, for sites without a
+     * sitemap.
      *
-     * Deliberately only what the core itself provides, and deliberately not
-     * served as a sitemap.xml of its own: producing that file is the job of a
-     * sitemap or SEO plugin, and a second one would only disagree with the
-     * first. This list never leaves the server - it exists solely to be handed
-     * to IndexNow.
+     * Gathered internally and handed straight to IndexNow, or served as the
+     * optional sitemap. Never a second sitemap.xml alongside another plugin's.
      *
      * @return array<int, string>
      */
     public static function fromCore(): array
     {
-        $urls = [url('/')];
-
         try {
-            foreach (Page::enabled()->doesntHave('roles')->get() as $page) {
-                $urls[] = route('pages.show', $page->slug);
-            }
-
-            foreach (Post::published()->get() as $post) {
-                $urls[] = route('posts.show', $post->slug);
-            }
+            return SiteUrls::all();
         } catch (\Throwable $e) {
             // A missing table or a renamed route must not break the submission;
-            // whatever was collected so far is still worth sending.
+            // the home page alone is still worth sending.
+            return [url('/')];
         }
-
-        return array_values(array_unique($urls));
     }
 
     /**
