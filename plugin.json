@@ -1,8 +1,8 @@
 {
     "id": "sitemap",
     "name": "Sitemap",
-    "description": "Serves a sitemap.xml with every publicly visible URL of your site, and checks those pages for the on-page problems search engines complain about.",
-    "version": "1.1.0",
+    "description": "Sitemap, canonical URLs, robots.txt and on-page checks: the search engine basics an Azuriom site needs, in one plugin.",
+    "version": "1.2.0",
     "url": "https://git.fastm.de/Max/azuriom-sitemap",
     "authors": [
         "Robotter112"

@@ -47,6 +47,33 @@
         </div>
     </div>
 
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h2 class="h5">@lang('sitemap::admin.robots-title')</h2>
+
+            @if($robots['hasSitemap'])
+                <div class="alert alert-success mb-0">
+                    <i class="bi bi-check-circle"></i> @lang('sitemap::admin.robots-ok')
+                </div>
+            @else
+                <div class="alert alert-warning">@lang('sitemap::admin.robots-missing')</div>
+
+                @if($robots['writable'])
+                    <form action="{{ route('sitemap.admin.robots') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-file-earmark-plus"></i> @lang('sitemap::admin.robots-write')
+                        </button>
+                    </form>
+                @else
+                    <p class="text-muted small mb-0">
+                        @lang('sitemap::admin.robots-not-writable', ['path' => $robots['path']])
+                    </p>
+                @endif
+            @endif
+        </div>
+    </div>
+
     @if(session('checked'))
         @php($ergebnis = session('checked'))
         @php($statusFehler = collect($ergebnis['bad'])->where('status', '!=', 200))
@@ -132,6 +159,32 @@
                         <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
                     <small class="form-text text-muted">@lang('sitemap::admin.cache-minutes-hint')</small>
+                </div>
+
+                <hr class="my-4">
+
+                <h3 class="h6">@lang('sitemap::admin.canonical-title')</h3>
+
+                <div class="form-check form-switch mb-2">
+                    <input type="hidden" name="canonical" value="0">
+                    <input class="form-check-input" type="checkbox" role="switch"
+                           id="canonical" name="canonical" value="1"
+                           @checked(old('canonical', $canonical))>
+                    <label class="form-check-label" for="canonical">
+                        @lang('sitemap::admin.canonical-enable')
+                    </label>
+                </div>
+                <p class="text-muted small">@lang('sitemap::admin.canonical-hint')</p>
+
+                <div class="mb-3">
+                    <label class="form-label" for="canonical_keep">@lang('sitemap::admin.canonical-keep')</label>
+                    <input type="text" class="form-control @error('canonical_keep') is-invalid @enderror"
+                           id="canonical_keep" name="canonical_keep"
+                           value="{{ old('canonical_keep', $canonicalKeep) }}" spellcheck="false">
+                    @error('canonical_keep')
+                        <span class="invalid-feedback">{{ $message }}</span>
+                    @enderror
+                    <small class="form-text text-muted">@lang('sitemap::admin.canonical-keep-hint')</small>
                 </div>
 
                 <button type="submit" class="btn btn-primary">

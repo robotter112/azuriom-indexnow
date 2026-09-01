@@ -5,9 +5,24 @@ namespace Azuriom\Plugin\Sitemap\Providers;
 use Azuriom\Extensions\Plugin\BasePluginServiceProvider;
 use Azuriom\Models\Permission;
 use Azuriom\Plugin\Sitemap\Commands\CheckSitemapCommand;
+use Azuriom\Plugin\Sitemap\Middleware\AddCanonicalUrl;
 
 class SitemapServiceProvider extends BasePluginServiceProvider
 {
+    /**
+     * The plugin's global HTTP middleware stack.
+     *
+     * @var array<int, class-string>
+     */
+    protected array $middleware = [
+        AddCanonicalUrl::class,
+    ];
+
+    public function register(): void
+    {
+        $this->registerMiddlewares();
+    }
+
     public function boot(): void
     {
         $this->loadViews();

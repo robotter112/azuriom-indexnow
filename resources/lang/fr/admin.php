@@ -40,4 +40,16 @@ return [
         'title-missing' => 'Aucun titre de page',
         'images-without-alt' => ':count image(s) sans attribut alt exploitable',
     ],
+
+    'robots-title' => 'robots.txt',
+    'robots-ok' => 'Votre robots.txt indique le sitemap aux robots d\'indexation.',
+    'robots-missing' => 'Votre robots.txt ne mentionne pas le sitemap. Les moteurs de recherche ne le trouveront alors que si vous l\'avez soumis dans une console pour webmasters.',
+    'robots-write' => 'Ajouter la ligne Sitemap',
+    'robots-written' => 'La ligne Sitemap a été ajoutée au robots.txt.',
+    'robots-not-writable' => 'Le robots.txt n\'est pas accessible en écriture (:path). Ajoutez la ligne manuellement.',
+    'canonical-title' => 'URL canonique',
+    'canonical-enable' => 'Ajouter une URL canonique aux pages qui n\'en ont pas',
+    'canonical-hint' => 'Une même page atteinte avec des paramètres de suivi ou de cache ressemble à une adresse distincte pour un moteur de recherche, ce qui divise son classement. Ceci ajoute l\'adresse propre. Une balise déjà posée par votre thème n\'est jamais remplacée.',
+    'canonical-keep' => 'Paramètres de requête à conserver',
+    'canonical-keep-hint' => 'Séparés par des virgules. Ils modifient le contenu de la page et doivent être conservés. Sans « page », les moteurs de recherche considéreraient la page 2 comme une copie de la page 1 et elle sortirait de l\'index.',
 ];

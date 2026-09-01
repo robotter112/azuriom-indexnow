@@ -40,4 +40,16 @@ return [
         'title-missing' => 'Kein Seitentitel',
         'images-without-alt' => ':count Bild(er) ohne brauchbares alt-Attribut',
     ],
+
+    'robots-title' => 'robots.txt',
+    'robots-ok' => 'Deine robots.txt verweist Suchmaschinen auf die Sitemap.',
+    'robots-missing' => 'Deine robots.txt erwähnt die Sitemap nicht. Suchmaschinen finden sie dann nur, wenn du sie in einer Webmaster-Konsole eingereicht hast.',
+    'robots-write' => 'Sitemap-Zeile eintragen',
+    'robots-written' => 'Die Sitemap-Zeile wurde in die robots.txt eingetragen.',
+    'robots-not-writable' => 'Die robots.txt ist nicht beschreibbar (:path). Trage die Zeile von Hand ein.',
+    'canonical-title' => 'Kanonische Adresse',
+    'canonical-enable' => 'Kanonische Adresse zu Seiten hinzufügen, die keine haben',
+    'canonical-hint' => 'Dieselbe Seite mit Tracking- oder Cache-Parametern wirkt auf eine Suchmaschine wie eine eigene Adresse, was ihre Bewertung aufteilt. Dies ergänzt die saubere Adresse. Eine vorhandene Angabe aus dem Theme wird nie überschrieben.',
+    'canonical-keep' => 'Zu erhaltende Abfrageparameter',
+    'canonical-keep-hint' => 'Mit Komma getrennt. Diese verändern den Inhalt der Seite und müssen erhalten bleiben. Ohne „page" würde Suchmaschinen mitgeteilt, Seite 2 sei eine Kopie von Seite 1 – Seite 2 fiele aus dem Index.',
 ];

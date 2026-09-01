@@ -8,4 +8,5 @@ Route::middleware('can:sitemap.admin')->group(function () {
     Route::post('/', [AdminController::class, 'update'])->name('update');
     Route::post('/refresh', [AdminController::class, 'refresh'])->name('refresh');
     Route::post('/check', [AdminController::class, 'check'])->name('check');
+    Route::post('/robots', [AdminController::class, 'robots'])->name('robots');
 });

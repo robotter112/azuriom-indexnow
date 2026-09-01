@@ -28,6 +28,9 @@ class AdminController extends Controller
             'cached' => Cache::has('sitemap.urls'),
             'exclude' => implode("\n", SitemapController::excludePatterns()),
             'cacheMinutes' => SitemapController::cacheMinutes(),
+            'canonical' => SitemapController::canonicalEnabled(),
+            'canonicalKeep' => implode(', ', SitemapController::canonicalKeptParameters()),
+            'robots' => $this->robotsState(),
         ]);
     }
 
@@ -36,6 +39,8 @@ class AdminController extends Controller
         $validated = $request->validate([
             'exclude' => ['nullable', 'string', 'max:10000'],
             'cache_minutes' => ['required', 'integer', 'min:1', 'max:10080'],
+            'canonical' => ['nullable', 'boolean'],
+            'canonical_keep' => ['nullable', 'string', 'max:500'],
         ]);
 
         // One pattern per line, blank lines dropped.
@@ -45,9 +50,17 @@ class AdminController extends Controller
             ->values()
             ->all();
 
+        $keep = collect(explode(',', $validated['canonical_keep'] ?? ''))
+            ->map(fn ($name) => trim($name))
+            ->filter()
+            ->values()
+            ->all();
+
         Setting::updateSettings([
             'sitemap.exclude' => json_encode($patterns),
             'sitemap.cache_minutes' => $validated['cache_minutes'],
+            'sitemap.canonical' => $request->boolean('canonical') ? '1' : '0',
+            'sitemap.canonical_keep' => json_encode($keep),
         ]);
 
         Cache::forget('sitemap.urls');
@@ -91,6 +104,51 @@ class AdminController extends Controller
                 'capped' => count($this->urls()) > self::CHECK_LIMIT,
                 'bad' => $bad,
             ]);
+    }
+
+    /**
+     * Write the Sitemap line into public/robots.txt.
+     *
+     * Crawlers look for the sitemap there; without the line they only find it
+     * if somebody submitted it by hand in a webmaster console.
+     */
+    public function robots()
+    {
+        $pfad = public_path('robots.txt');
+        $zeile = 'Sitemap: '.route('sitemap.index');
+
+        if (! is_writable($pfad) && file_exists($pfad)) {
+            return to_route('sitemap.admin.index')
+                ->with('error', trans('sitemap::admin.robots-not-writable', ['path' => $pfad]));
+        }
+
+        $inhalt = file_exists($pfad) ? rtrim(file_get_contents($pfad), "\r\n") : "User-agent: *\nDisallow:";
+
+        if (! str_contains($inhalt, $zeile)) {
+            $inhalt .= "\n\n".$zeile;
+        }
+
+        file_put_contents($pfad, $inhalt."\n");
+
+        return to_route('sitemap.admin.index')
+            ->with('success', trans('sitemap::admin.robots-written'));
+    }
+
+    /**
+     * @return array{exists: bool, hasSitemap: bool, writable: bool, path: string}
+     */
+    protected function robotsState(): array
+    {
+        $pfad = public_path('robots.txt');
+        $vorhanden = file_exists($pfad);
+
+        return [
+            'exists' => $vorhanden,
+            'hasSitemap' => $vorhanden
+                && str_contains(file_get_contents($pfad), 'Sitemap: '.route('sitemap.index')),
+            'writable' => $vorhanden ? is_writable($pfad) : is_writable(dirname($pfad)),
+            'path' => $pfad,
+        ];
     }
 
     /**

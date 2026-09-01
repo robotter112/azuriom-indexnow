@@ -100,6 +100,29 @@ engines complain about, at no extra request:
 These pages still belong in the sitemap — the report tells you where to improve
 them, it does not exclude anything.
 
+## Canonical URLs
+
+The same page reached with a tracking parameter (`?ref=…`), a campaign tag
+(`?utm_source=…`) or a cache buster looks like a separate address to a search
+engine, which splits its ranking between them. The plugin adds
+`<link rel="canonical">` with the clean address to pages that do not already
+have one.
+
+Parameters that genuinely change the content survive — by default `page`.
+**Do not remove `page` from that list**: it would tell search engines that page 2
+is a copy of page 1, and page 2 would drop out of the index.
+
+A canonical set by your theme or another plugin is never overwritten. The feature
+can be switched off in the admin page. Technically it rewrites the finished HTML
+response, because Azuriom's core layout offers no `@stack('meta')` a plugin could
+push into; it only touches successful HTML responses to GET requests that contain
+a `</head>`.
+
+## robots.txt
+
+Crawlers look for the sitemap in `robots.txt`. The admin page reports whether the
+line is there and can write it for you if the file is writable.
+
 ## Tests
 
 The HTML analysis works with regular expressions, which break quietly, so it
@@ -107,7 +130,11 @@ carries a self-check that needs no test framework:
 
 ```bash
 php tests/SeoCheckTest.php
+php tests/CanonicalUrlTest.php
 ```
+
+A wrong canonical is worse than none — it can remove a page from the index — so
+that part carries its own checks.
 
 ## Adding your own URLs
 

@@ -5,6 +5,7 @@ namespace Azuriom\Plugin\Sitemap\Controllers;
 use Azuriom\Http\Controllers\Controller;
 use Azuriom\Models\Page;
 use Azuriom\Models\Post;
+use Azuriom\Plugin\Sitemap\CanonicalUrl;
 use Azuriom\Plugin\Sitemap\Events\SitemapBuilding;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -80,6 +81,31 @@ class SitemapController extends Controller
         }
 
         return self::fileConfig()['exclude'] ?? [];
+    }
+
+    public static function canonicalEnabled(): bool
+    {
+        $wert = setting('sitemap.canonical');
+
+        return $wert !== null
+            ? (bool) $wert
+            : (self::fileConfig()['canonical'] ?? true);
+    }
+
+    /**
+     * Query parameters a canonical URL keeps, because they change the content.
+     *
+     * @return array<int, string>
+     */
+    public static function canonicalKeptParameters(): array
+    {
+        $gespeichert = setting('sitemap.canonical_keep');
+
+        if ($gespeichert !== null) {
+            return json_decode($gespeichert, true) ?: [];
+        }
+
+        return self::fileConfig()['canonical_keep'] ?? CanonicalUrl::DEFAULT_KEPT;
     }
 
     /**

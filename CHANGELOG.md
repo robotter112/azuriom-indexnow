@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-09-01
+
+### Added
+
+- Canonical URLs: pages without one get `<link rel="canonical">` with the clean
+  address, so the same page reached with tracking or cache-busting parameters is
+  no longer treated as a separate address. Parameters that change the content
+  (by default `page`) are kept, and a canonical already set by the theme is
+  never overwritten. Can be switched off.
+- robots.txt: the admin page reports whether it points crawlers at the sitemap
+  and can write the `Sitemap:` line itself.
+- Self-check for the canonical URL building (`php tests/CanonicalUrlTest.php`).
+
 ## [1.1.0] - 2026-09-01
 
 ### Added
@@ -43,6 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `SitemapBuilding` event so other plugins can contribute their own URLs.
 - English, French and German translations for the admin page.
 
-[Unreleased]: https://git.fastm.de/Max/azuriom-sitemap/compare/v1.1.0...HEAD
+[Unreleased]: https://git.fastm.de/Max/azuriom-sitemap/compare/v1.2.0...HEAD
+[1.2.0]: https://git.fastm.de/Max/azuriom-sitemap/releases/tag/v1.2.0
 [1.1.0]: https://git.fastm.de/Max/azuriom-sitemap/releases/tag/v1.1.0
 [1.0.0]: https://git.fastm.de/Max/azuriom-sitemap/releases/tag/v1.0.0

@@ -33,4 +33,24 @@ return [
         'mydailychest', // redirects guests to the login page
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Canonical URL
+    |--------------------------------------------------------------------------
+    |
+    | Adds <link rel="canonical"> to pages that do not already have one, so the
+    | same page reached with tracking or cache-busting parameters is not treated
+    | as a separate address.
+    |
+    | 'canonical_keep' lists the query parameters that genuinely change the
+    | content and therefore survive. Removing 'page' from it would tell search
+    | engines that page 2 is a copy of page 1, and page 2 would drop out of the
+    | index - so only shorten this list on purpose.
+    |
+    */
+
+    'canonical' => true,
+
+    'canonical_keep' => ['page'],
+
 ];

@@ -40,4 +40,16 @@ return [
         'title-missing' => 'No page title',
         'images-without-alt' => ':count image(s) without a usable alt attribute',
     ],
+
+    'robots-title' => 'robots.txt',
+    'robots-ok' => 'Your robots.txt points crawlers at the sitemap.',
+    'robots-missing' => 'Your robots.txt does not mention the sitemap. Search engines then only find it if you submitted it in a webmaster console.',
+    'robots-write' => 'Add the Sitemap line',
+    'robots-written' => 'The Sitemap line was added to robots.txt.',
+    'robots-not-writable' => 'robots.txt is not writable (:path). Add the line by hand.',
+    'canonical-title' => 'Canonical URL',
+    'canonical-enable' => 'Add a canonical URL to pages that have none',
+    'canonical-hint' => 'The same page reached with tracking or cache-busting parameters looks like a separate address to a search engine, which splits its ranking. This adds the clean address to the page. An existing canonical from your theme is never overwritten.',
+    'canonical-keep' => 'Query parameters to keep',
+    'canonical-keep-hint' => 'Comma separated. These change what the page shows and must survive. Removing "page" would tell search engines that page 2 is a copy of page 1, and page 2 would drop out of the index.',
 ];
