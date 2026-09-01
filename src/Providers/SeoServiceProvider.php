@@ -48,7 +48,7 @@ class SeoServiceProvider extends BasePluginServiceProvider
         return [
             'seo' => [
                 'name' => trans('seo::admin.title'),
-                'icon' => 'bi bi-diagram-3',
+                'icon' => 'bi bi-search',
                 'route' => 'seo.admin.index',
                 'permission' => 'seo.admin',
             ],

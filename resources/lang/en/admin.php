@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'title' => 'Sitemap',
+    'title' => 'SEO',
     'permission' => 'Manage the sitemap',
 
     'url' => 'Your sitemap',

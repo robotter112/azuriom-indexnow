@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the `page` parameter, because removing it silently drops paginated pages from
   the index.
 - Buttons that wrap in a narrow card no longer sit flush against each other.
+- The admin menu entry is called "SEO" instead of "Sitemap" and carries a
+  magnifying glass instead of the sitemap tree - the plugin covers more than the
+  sitemap now.
 
 ## [1.3.1] - 2026-09-01
 
