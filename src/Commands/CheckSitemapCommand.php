@@ -1,15 +1,15 @@
 <?php
 
-namespace Azuriom\Plugin\Sitemap\Commands;
+namespace Azuriom\Plugin\Seo\Commands;
 
-use Azuriom\Plugin\Sitemap\Controllers\SitemapController;
-use Azuriom\Plugin\Sitemap\SeoCheck;
+use Azuriom\Plugin\Seo\Controllers\SitemapController;
+use Azuriom\Plugin\Seo\SeoCheck;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 
 class CheckSitemapCommand extends Command
 {
-    protected $signature = 'sitemap:check';
+    protected $signature = 'seo:check';
 
     protected $description = 'Fetch every URL of the sitemap as a guest and report the ones that do not answer with 200';
 

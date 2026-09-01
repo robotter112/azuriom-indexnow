@@ -1,6 +1,6 @@
 <?php
 
-namespace Azuriom\Plugin\Sitemap\Events;
+namespace Azuriom\Plugin\Seo\Events;
 
 use Illuminate\Support\Collection;
 

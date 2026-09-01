@@ -1,9 +1,9 @@
 <?php
 
-namespace Azuriom\Plugin\Sitemap\Middleware;
+namespace Azuriom\Plugin\Seo\Middleware;
 
-use Azuriom\Plugin\Sitemap\CanonicalUrl;
-use Azuriom\Plugin\Sitemap\Controllers\SitemapController;
+use Azuriom\Plugin\Seo\CanonicalUrl;
+use Azuriom\Plugin\Seo\Controllers\SitemapController;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;

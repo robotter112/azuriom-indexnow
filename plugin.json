@@ -1,15 +1,15 @@
 {
-    "id": "sitemap",
-    "name": "Sitemap",
+    "id": "seo",
+    "name": "SEO",
     "description": "Sitemap, canonical URLs, robots.txt and on-page checks: the search engine basics an Azuriom site needs, in one plugin.",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "url": "https://git.fastm.de/Max/azuriom-sitemap",
     "authors": [
         "Robotter112"
     ],
     "azuriom_api": "1.2.0",
     "providers": [
-        "\\Azuriom\\Plugin\\Sitemap\\Providers\\SitemapServiceProvider",
-        "\\Azuriom\\Plugin\\Sitemap\\Providers\\RouteServiceProvider"
+        "\\Azuriom\\Plugin\\Seo\\Providers\\SeoServiceProvider",
+        "\\Azuriom\\Plugin\\Seo\\Providers\\RouteServiceProvider"
     ]
 }

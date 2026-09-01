@@ -11,7 +11,7 @@
 
 require __DIR__.'/../src/CanonicalUrl.php';
 
-use Azuriom\Plugin\Sitemap\CanonicalUrl;
+use Azuriom\Plugin\Seo\CanonicalUrl;
 
 $fehler = 0;
 

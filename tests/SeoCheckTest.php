@@ -11,7 +11,7 @@
 
 require __DIR__.'/../src/SeoCheck.php';
 
-use Azuriom\Plugin\Sitemap\SeoCheck;
+use Azuriom\Plugin\Seo\SeoCheck;
 
 $fehler = 0;
 

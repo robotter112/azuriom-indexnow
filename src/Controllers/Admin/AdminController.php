@@ -1,11 +1,12 @@
 <?php
 
-namespace Azuriom\Plugin\Sitemap\Controllers\Admin;
+namespace Azuriom\Plugin\Seo\Controllers\Admin;
 
 use Azuriom\Http\Controllers\Controller;
 use Azuriom\Models\Setting;
-use Azuriom\Plugin\Sitemap\Controllers\SitemapController;
-use Azuriom\Plugin\Sitemap\SeoCheck;
+use Azuriom\Plugin\Seo\Controllers\SitemapController;
+use Azuriom\Plugin\Seo\IndexNow;
+use Azuriom\Plugin\Seo\SeoCheck;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -22,15 +23,16 @@ class AdminController extends Controller
 
     public function index()
     {
-        return view('sitemap::admin.index', [
-            'sitemapUrl' => route('sitemap.index'),
+        return view('seo::admin.index', [
+            'sitemapUrl' => route('seo.index'),
             'urls' => $this->urls(),
-            'cached' => Cache::has('sitemap.urls'),
+            'cached' => Cache::has('seo.urls'),
             'exclude' => implode("\n", SitemapController::excludePatterns()),
             'cacheMinutes' => SitemapController::cacheMinutes(),
             'canonical' => SitemapController::canonicalEnabled(),
             'canonicalKeep' => implode(', ', SitemapController::canonicalKeptParameters()),
             'robots' => $this->robotsState(),
+            'indexNow' => $this->indexNowState(),
         ]);
     }
 
@@ -57,24 +59,24 @@ class AdminController extends Controller
             ->all();
 
         Setting::updateSettings([
-            'sitemap.exclude' => json_encode($patterns),
-            'sitemap.cache_minutes' => $validated['cache_minutes'],
-            'sitemap.canonical' => $request->boolean('canonical') ? '1' : '0',
-            'sitemap.canonical_keep' => json_encode($keep),
+            'seo.exclude' => json_encode($patterns),
+            'seo.cache_minutes' => $validated['cache_minutes'],
+            'seo.canonical' => $request->boolean('canonical') ? '1' : '0',
+            'seo.canonical_keep' => json_encode($keep),
         ]);
 
-        Cache::forget('sitemap.urls');
+        Cache::forget('seo.urls');
 
-        return to_route('sitemap.admin.index')
-            ->with('success', trans('sitemap::admin.saved'));
+        return to_route('seo.admin.index')
+            ->with('success', trans('seo::admin.saved'));
     }
 
     public function refresh()
     {
-        Cache::forget('sitemap.urls');
+        Cache::forget('seo.urls');
 
-        return to_route('sitemap.admin.index')
-            ->with('success', trans('sitemap::admin.refreshed', ['count' => count($this->urls())]));
+        return to_route('seo.admin.index')
+            ->with('success', trans('seo::admin.refreshed', ['count' => count($this->urls())]));
     }
 
     public function check()
@@ -98,7 +100,7 @@ class AdminController extends Controller
             }
         }
 
-        return to_route('sitemap.admin.index')
+        return to_route('seo.admin.index')
             ->with('checked', [
                 'total' => $urls->count(),
                 'capped' => count($this->urls()) > self::CHECK_LIMIT,
@@ -115,11 +117,11 @@ class AdminController extends Controller
     public function robots()
     {
         $pfad = public_path('robots.txt');
-        $zeile = 'Sitemap: '.route('sitemap.index');
+        $zeile = 'Sitemap: '.route('seo.index');
 
         if (! is_writable($pfad) && file_exists($pfad)) {
-            return to_route('sitemap.admin.index')
-                ->with('error', trans('sitemap::admin.robots-not-writable', ['path' => $pfad]));
+            return to_route('seo.admin.index')
+                ->with('error', trans('seo::admin.robots-not-writable', ['path' => $pfad]));
         }
 
         $inhalt = file_exists($pfad) ? rtrim(file_get_contents($pfad), "\r\n") : "User-agent: *\nDisallow:";
@@ -130,8 +132,8 @@ class AdminController extends Controller
 
         file_put_contents($pfad, $inhalt."\n");
 
-        return to_route('sitemap.admin.index')
-            ->with('success', trans('sitemap::admin.robots-written'));
+        return to_route('seo.admin.index')
+            ->with('success', trans('seo::admin.robots-written'));
     }
 
     /**
@@ -145,9 +147,103 @@ class AdminController extends Controller
         return [
             'exists' => $vorhanden,
             'hasSitemap' => $vorhanden
-                && str_contains(file_get_contents($pfad), 'Sitemap: '.route('sitemap.index')),
+                && str_contains(file_get_contents($pfad), 'Sitemap: '.route('seo.index')),
             'writable' => $vorhanden ? is_writable($pfad) : is_writable(dirname($pfad)),
             'path' => $pfad,
+        ];
+    }
+
+    /**
+     * Turn IndexNow on: make a key, put the key file in place, and only save
+     * anything once the file has been confirmed reachable over HTTP. A key that
+     * cannot be verified would make every later submission fail with 403, so it
+     * is better to fail here, visibly, than silently later.
+     */
+    public function indexNowEnable()
+    {
+        $key = IndexNow::generateKey();
+        $datei = public_path(IndexNow::keyFileName($key));
+
+        if (! is_writable(dirname($datei))) {
+            return to_route('seo.admin.index')
+                ->with('error', trans('seo::admin.indexnow-not-writable', ['path' => dirname($datei)]));
+        }
+
+        file_put_contents($datei, $key);
+
+        $url = url(IndexNow::keyFileName($key));
+        $pruefung = IndexNow::verifyKeyFile($key, $url);
+
+        if (! $pruefung['ok']) {
+            // Do not leave a stray file behind for a setup that did not work.
+            @unlink($datei);
+
+            return to_route('seo.admin.index')->with('error', trans(
+                'seo::admin.indexnow-verify-'.$pruefung['reason'],
+                ['url' => $url, 'status' => $pruefung['status'] ?? 0]
+            ));
+        }
+
+        Setting::updateSettings(['seo.indexnow_key' => $key]);
+
+        return to_route('seo.admin.index')->with('success', trans('seo::admin.indexnow-enabled'));
+    }
+
+    /**
+     * Turn it off again and remove the key file.
+     */
+    public function indexNowDisable()
+    {
+        $key = setting('seo.indexnow_key');
+
+        if ($key) {
+            @unlink(public_path(IndexNow::keyFileName($key)));
+        }
+
+        Setting::updateSettings(['seo.indexnow_key' => null]);
+
+        return to_route('seo.admin.index')->with('success', trans('seo::admin.indexnow-disabled'));
+    }
+
+    /**
+     * Submit every URL of the sitemap.
+     */
+    public function indexNowSubmit()
+    {
+        $key = setting('seo.indexnow_key');
+
+        if (! $key) {
+            return to_route('seo.admin.index')->with('error', trans('seo::admin.indexnow-not-enabled'));
+        }
+
+        $sitemapUrl = route('seo.index');
+        $ergebnis = IndexNow::submit(
+            IndexNow::hostFor($sitemapUrl),
+            $key,
+            url(IndexNow::keyFileName($key)),
+            collect($this->urls())->pluck('loc')->all()
+        );
+
+        $text = trans('seo::admin.indexnow-result-'.$ergebnis['reason'], [
+            'count' => $ergebnis['count'],
+            'status' => $ergebnis['status'],
+        ]);
+
+        return to_route('seo.admin.index')
+            ->with($ergebnis['ok'] ? 'success' : 'error', $text);
+    }
+
+    /**
+     * @return array{enabled: bool, key: ?string, keyUrl: ?string}
+     */
+    protected function indexNowState(): array
+    {
+        $key = setting('seo.indexnow_key');
+
+        return [
+            'enabled' => (bool) $key,
+            'key' => $key,
+            'keyUrl' => $key ? url(IndexNow::keyFileName($key)) : null,
         ];
     }
 

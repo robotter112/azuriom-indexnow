@@ -1,11 +1,11 @@
 {
-    "name": "azuriom/sitemap",
+    "name": "azuriom/seo",
     "type": "azuriom-plugin",
-    "description": "Sitemap plugin for Azuriom",
+    "description": "SEO plugin for Azuriom",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Azuriom\\Plugin\\Sitemap\\": "src/"
+            "Azuriom\\Plugin\\Seo\\": "src/"
         }
     }
 }

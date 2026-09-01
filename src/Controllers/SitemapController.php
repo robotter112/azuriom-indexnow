@@ -1,12 +1,12 @@
 <?php
 
-namespace Azuriom\Plugin\Sitemap\Controllers;
+namespace Azuriom\Plugin\Seo\Controllers;
 
 use Azuriom\Http\Controllers\Controller;
 use Azuriom\Models\Page;
 use Azuriom\Models\Post;
-use Azuriom\Plugin\Sitemap\CanonicalUrl;
-use Azuriom\Plugin\Sitemap\Events\SitemapBuilding;
+use Azuriom\Plugin\Seo\CanonicalUrl;
+use Azuriom\Plugin\Seo\Events\SitemapBuilding;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route as RouteFacade;
@@ -43,7 +43,7 @@ class SitemapController extends Controller
     public function index()
     {
         return response()
-            ->view('sitemap::sitemap', ['urls' => $this->urls()])
+            ->view('seo::sitemap', ['urls' => $this->urls()])
             ->header('Content-Type', 'application/xml; charset=UTF-8');
     }
 
@@ -52,7 +52,7 @@ class SitemapController extends Controller
      */
     public function urls(): array
     {
-        return Cache::remember('sitemap.urls', now()->addMinutes(self::cacheMinutes()), function () {
+        return Cache::remember('seo.urls', now()->addMinutes(self::cacheMinutes()), function () {
             return $this->build();
         });
     }
@@ -64,7 +64,7 @@ class SitemapController extends Controller
      */
     public static function cacheMinutes(): int
     {
-        $wert = setting('sitemap.cache_minutes');
+        $wert = setting('seo.cache_minutes');
 
         return $wert !== null ? (int) $wert : (self::fileConfig()['cache_minutes'] ?? 60);
     }
@@ -74,7 +74,7 @@ class SitemapController extends Controller
      */
     public static function excludePatterns(): array
     {
-        $gespeichert = setting('sitemap.exclude');
+        $gespeichert = setting('seo.exclude');
 
         if ($gespeichert !== null) {
             return json_decode($gespeichert, true) ?: [];
@@ -85,7 +85,7 @@ class SitemapController extends Controller
 
     public static function canonicalEnabled(): bool
     {
-        $wert = setting('sitemap.canonical');
+        $wert = setting('seo.canonical');
 
         return $wert !== null
             ? (bool) $wert
@@ -99,7 +99,7 @@ class SitemapController extends Controller
      */
     public static function canonicalKeptParameters(): array
     {
-        $gespeichert = setting('sitemap.canonical_keep');
+        $gespeichert = setting('seo.canonical_keep');
 
         if ($gespeichert !== null) {
             return json_decode($gespeichert, true) ?: [];
@@ -155,7 +155,7 @@ class SitemapController extends Controller
                 continue;
             }
 
-            if ($route->getName() === 'sitemap.index') {
+            if ($route->getName() === 'seo.index') {
                 continue; // no point in listing the sitemap in itself
             }
 

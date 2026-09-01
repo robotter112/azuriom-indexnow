@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-09-01
+
+### Added
+
+- IndexNow support. One button generates the key, writes the key file and
+  verifies over HTTP that it is reachable and returns the key before saving
+  anything — an unverifiable key would make every later submission fail with
+  `403`. A second button submits all sitemap URLs and reports the answer in
+  plain words. Bing, Yandex, Seznam and Naver participate; Google does not.
+- Self-check for the IndexNow key handling and status interpretation
+  (`php tests/IndexNowTest.php`).
+
+### Changed
+
+- **The plugin is now called `seo`, not `sitemap`.** It long since covered more
+  than the sitemap. The public address stays `/sitemap.xml`, so submitted
+  sitemaps keep working, but the plugin folder, its id, the admin route and the
+  console command changed (`php artisan seo:check`). Settings are carried over.
+
 ## [1.2.0] - 2026-09-01
 
 ### Added
@@ -49,14 +68,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   contributes what a logged-out visitor can open.
 - Admin page under **Admin → Sitemap** with the sitemap address, the current URL
   count, a rebuild button and both settings.
-- **Check URLs** button and `php artisan sitemap:check`, which fetch every
+- **Check URLs** button and `php artisan seo:check`, which fetch every
   listed URL as a guest and report anything that does not answer with `200`.
 - Excluded paths setting for pages whose plugin redirects guests from inside its
   own controller, which cannot be detected automatically.
 - `SitemapBuilding` event so other plugins can contribute their own URLs.
 - English, French and German translations for the admin page.
 
-[Unreleased]: https://git.fastm.de/Max/azuriom-sitemap/compare/v1.2.0...HEAD
-[1.2.0]: https://git.fastm.de/Max/azuriom-sitemap/releases/tag/v1.2.0
-[1.1.0]: https://git.fastm.de/Max/azuriom-sitemap/releases/tag/v1.1.0
-[1.0.0]: https://git.fastm.de/Max/azuriom-sitemap/releases/tag/v1.0.0
+[Unreleased]: https://git.fastm.de/Max/azuriom-seo/compare/v1.2.0...HEAD
+[1.2.0]: https://git.fastm.de/Max/azuriom-seo/releases/tag/v1.2.0
+[1.1.0]: https://git.fastm.de/Max/azuriom-seo/releases/tag/v1.1.0
+[1.0.0]: https://git.fastm.de/Max/azuriom-seo/releases/tag/v1.0.0

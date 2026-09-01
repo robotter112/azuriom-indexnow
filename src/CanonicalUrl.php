@@ -1,6 +1,6 @@
 <?php
 
-namespace Azuriom\Plugin\Sitemap;
+namespace Azuriom\Plugin\Seo;
 
 /**
  * Builds the canonical address for a request URL.

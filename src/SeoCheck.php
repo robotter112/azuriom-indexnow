@@ -1,6 +1,6 @@
 <?php
 
-namespace Azuriom\Plugin\Sitemap;
+namespace Azuriom\Plugin\Seo;
 
 /**
  * Looks for the handful of on-page problems search engines actually complain

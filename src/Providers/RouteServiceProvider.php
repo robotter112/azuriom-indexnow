@@ -1,6 +1,6 @@
 <?php
 
-namespace Azuriom\Plugin\Sitemap\Providers;
+namespace Azuriom\Plugin\Seo\Providers;
 
 use Azuriom\Extensions\Plugin\BaseRouteServiceProvider;
 use Illuminate\Support\Facades\Route;

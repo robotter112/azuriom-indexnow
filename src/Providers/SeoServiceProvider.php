@@ -1,13 +1,13 @@
 <?php
 
-namespace Azuriom\Plugin\Sitemap\Providers;
+namespace Azuriom\Plugin\Seo\Providers;
 
 use Azuriom\Extensions\Plugin\BasePluginServiceProvider;
 use Azuriom\Models\Permission;
-use Azuriom\Plugin\Sitemap\Commands\CheckSitemapCommand;
-use Azuriom\Plugin\Sitemap\Middleware\AddCanonicalUrl;
+use Azuriom\Plugin\Seo\Commands\CheckSitemapCommand;
+use Azuriom\Plugin\Seo\Middleware\AddCanonicalUrl;
 
-class SitemapServiceProvider extends BasePluginServiceProvider
+class SeoServiceProvider extends BasePluginServiceProvider
 {
     /**
      * The plugin's global HTTP middleware stack.
@@ -32,7 +32,7 @@ class SitemapServiceProvider extends BasePluginServiceProvider
         $this->registerAdminNavigation();
 
         Permission::registerPermissions([
-            'sitemap.admin' => 'sitemap::admin.permission',
+            'seo.admin' => 'seo::admin.permission',
         ]);
 
         if ($this->app->runningInConsole()) {
@@ -46,11 +46,11 @@ class SitemapServiceProvider extends BasePluginServiceProvider
     protected function adminNavigation(): array
     {
         return [
-            'sitemap' => [
-                'name' => trans('sitemap::admin.title'),
+            'seo' => [
+                'name' => trans('seo::admin.title'),
                 'icon' => 'bi bi-diagram-3',
-                'route' => 'sitemap.admin.index',
-                'permission' => 'sitemap.admin',
+                'route' => 'seo.admin.index',
+                'permission' => 'seo.admin',
             ],
         ];
     }

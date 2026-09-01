@@ -1,11 +1,11 @@
-# Sitemap
+# SEO
 
-An [Azuriom](https://azuriom.com) plugin that serves a `sitemap.xml` at the
-document root of your site, listing every URL a logged-out visitor can open, so
-search engines can find and index all of your content instead of only the pages
-they stumble upon through links.
+An [Azuriom](https://azuriom.com) plugin covering the search engine basics a
+site needs: a **sitemap**, **canonical URLs**, **robots.txt**, **IndexNow** and
+**on-page checks** — in one place, with no configuration required to get
+started.
 
-Repository: <https://git.fastm.de/Max/azuriom-sitemap>
+Repository: <https://git.fastm.de/Max/azuriom-seo>
 
 ## What ends up in the sitemap
 
@@ -83,7 +83,7 @@ The button stops after 60 URLs so the request cannot time out. For a full run on
 a large site use the command, which has no cap:
 
 ```bash
-php artisan sitemap:check
+php artisan seo:check
 ```
 
 ### On-page checks
@@ -123,6 +123,23 @@ a `</head>`.
 Crawlers look for the sitemap in `robots.txt`. The admin page reports whether the
 line is there and can write it for you if the file is writable.
 
+## IndexNow
+
+IndexNow tells search engines immediately that pages changed, instead of waiting
+for the next crawl. **Bing, Yandex, Seznam and Naver support it. Google does
+not** — for Google the sitemap remains the way.
+
+It is one button. Enabling generates a key, writes the key file to your document
+root, and then **fetches that file over HTTP to confirm it is really reachable
+and really returns the key**. Only if that succeeds is anything saved; otherwise
+the stray file is removed again and you get told exactly what went wrong. A key
+that cannot be verified would make every later submission fail with `403`, so it
+fails here, visibly, instead of silently later.
+
+*Submit all URLs* then sends the sitemap URLs and reports the answer in plain
+words — accepted, still validating, key rejected, host mismatch, rate limited.
+Disabling removes the key file again.
+
 ## Tests
 
 The HTML analysis works with regular expressions, which break quietly, so it
@@ -141,7 +158,7 @@ that part carries its own checks.
 Other plugins can contribute URLs by listening to the `SitemapBuilding` event:
 
 ```php
-use Azuriom\Plugin\Sitemap\Events\SitemapBuilding;
+use Azuriom\Plugin\Seo\Events\SitemapBuilding;
 use Illuminate\Support\Facades\Event;
 
 Event::listen(SitemapBuilding::class, function (SitemapBuilding $event) {
@@ -163,7 +180,7 @@ Adding a language is text work, no code: copy `resources/lang/en/admin.php` to
 `resources/lang/<locale>/admin.php` and translate the 21 strings. Pull requests
 for further locales are welcome — Azuriom itself ships 19.
 
-Console output of `php artisan sitemap:check` is English only, matching
+Console output of `php artisan seo:check` is English only, matching
 Azuriom's own commands.
 
 ## Limits
@@ -175,7 +192,7 @@ your site is that big, please open an issue.
 ## Contributing
 
 Issues and pull requests are welcome at
-<https://git.fastm.de/Max/azuriom-sitemap>. Please keep the code in the style of
+<https://git.fastm.de/Max/azuriom-seo>. Please keep the code in the style of
 the surrounding files: comments in English, no new dependencies, and a note in
 `CHANGELOG.md` for anything users can notice.
 
