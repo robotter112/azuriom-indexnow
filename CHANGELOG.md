@@ -15,6 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   top of the existing English, French and German. Key parity, placeholder parity
   and plural forms are verified against the English reference.
 
+### Changed
+
+- The hint texts on the admin page are about half as long and say what to do
+  rather than how it works, in all 19 languages. The one warning that stays is
+  the `page` parameter, because removing it silently drops paginated pages from
+  the index.
+- Buttons that wrap in a narrow card no longer sit flush against each other.
+
 ## [1.3.1] - 2026-09-01
 
 ### Fixed
