@@ -7,6 +7,14 @@ use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends BaseRouteServiceProvider
 {
+    /**
+     * Marks the optional sitemap as switched on. Written by the admin page.
+     */
+    public static function flagPath(): string
+    {
+        return storage_path('app/indexnow-serve-sitemap');
+    }
+
     public function loadRoutes(): void
     {
         $this->mapPluginsRoutes();
@@ -16,6 +24,19 @@ class RouteServiceProvider extends BaseRouteServiceProvider
 
     protected function mapPluginsRoutes(): void
     {
+        // Only registered when the option is on. Registering it unconditionally
+        // and answering 404 looked harmless but was not: two plugins claiming
+        // /sitemap.xml means the first one registered wins, and "indexnow"
+        // sorts before "seo" - so a dormant route took the address away from
+        // the plugin actually serving it.
+        //
+        // A file rather than the setting, because settings are not loaded yet
+        // when routes are registered - setting() returns null here even when
+        // the value is stored, which would leave the option permanently off.
+        if (! file_exists(self::flagPath())) {
+            return;
+        }
+
         // No prefix: a sitemap is only looked for at the document root. The
         // core fallback route is registered with ->fallback() and never shadows
         // this one.

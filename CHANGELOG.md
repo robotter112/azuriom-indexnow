@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-09-01
+
+### Fixed
+
+- The optional sitemap route was registered even while the option was off,
+  answering `404`. Where another plugin serves `/sitemap.xml`, the first
+  registration wins and `indexnow` sorts before `seo` — so a dormant route took
+  the address away from the plugin actually serving it, and the site lost its
+  sitemap. The route is now only registered when the option is on.
+- That switch is read from a file rather than the setting, because settings are
+  not loaded yet when routes are registered: `setting()` returned `null` there
+  even with the value stored, which would have left the option permanently off.
+
 ## [2.1.0] - 2026-09-01
 
 ### Added
@@ -63,7 +76,8 @@ This plugin grew out of a broader SEO plugin. Since
 canonical URLs, robots.txt and structured data — but not IndexNow — everything
 overlapping was removed and only the missing piece kept.
 
-[Unreleased]: https://github.com/Robotter112/azuriom-indexnow/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/Robotter112/azuriom-indexnow/compare/v2.1.1...HEAD
+[2.1.1]: https://github.com/Robotter112/azuriom-indexnow/releases/tag/v2.1.1
 [2.1.0]: https://github.com/Robotter112/azuriom-indexnow/releases/tag/v2.1.0
 [2.0.1]: https://github.com/Robotter112/azuriom-indexnow/releases/tag/v2.0.1
 [2.0.0]: https://github.com/Robotter112/azuriom-indexnow/releases/tag/v2.0.0

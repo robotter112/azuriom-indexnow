@@ -6,8 +6,10 @@ use Azuriom\Http\Controllers\Controller;
 use Azuriom\Models\Setting;
 use Azuriom\Plugin\Indexnow\Client;
 use Azuriom\Plugin\Indexnow\Controllers\SitemapController;
+use Azuriom\Plugin\Indexnow\Providers\RouteServiceProvider;
 use Azuriom\Plugin\Indexnow\UrlSource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 
 class AdminController extends Controller
@@ -116,6 +118,8 @@ class AdminController extends Controller
 
     public function update(Request $request)
     {
+        $wasServing = (bool) setting('indexnow.serve_sitemap');
+
         $validated = $request->validate([
             'sitemap' => ['nullable', 'string', 'max:500', 'url', function ($attribute, $value, $fail) {
                 if ($value && ! Client::isOwnHost($value)) {
@@ -133,6 +137,21 @@ class AdminController extends Controller
         ]);
 
         Cache::forget('indexnow.sitemap');
+
+        // The route is registered from a file rather than this setting, because
+        // settings are not loaded yet at that point. Keep the two in step and
+        // drop the cached route table, which was built for the old state.
+        if ($request->boolean('serve_sitemap') !== $wasServing) {
+            $flag = RouteServiceProvider::flagPath();
+
+            if ($request->boolean('serve_sitemap')) {
+                @file_put_contents($flag, '');
+            } else {
+                @unlink($flag);
+            }
+
+            Artisan::call('route:clear');
+        }
 
         return to_route('indexnow.admin.index')->with('success', trans('indexnow::admin.saved'));
     }
