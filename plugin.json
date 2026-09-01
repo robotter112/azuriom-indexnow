@@ -2,7 +2,7 @@
     "id": "indexnow",
     "name": "IndexNow",
     "description": "Tells Bing, Yandex, Seznam and Naver right away when a page changes, instead of waiting for the next crawl. One button to set up.",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "url": "https://github.com/Robotter112/azuriom-indexnow",
     "authors": [
         "Robotter112"

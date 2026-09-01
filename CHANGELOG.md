@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-09-01
+
 ### Security
 
 - The IndexNow key is validated before it is used as a file name. It ends up in
@@ -42,5 +44,6 @@ This plugin grew out of a broader SEO plugin. Since
 canonical URLs, robots.txt and structured data — but not IndexNow — everything
 overlapping was removed and only the missing piece kept.
 
-[Unreleased]: https://github.com/Robotter112/azuriom-indexnow/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/Robotter112/azuriom-indexnow/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/Robotter112/azuriom-indexnow/releases/tag/v2.0.1
 [2.0.0]: https://github.com/Robotter112/azuriom-indexnow/releases/tag/v2.0.0
