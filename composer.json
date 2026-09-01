@@ -2,6 +2,7 @@
     "name": "azuriom/sitemap",
     "type": "azuriom-plugin",
     "description": "Sitemap plugin for Azuriom",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "Azuriom\\Plugin\\Sitemap\\": "src/"
