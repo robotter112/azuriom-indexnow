@@ -44,12 +44,16 @@ class IndexnowServiceProvider extends BasePluginServiceProvider
      */
     protected function watchForChanges(): void
     {
-        if (! setting('indexnow.auto')) {
-            return;
-        }
-
         foreach (self::WATCHED as $model) {
             $model::saved(function (Model $record) {
+                // Read on save, not at boot: Azuriom loads the settings only
+                // after the plugins have booted, so setting() would return the
+                // default there whatever is stored. On unless switched off,
+                // like the switch on the admin page shows it.
+                if (! setting('indexnow.auto', true)) {
+                    return;
+                }
+
                 $url = Client::urlFor($record);
 
                 if ($url === null) {
