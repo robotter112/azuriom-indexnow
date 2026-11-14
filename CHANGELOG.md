@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-11-14
+
+### Fixed
+
+- Enabling the plugin no longer breaks the admin panel on hosts where AzBoost,
+  Azuriom's route and config cache, is on and `opcache_invalidate()` is
+  disabled, as is common on shared hosting. Azuriom rebuilds its route cache
+  from an outdated plugin list there, so this plugin's routes were missing while
+  its menu entry was not, and every admin page failed with
+  `Route [indexnow.admin.index] not defined`. The entry now stays hidden until
+  the routes exist; *Reload AzBoost* under *Settings → Performance* brings it
+  back.
+- Automatic reporting works. The setting was read while the plugin booted,
+  before Azuriom loads its settings, so it always looked switched off and saving
+  a page or post reported nothing, whatever the switch showed. It is now read
+  when something is saved, and is on unless switched off — as the admin page has
+  always shown it.
+
 ## [2.1.0] - 2026-09-01
 
 ### Added
@@ -65,7 +83,8 @@ This plugin grew out of a broader SEO plugin. Since
 canonical URLs, robots.txt and structured data — but not IndexNow — everything
 overlapping was removed and only the missing piece kept.
 
-[Unreleased]: https://github.com/Robotter112/azuriom-indexnow/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/Robotter112/azuriom-indexnow/compare/v2.1.1...HEAD
+[2.1.1]: https://github.com/Robotter112/azuriom-indexnow/releases/tag/v2.1.1
 [2.1.0]: https://github.com/Robotter112/azuriom-indexnow/releases/tag/v2.1.0
 [2.0.1]: https://github.com/Robotter112/azuriom-indexnow/releases/tag/v2.0.1
 [2.0.0]: https://github.com/Robotter112/azuriom-indexnow/releases/tag/v2.0.0
