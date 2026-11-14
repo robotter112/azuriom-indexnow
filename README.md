@@ -1,4 +1,5 @@
 <img width="2000" height="1000" alt="cover" src="https://github.com/user-attachments/assets/08f78091-8a6c-40c1-a289-e41e053504dd" />
+
 # IndexNow
 
 An [Azuriom](https://azuriom.com) plugin that tells search engines a page changed
