@@ -7,8 +7,11 @@ use Azuriom\Models\Page;
 use Azuriom\Models\Permission;
 use Azuriom\Models\Post;
 use Azuriom\Plugin\Indexnow\Client;
+use Azuriom\Support\Optimizer;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
+use Throwable;
 
 class IndexnowServiceProvider extends BasePluginServiceProvider
 {
@@ -72,11 +75,13 @@ class IndexnowServiceProvider extends BasePluginServiceProvider
      */
     protected function adminNavigation(): array
     {
-        // Azuriom can rebuild its route cache from an outdated plugin list
-        // (advanced cache on, opcache_invalidate() disabled by the host), which
-        // leaves this route out. Linking to it anyway would break every admin
-        // page, so the entry stays hidden until the cache is rebuilt.
+        // Azuriom can build its route cache from an outdated plugin list (AzBoost
+        // on, opcache_invalidate() disabled by the host), which leaves this route
+        // out. Linking to it anyway would break every admin page, so the entry
+        // waits until the repair below has taken effect.
         if (! Route::has('indexnow.admin.index')) {
+            $this->repairRouteCache();
+
             return [];
         }
 
@@ -88,5 +93,30 @@ class IndexnowServiceProvider extends BasePluginServiceProvider
                 'permission' => 'indexnow.admin',
             ],
         ];
+    }
+
+    /**
+     * Rebuild a route cache that lacks this plugin, as "Reload AzBoost" does.
+     * What failed while enabling works now: this request already runs with the
+     * plugin, so the rebuild reads a plugin list that contains it.
+     */
+    protected function repairRouteCache(): void
+    {
+        // At most every five minutes: the host may keep serving the old file
+        // from OPcache for a moment, and a rebuild takes a second or two.
+        if (! $this->app->routesAreCached() || ! Cache::add('indexnow.route_repair', true, 300)) {
+            return;
+        }
+
+        // After the response, so the page that noticed it is not slowed down.
+        $this->app->terminating(function () {
+            try {
+                $this->app->make(Optimizer::class)->reloadRoutesCache();
+            } catch (Throwable $e) {
+                // route:cache deletes the old file first, so the routes load
+                // uncached from now on, this plugin's included.
+                report($e);
+            }
+        });
     }
 }
