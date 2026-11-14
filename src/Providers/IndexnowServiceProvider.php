@@ -8,6 +8,7 @@ use Azuriom\Models\Permission;
 use Azuriom\Models\Post;
 use Azuriom\Plugin\Indexnow\Client;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Route;
 
 class IndexnowServiceProvider extends BasePluginServiceProvider
 {
@@ -67,6 +68,14 @@ class IndexnowServiceProvider extends BasePluginServiceProvider
      */
     protected function adminNavigation(): array
     {
+        // Azuriom can rebuild its route cache from an outdated plugin list
+        // (advanced cache on, opcache_invalidate() disabled by the host), which
+        // leaves this route out. Linking to it anyway would break every admin
+        // page, so the entry stays hidden until the cache is rebuilt.
+        if (! Route::has('indexnow.admin.index')) {
+            return [];
+        }
+
         return [
             'indexnow' => [
                 'name' => trans('indexnow::admin.title'),
