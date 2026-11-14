@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.2] - 2026-11-14
+
+### Fixed
+
+- The plugin now repairs a route cache that Azuriom built without it, as
+  happens on hosts where AzBoost is on and `opcache_invalidate()` is disabled.
+  2.1.1 kept the admin panel working in that case, but IndexNow stayed
+  unreachable until someone clicked *Reload AzBoost*. Now the first admin page
+  that notices the gap rebuilds the cache right after it is delivered, the same
+  way that button does, and the menu entry appears a moment later. AzBoost stays
+  on.
+
 ## [2.1.1] - 2026-11-14
 
 ### Fixed
@@ -83,7 +95,8 @@ This plugin grew out of a broader SEO plugin. Since
 canonical URLs, robots.txt and structured data — but not IndexNow — everything
 overlapping was removed and only the missing piece kept.
 
-[Unreleased]: https://github.com/Robotter112/azuriom-indexnow/compare/v2.1.1...HEAD
+[Unreleased]: https://github.com/Robotter112/azuriom-indexnow/compare/v2.1.2...HEAD
+[2.1.2]: https://github.com/Robotter112/azuriom-indexnow/releases/tag/v2.1.2
 [2.1.1]: https://github.com/Robotter112/azuriom-indexnow/releases/tag/v2.1.1
 [2.1.0]: https://github.com/Robotter112/azuriom-indexnow/releases/tag/v2.1.0
 [2.0.1]: https://github.com/Robotter112/azuriom-indexnow/releases/tag/v2.0.1
