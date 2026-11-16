@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-11-16
+
+IndexNow now covers every plugin and reports only what everyone can see.
+
 ### Added
 
 - Every plugin is covered by the automatic reporting, without changing it: when
@@ -19,6 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   answer to the event `indexnow.urls` adds them to *Submit all URLs* and the
   optional sitemap. Only addresses of the site itself are taken. OnAir Connect
   uses this for its collections.
+- Only what a visitor who is not logged in can open is reported: before a report
+  goes out, every address is opened without cookies, and only pages (200) and
+  addresses that are gone (404, 410) are kept. Login pages, 401, 403 and pages
+  under maintenance (503) are never reported, whatever plugin they belong to.
+  Where the site cannot reach itself, the rules decide and maintenance stays out.
 - A feature test in a fresh Azuriom (`tests/ci.sh`), next to a plugin that knows
   nothing about IndexNow, with and without AzBoost.
 
@@ -28,6 +37,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   address too, so search engines forget it.
 - Everything that changes during one request goes out as one report instead of
   one request per saved item.
+
+### Fixed
+
+- A new page restricted to roles was reported: Azuriom assigns the roles of a
+  page only after saving it, so at that moment it looked public. Whether a page
+  is public is now decided when the report goes out, and a page with roles is
+  never reported, also when renamed, disabled or deleted.
 
 ## [2.1.2] - 2026-11-14
 
