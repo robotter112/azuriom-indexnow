@@ -40,19 +40,33 @@ function check(bool $ok, string $label): void
     $failures += $ok ? 0 : 1;
 }
 
+// The IndexNow endpoint answers $status. The site itself answers what $site says
+// for an address (200 when not listed, 'down' when it cannot be reached): that is
+// what a visitor who is not logged in gets.
 $status = 200;
-Http::fake(function () use (&$status) {
+$site = [];
+Http::fake(function ($request) use (&$status, &$site) {
+    if (str_starts_with($request->url(), url('/'))) {
+        $answer = $site[$request->url()] ?? 200;
+
+        if ($answer === 'down') {
+            throw new Illuminate\Http\Client\ConnectionException('The site cannot reach itself');
+        }
+
+        return Http::response('', $answer);
+    }
+
     return Http::response('', $status);
 });
 
-// What one request reports: everything sent to IndexNow when it ends.
+// What one request reports: the lists sent to IndexNow when it ends.
 $seen = 0;
 $reported = function () use ($app, &$seen): array {
     $app->terminate();
     $requests = Http::recorded()->slice($seen)->values();
     $seen += $requests->count();
 
-    return $requests->map(fn ($pair) => $pair[0]->data()['urlList'] ?? [])->all();
+    return $requests->filter(fn ($pair) => $pair[0]->method() === 'POST')->map(fn ($pair) => $pair[0]->data()['urlList'] ?? [])->values()->all();
 };
 
 Cache::flush();
@@ -130,6 +144,48 @@ $all = SiteUrls::all();
 check(in_array(url('/knowledge/setup'), $all, true) && ! in_array('https://example.org/elsewhere', $all, true), 'a plugin adds its addresses to the sitemap and to "Submit all URLs"');
 check(in_array(url('indexnow-demo'), $all, true) && ! in_array(url('admin/indexnow-demo'), $all, true), 'the sitemap has the public plugin page, not its admin page');
 
+// --- only what a visitor who is not logged in can open -------------------------
+
+$site[route('posts.show', 'login-post')] = 302;
+$post('login-post');
+check($reported() === [], 'an address that sends visitors to the login form is not reported');
+foreach ([401, 403] as $answer) {
+    $site[route('posts.show', "closed-$answer")] = $answer;
+    $post("closed-$answer");
+}
+check($reported() === [], 'an address that answers 401 or 403 is not reported');
+Cache::forget('indexnow.reported.'.sha1(url('indexnow-demo')));
+$site[url('indexnow-demo')] = 302;
+Item::create(['name' => 'Members only']);
+check($reported() === [], 'a plugin page behind a login is not reported');
+unset($site[url('indexnow-demo')]);
+Item::create(['name' => 'Public again']);
+check($reported() === [[url('indexnow-demo')]], 'once public, it is reported with the next change (a refused check starts no pause)');
+
+$site[route('posts.show', 'rebuilt-post')] = 503;
+$rebuilt = $post('rebuilt-post');
+$rebuilt->delete();
+check($reported() === [], 'under maintenance (503) nothing is reported, neither as changed nor as gone');
+$site[route('posts.show', 'gone-post')] = 404;
+$gone = $post('gone-post');
+$reported();
+$gone->delete();
+check($reported() === [[route('posts.show', 'gone-post')]], 'a page that is gone (404) is reported, so search engines forget it');
+
+$site[route('posts.show', 'unreachable-post')] = 'down';
+$post('unreachable-post');
+check($reported() === [[route('posts.show', 'unreachable-post')]], 'if the site cannot reach itself, the rules decide');
+Setting::updateSettings(['maintenance.enabled' => '1', 'maintenance.paths' => ['/news/*']]);
+$site[route('posts.show', 'unreachable-maintained')] = 'down';
+$post('unreachable-maintained');
+check($reported() === [], 'and an address under maintenance stays out (maintenance of single paths)');
+Setting::updateSettings(['maintenance.paths' => []]);
+$site[route('posts.show', 'unreachable-everywhere')] = 'down';
+$post('unreachable-everywhere');
+check($reported() === [], 'maintenance of the whole site keeps every address out');
+Setting::updateSettings(['maintenance.enabled' => '0', 'maintenance.paths' => []]);
+check(Http::recorded()->every(fn ($pair) => $pair[0]->method() === 'POST' || str_starts_with($pair[0]->url(), url('/'))), 'only addresses of this site are ever opened for the check');
+
 // --- switches and failures ---------------------------------------------------
 
 Setting::updateSettings(['indexnow.auto' => '0']);
@@ -153,7 +209,7 @@ try {
 check($failed === false, 'a failing IndexNow never disturbs the save');
 $status = 200;
 
-Post::whereIn('slug', ['first-post', 'second-post', 'draft-post', 'quiet-post', 'keyless-post', 'failing-post'])->delete();
+Post::whereIn('slug', ['first-post', 'second-post', 'draft-post', 'quiet-post', 'keyless-post', 'failing-post', 'login-post', 'closed-401', 'closed-403', 'unreachable-post', 'unreachable-maintained', 'unreachable-everywhere'])->delete();
 $page->delete();
 $author->delete();
 $reported();

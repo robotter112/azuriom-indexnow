@@ -44,6 +44,23 @@ Everything that changes during one request goes out as **one** report, **after**
 the response, so saving in the admin panel is never slowed down, and a failure
 there can never disturb the save that triggered it.
 
+### Only what everyone can see
+
+Before a report goes out, the plugin opens every address the way a visitor who is
+**not logged in** does — no cookies, no redirects followed — and keeps only:
+
+- addresses that answer with a page (200), and
+- addresses that are gone (404, 410), so search engines forget them.
+
+Anything that sends visitors to the login form, answers 401 or 403, or needs a
+role is **never** reported, whatever plugin it belongs to. Pages under
+**maintenance** (503) are not reported either — neither as changed nor as gone —
+so rebuilding something never costs its place in the search results. Pages
+restricted to roles are also left out by the rules before any check.
+
+The check needs the site to reach itself, as the key verification does. Where it
+cannot, the rules decide, and addresses under maintenance stay out.
+
 ### Pages of other plugins
 
 A plugin that knows the exact addresses of its pages can hand them over, without
@@ -103,6 +120,8 @@ still validating, key rejected, host mismatch, rate limited.
   the bulk submission falls back to Azuriom's pages and posts, and the per-page
   reporting never needed it in the first place
 - No migrations, no dependencies
+- The site must be able to reach its own address (for the key check, and for the
+  check that keeps non-public addresses out of the reports)
 
 ## Translations
 

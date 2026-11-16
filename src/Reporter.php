@@ -7,6 +7,7 @@ use Azuriom\Models\Post;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -23,10 +24,24 @@ use Throwable;
  *
  * Everything that changes during one request goes out together after the
  * response: one request to IndexNow, and never a delay for the person saving.
+ *
+ * Before it goes out, every address is opened the way a visitor who is not
+ * logged in opens it (visible()): only what such a visitor gets as a page, or
+ * as gone, is reported - never what needs a login or a role, and nothing under
+ * maintenance.
  */
 class Reporter
 {
     public const PLUGIN_PAGE_PAUSE = 3600;
+
+    /** Answers worth reporting: a page for everyone (200), or gone for good (404, 410). */
+    public const REPORTABLE = [200, 404, 410];
+
+    /** Addresses opened per report; beyond that (a big import) the rules alone decide. */
+    public const MAX_CHECKS = 25;
+
+    /** @var array<string, true> plugin pages, reported at most once per PLUGIN_PAGE_PAUSE */
+    private static array $paused = [];
 
     /** @var array<string, true> */
     private static array $queue = [];
@@ -128,7 +143,82 @@ class Reporter
      */
     public static function queueOncePerPause(array $urls): void
     {
-        self::queue(array_values(array_filter($urls, fn (string $url) => Cache::add('indexnow.reported.'.sha1($url), true, self::PLUGIN_PAGE_PAUSE))));
+        // The pause starts when a page is really reported (flush()), so a page that
+        // was not public yet is checked again with the next change.
+        $urls = array_values(array_filter($urls, fn (string $url) => ! Cache::has(self::pauseKey($url))));
+
+        foreach ($urls as $url) {
+            self::$paused[$url] = true;
+        }
+
+        self::queue($urls);
+    }
+
+    private static function pauseKey(string $url): string
+    {
+        return 'indexnow.reported.'.sha1($url);
+    }
+
+    /**
+     * The addresses a visitor who is not logged in gets as a page (200) or as gone
+     * (404, 410). A redirect (to the login form), 401, 403 and every other answer,
+     * maintenance (503) included, keep an address out. Only addresses of this site
+     * are opened, without cookies and without following redirects. If the site
+     * cannot reach itself, the rules that chose the address decide, and addresses
+     * under maintenance stay out.
+     *
+     * @param  array<int, string>  $urls
+     * @return array<int, string>
+     */
+    public static function visible(array $urls): array
+    {
+        $kept = [];
+
+        foreach (array_values(array_filter($urls, fn (string $url) => Client::isOwnHost($url))) as $index => $url) {
+            $status = $index < self::MAX_CHECKS ? self::guestStatus($url) : null;
+
+            if ($status === null ? ! self::underMaintenance($url) : in_array($status, self::REPORTABLE, true)) {
+                $kept[] = $url;
+            }
+        }
+
+        return $kept;
+    }
+
+    private static function guestStatus(string $url): ?int
+    {
+        try {
+            return Http::withoutRedirecting()
+                ->timeout(8)
+                ->withHeaders(['User-Agent' => 'IndexNow for Azuriom (visibility check)', 'Accept' => 'text/html'])
+                ->get($url)
+                ->status();
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * Whether Azuriom shows its maintenance page at this address to visitors, by the
+     * same rules as its middleware: the whole site, or the listed paths.
+     */
+    private static function underMaintenance(string $url): bool
+    {
+        if (! setting('maintenance.enabled', false)) {
+            return false;
+        }
+
+        $paths = array_map(function (string $path) {
+            return trim(Str::endsWith($path, '/*') ? Str::replaceLast('/*', '*', $path) : $path, '/');
+        }, (array) setting('maintenance.paths', []));
+
+        if ($paths === []) {
+            return true;
+        }
+
+        $path = trim(rawurldecode((string) parse_url($url, PHP_URL_PATH)), '/');
+
+        return Str::is($paths, $path === '' ? '/' : $path);
     }
 
     /**
@@ -158,7 +248,14 @@ class Reporter
             }
         }
 
-        $urls = array_values(array_unique($urls));
+        $paused = self::$paused;
+        self::$paused = [];
+
+        $urls = self::visible(array_values(array_unique($urls)));
+
+        // A plugin page that goes out now starts its pause.
+        $urls = array_values(array_filter($urls, fn (string $url) => ! isset($paused[$url])
+            || Cache::add(self::pauseKey($url), true, self::PLUGIN_PAGE_PAUSE)));
 
         if ($urls === []) {
             return null;
