@@ -33,6 +33,12 @@ class Reporter
 
     private static bool $flushing = false;
 
+    /** @var array<int, string|null> changed pages => their former address, checked when sending */
+    private static array $pages = [];
+
+    /** @var array<int, string|null> pages being deleted => their address if visitors could open them */
+    private static array $deletedPages = [];
+
     /** @var array<string, string>|null namespace prefix => plugin id */
     private static ?array $namespaces = null;
 
@@ -42,8 +48,25 @@ class Reporter
             return;
         }
 
-        if ($record instanceof Post || $record instanceof Page) {
+        if ($record instanceof Post) {
             self::queue([Client::urlFor($record), self::formerUrl($record)]);
+
+            return;
+        }
+
+        if ($record instanceof Page) {
+            if (! $record->exists) {
+                // Deleted: what was known before the database dropped its roles (deleting()).
+                self::queue([self::$deletedPages[$record->getKey()] ?? null]);
+                unset(self::$deletedPages[$record->getKey()]);
+
+                return;
+            }
+
+            // Azuriom assigns the roles of a page only after saving it, so whether
+            // visitors may see it is decided when the report goes out (flush()).
+            self::$pages[$record->getKey()] ??= self::formerUrl($record);
+            self::scheduleFlush();
 
             return;
         }
@@ -70,7 +93,31 @@ class Reporter
             }
         }
 
-        if (self::$queue !== [] && ! self::$flushing) {
+        if (self::$queue !== []) {
+            self::scheduleFlush();
+        }
+    }
+
+    /**
+     * A page is about to be deleted: note now whether visitors could open it. The
+     * database removes its roles together with it, so afterwards it would look public.
+     */
+    public static function deleting(Model $record): void
+    {
+        if ($record instanceof Page && self::enabled()) {
+            try {
+                self::$deletedPages[$record->getKey()] = $record->is_enabled && ! $record->roles()->exists()
+                    ? route('pages.show', $record->slug)
+                    : null;
+            } catch (Throwable) {
+                self::$deletedPages[$record->getKey()] = null;
+            }
+        }
+    }
+
+    private static function scheduleFlush(): void
+    {
+        if (! self::$flushing) {
             self::$flushing = true;
             app()->terminating(fn () => self::flush());
         }
@@ -91,9 +138,27 @@ class Reporter
      */
     public static function flush(): ?array
     {
+        $pages = self::$pages;
+        self::$pages = [];
         $urls = array_keys(self::$queue);
         self::$queue = [];
         self::$flushing = false;
+
+        // Pages as they are now, roles included. A page restricted to roles is never
+        // reported, not even its former address: that would make it known.
+        foreach ($pages as $id => $former) {
+            try {
+                $page = Page::find($id);
+
+                if ($page !== null && ! $page->roles()->exists()) {
+                    array_push($urls, ...array_filter([Client::urlFor($page), $former]));
+                }
+            } catch (Throwable $e) {
+                report($e);
+            }
+        }
+
+        $urls = array_values(array_unique($urls));
 
         if ($urls === []) {
             return null;

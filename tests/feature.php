@@ -90,6 +90,21 @@ check($reported() === [[route('pages.show', 'about-indexnow')]], 'an enabled pag
 $page->forceFill(['is_enabled' => false])->save();
 check($reported() === [[route('pages.show', 'about-indexnow')]], 'disabling a page reports its address');
 
+// Pages restricted to roles are never made known, not even by their old address.
+$role = Azuriom\Models\Role::query()->first();
+$secret = Page::forceCreate(['title' => 'Team', 'slug' => 'team-only', 'description' => 'Team', 'content' => '<p>Team</p>', 'is_enabled' => true]);
+$secret->roles()->sync([$role->id]); // as the admin panel does it: roles after saving
+check($reported() === [], 'a page restricted to roles is not reported, although its roles come after saving');
+$secret->forceFill(['slug' => 'team-only-renamed'])->save();
+$secret->forceFill(['is_enabled' => false])->save();
+check($reported() === [], 'renaming or disabling a page restricted to roles reports nothing');
+$secret->delete();
+check($reported() === [], 'deleting a page restricted to roles reports nothing, although the database drops its roles with it');
+$public = Page::forceCreate(['title' => 'Public', 'slug' => 'public-page', 'description' => 'Public', 'content' => '<p>Public</p>', 'is_enabled' => true]);
+$reported();
+$public->delete();
+check($reported() === [[route('pages.show', 'public-page')]], 'deleting a public page reports its address');
+
 // --- entries of any other plugin ---------------------------------------------
 
 check(SiteUrls::pluginPages('indexnow-demo') === [url('indexnow-demo')], 'the public pages of a plugin are found in the route table, without its admin pages');

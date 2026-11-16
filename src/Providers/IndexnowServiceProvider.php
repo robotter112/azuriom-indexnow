@@ -43,6 +43,13 @@ class IndexnowServiceProvider extends BasePluginServiceProvider
             }
         });
 
+        // Before a page is gone together with its roles (see Reporter::deleting()).
+        Event::listen('eloquent.deleting: *', function (string $event, array $payload) {
+            if (($payload[0] ?? null) instanceof Model) {
+                Reporter::deleting($payload[0]);
+            }
+        });
+
         // Other plugins hand over exact addresses without depending on this one:
         // event('indexnow.submit', [[$url, ...]]). Without IndexNow nobody listens.
         Event::listen('indexnow.submit', function ($urls) {
