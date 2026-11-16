@@ -151,17 +151,35 @@ class Client
      */
     public static function submitOne(string $url): array
     {
+        return self::submitOwn([$url]);
+    }
+
+    /**
+     * Report addresses handed over by other plugins. Only addresses of this
+     * site go out: IndexNow rejects a list for a host the key does not prove.
+     *
+     * @param  array<int, mixed>  $urls
+     * @return array{ok: bool, reason: string, status: int, count: int}
+     */
+    public static function submitOwn(array $urls): array
+    {
         $key = setting('indexnow.key');
 
         if (! $key) {
             return ['ok' => false, 'reason' => 'not-enabled', 'status' => 0, 'count' => 0];
         }
 
+        $urls = array_values(array_unique(array_filter($urls, fn ($url) => is_string($url) && self::isOwnHost($url))));
+
+        if ($urls === []) {
+            return ['ok' => false, 'reason' => 'no-urls', 'status' => 0, 'count' => 0];
+        }
+
         return self::submit(
-            self::hostFor($url),
+            self::hostFor($urls[0]),
             $key,
             url(self::keyFileName($key)),
-            [$url]
+            $urls
         );
     }
 

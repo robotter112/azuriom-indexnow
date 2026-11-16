@@ -3,29 +3,17 @@
 namespace Azuriom\Plugin\Indexnow\Providers;
 
 use Azuriom\Extensions\Plugin\BasePluginServiceProvider;
-use Azuriom\Models\Page;
 use Azuriom\Models\Permission;
-use Azuriom\Models\Post;
-use Azuriom\Plugin\Indexnow\Client;
+use Azuriom\Plugin\Indexnow\Reporter;
 use Azuriom\Support\Optimizer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Throwable;
 
 class IndexnowServiceProvider extends BasePluginServiceProvider
 {
-    /**
-     * Models whose changes are worth reporting. Anything saved here is a page a
-     * visitor can open, which is the whole point of telling a search engine.
-     *
-     * @var array<int, class-string<Model>>
-     */
-    private const WATCHED = [
-        Page::class,
-        Post::class,
-    ];
-
     public function boot(): void
     {
         $this->loadViews();
@@ -42,32 +30,26 @@ class IndexnowServiceProvider extends BasePluginServiceProvider
     }
 
     /**
-     * Report a page as soon as it is saved, which is what IndexNow is for -
-     * waiting for someone to press a button defeats the purpose.
+     * Report what changed as soon as it is saved or deleted, which is what IndexNow
+     * is for - waiting for someone to press a button defeats the purpose. Every
+     * model is looked at, so pages, posts and the entries of every plugin are
+     * covered (see Reporter); the report goes out after the response.
      */
     protected function watchForChanges(): void
     {
-        foreach (self::WATCHED as $model) {
-            $model::saved(function (Model $record) {
-                // Read on save, not at boot: Azuriom loads the settings only
-                // after the plugins have booted, so setting() would return the
-                // default there whatever is stored. On unless switched off,
-                // like the switch on the admin page shows it.
-                if (! setting('indexnow.auto', true)) {
-                    return;
-                }
+        Event::listen(['eloquent.saved: *', 'eloquent.deleted: *'], function (string $event, array $payload) {
+            if (($payload[0] ?? null) instanceof Model) {
+                Reporter::changed($payload[0]);
+            }
+        });
 
-                $url = Client::urlFor($record);
-
-                if ($url === null) {
-                    return;
-                }
-
-                // After the response, so saving a post in the admin panel is
-                // never slowed down by an outgoing HTTP request.
-                app()->terminating(fn () => Client::submitOne($url));
-            });
-        }
+        // Other plugins hand over exact addresses without depending on this one:
+        // event('indexnow.submit', [[$url, ...]]). Without IndexNow nobody listens.
+        Event::listen('indexnow.submit', function ($urls) {
+            if (is_array($urls)) {
+                Reporter::queue($urls);
+            }
+        });
     }
 
     /**

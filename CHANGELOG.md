@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Every plugin is covered by the automatic reporting, without changing it: when
+  a plugin saves or deletes an entry (a game, a forum discussion, a wiki page …),
+  its public pages such as `/games` or `/forum` are reported, found in the route
+  table. Such a page is reported at most once an hour, and quiet saves of
+  scheduled refreshes report nothing.
+- Plugins that know their exact addresses can hand them over without depending
+  on IndexNow: the event `indexnow.submit` reports a list of addresses, and an
+  answer to the event `indexnow.urls` adds them to *Submit all URLs* and the
+  optional sitemap. Only addresses of the site itself are taken. OnAir Connect
+  uses this for its collections.
+- A feature test in a fresh Azuriom (`tests/ci.sh`), next to a plugin that knows
+  nothing about IndexNow, with and without AzBoost.
+
+### Changed
+
+- Deleting, taking offline or renaming a page or news post now reports its old
+  address too, so search engines forget it.
+- Everything that changes during one request goes out as one report instead of
+  one request per saved item.
+
 ## [2.1.2] - 2026-11-14
 
 ### Fixed

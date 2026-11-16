@@ -1,0 +1,9 @@
+{
+    "name": "azuriom/indexnow-demo",
+    "type": "azuriom-plugin",
+    "autoload": {
+        "psr-4": {
+            "Azuriom\\Plugin\\IndexnowDemo\\": "src/"
+        }
+    }
+}

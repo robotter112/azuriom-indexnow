@@ -5,6 +5,7 @@ namespace Azuriom\Plugin\Indexnow;
 use Azuriom\Models\Page;
 use Azuriom\Models\Post;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Support\Str;
 
@@ -50,8 +51,25 @@ class SiteUrls
         self::addForum($urls);
         self::addChangelog($urls);
         self::addSuggestions($urls);
+        self::addFromPlugins($urls);
 
         return $urls->unique()->take(self::MAX_URLS)->values()->all();
+    }
+
+    /**
+     * Pages of plugins this list cannot know, such as the collections of OnAir
+     * Connect: a plugin answers the event "indexnow.urls" with its addresses.
+     * Addresses of other sites are left out.
+     */
+    protected static function addFromPlugins(Collection $urls): void
+    {
+        foreach (Event::dispatch('indexnow.urls') as $answer) {
+            foreach ((array) $answer as $url) {
+                if (is_string($url) && Client::isOwnHost($url)) {
+                    $urls->push($url);
+                }
+            }
+        }
     }
 
     /**
@@ -63,6 +81,38 @@ class SiteUrls
      */
     protected static function addStaticRoutes(Collection $urls): void
     {
+        foreach (self::publicRoutes() as $route) {
+            $urls->push($route['url']);
+        }
+    }
+
+    /**
+     * The public pages of one plugin: its routes by name ("games.index") or by
+     * the first part of the address ("/games"). Reported when an entry of the
+     * plugin changes, since those pages list its entries.
+     *
+     * @return array<int, string>
+     */
+    public static function pluginPages(string $plugin): array
+    {
+        static $pages = [];
+
+        return $pages[$plugin] ??= collect(self::publicRoutes())
+            ->filter(fn (array $route) => Str::startsWith((string) $route['name'], $plugin.'.')
+                || explode('/', trim($route['uri'], '/'))[0] === $plugin)
+            ->pluck('url')
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int, array{name: ?string, uri: string, url: string}>
+     */
+    protected static function publicRoutes(): array
+    {
+        $public = [];
+
         foreach (RouteFacade::getRoutes() as $route) {
             if ($route->isFallback || ! in_array('GET', $route->methods(), true)) {
                 continue;
@@ -101,8 +151,10 @@ class SiteUrls
             // like a different address than the one linked everywhere else.
             $uri = $route->uri();
 
-            $urls->push($uri === '/' ? url('/').'/' : url($uri));
+            $public[] = ['name' => $route->getName(), 'uri' => $uri, 'url' => $uri === '/' ? url('/').'/' : url($uri)];
         }
+
+        return $public;
     }
 
     protected static function addPages(Collection $urls): void

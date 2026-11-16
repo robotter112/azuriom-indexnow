@@ -24,14 +24,41 @@ fail with `403`, far away from its cause.
 
 ## Automatic reporting
 
-With *Report changes automatically* on, saving a page or a news post reports it
-right away. That is the point of IndexNow — waiting for someone to press a button
-defeats it.
+With *Report changes automatically* on, every change is reported right away.
+That is the point of IndexNow — waiting for someone to press a button defeats it.
 
-Only pages a visitor can actually open are reported: a post scheduled for
-tomorrow, a disabled page or one restricted to a role is skipped. The request
-goes out **after** the response, so saving in the admin panel is never slowed
-down, and a failure there can never disturb the save that triggered it.
+- **Pages and news posts** are reported by their own address when saved — and
+  also when deleted, taken offline or given a new slug, so search engines forget
+  the old address. Only what a visitor can open counts: a post scheduled for
+  tomorrow, a disabled page or one restricted to a role is skipped.
+- **Every other plugin is covered too, without changing it.** When a plugin saves
+  or deletes an entry (a game, a forum discussion, a wiki page, a shop item …),
+  its public pages are reported: the parameterless pages found in the route table
+  under its name, such as `/games` or `/forum`, never its admin pages. Search
+  engines find the entry itself from there. Such a page changes with every entry,
+  so it is reported at most once an hour; changes made quietly (`saveQuietly()`,
+  as scheduled refreshes do) report nothing.
+- **Exact addresses** come from plugins that hand them over (see below).
+
+Everything that changes during one request goes out as **one** report, **after**
+the response, so saving in the admin panel is never slowed down, and a failure
+there can never disturb the save that triggered it.
+
+### Pages of other plugins
+
+A plugin that knows the exact addresses of its pages can hand them over, without
+requiring IndexNow — without it, nobody listens and nothing happens:
+
+```php
+// When one of your pages changes:
+event('indexnow.submit', [[route('myplugin.show', $item), route('myplugin.index')]]);
+
+// For "Submit all URLs" and the optional sitemap:
+Event::listen('indexnow.urls', fn () => MyPlugin::publicUrls());
+```
+
+Only addresses of your own site are taken, and *Report changes automatically*
+decides as it does for pages and posts.
 
 ## Submitting everything at once
 
@@ -90,10 +117,14 @@ not reviewed by one.
 ```bash
 php tests/ClientTest.php
 php tests/UrlSourceTest.php
+sh tests/ci.sh            # also the feature test in a fresh Azuriom
 ```
 
-Both run without a test framework. The key handling and the sitemap parsing work
-with string manipulation, which breaks quietly.
+The first two run without a test framework. The key handling and the sitemap
+parsing work with string manipulation, which breaks quietly. `tests/ci.sh` adds
+`tests/feature.php`, which runs in a fresh Azuriom next to a second plugin that
+knows nothing about IndexNow (`tests/stubs/indexnow-demo`), with and without
+AzBoost.
 
 ## License
 

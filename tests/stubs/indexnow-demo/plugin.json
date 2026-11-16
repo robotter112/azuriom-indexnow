@@ -1,0 +1,11 @@
+{
+    "id": "indexnow-demo",
+    "name": "IndexNow Demo",
+    "description": "Test stand-in for a plugin that knows nothing about IndexNow.",
+    "version": "1.0.0",
+    "azuriom_api": "1.2.0",
+    "providers": [
+        "\\Azuriom\\Plugin\\IndexnowDemo\\Providers\\DemoServiceProvider",
+        "\\Azuriom\\Plugin\\IndexnowDemo\\Providers\\RouteServiceProvider"
+    ]
+}
