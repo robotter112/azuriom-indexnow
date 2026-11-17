@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The admin page as designed: the state as a badge beside the title, a line on who reads
+  along (Bing, Yandex, Seznam and Naver right away, Google through the sitemap), the key
+  file with “Copy”, “Report now” for all addresses, and “Turn off IndexNow” at the foot of
+  the status card. The sitemap field says where its addresses come from (own sitemap,
+  sitemap found, none found), and today shows the addresses reported and known. In all
+  19 languages.
+
 ### Fixed
 
 - The admin page fetched the sitemap over HTTP on every view, which made it load half a

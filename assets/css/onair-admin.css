@@ -1,7 +1,8 @@
-/* onair-admin.css 1.1 – the admin pages of the OnAir plugin family in one design language.
+/* onair-admin.css 1.2 – the admin pages of the OnAir plugin family in one design language.
    Rules: ADMIN-DESIGN.md in the OnAir theme repo. Every plugin ships this same file, so each runs on its
-   own; change it in all of them at once and raise the version. Colours come from the Bootstrap variables
-   of Azuriom, so light and dark (data-bs-theme on <body>) both work. */
+   own; change it in all of them at once and raise the version. Neutral colours come from the Bootstrap
+   variables of Azuriom, the tones of tiles and badges are pairs of their own with a dark value, so light
+   and dark (data-bs-theme on <body>) both work and icons keep their colour in both. */
 
 body {
     --oa-muted: color-mix(in srgb, var(--bs-body-color) 80%, var(--bs-secondary-bg));
@@ -9,19 +10,35 @@ body {
     --oa-fill: color-mix(in srgb, var(--bs-body-color) 6%, var(--bs-secondary-bg));
     --oa-fill-hover: color-mix(in srgb, var(--bs-body-color) 11%, var(--bs-secondary-bg));
     --oa-line: color-mix(in srgb, var(--bs-border-color) 70%, var(--bs-secondary-bg));
+    --oa-tint: color-mix(in srgb, var(--bs-primary) 10%, var(--bs-secondary-bg));
+    --oa-tint-hover: color-mix(in srgb, var(--bs-primary) 17%, var(--bs-secondary-bg));
+    --oa-link: #2F6BC9;
     --oa-shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 4px 16px rgba(16, 24, 40, .05);
-    --oa-purple-bg: #F0E9FF;
-    --oa-purple-fg: #6D3FD0;
+    /* tones: area and ink */
+    --oa-green-bg: #E7F6EC;  --oa-green-fg: #1E7B3C;
+    --oa-blue-bg: #E8F0FC;   --oa-blue-fg: #2A62B8;
+    --oa-orange-bg: #FFF4E0; --oa-orange-fg: #B26A00;
+    --oa-amber-bg: #FEF3C7;  --oa-amber-fg: #92400E;
+    --oa-red-bg: #FDECEC;    --oa-red-fg: #C62828;
+    --oa-grey-bg: #EEF2F7;   --oa-grey-fg: #4B5866;
+    --oa-purple-bg: #F0E9FF; --oa-purple-fg: #7C3AED;
 }
 
 body[data-bs-theme="dark"] {
+    --oa-link: #8CB4F0;
     --oa-shadow: none;
-    --oa-purple-bg: #2A1F45;
-    --oa-purple-fg: #C9B3FF;
+    --oa-green-bg: #163A26;  --oa-green-fg: #7DDA9A;
+    --oa-blue-bg: #1A2C48;   --oa-blue-fg: #8CB4F0;
+    --oa-orange-bg: #3D2C12; --oa-orange-fg: #F2B562;
+    --oa-amber-bg: #3A2F10;  --oa-amber-fg: #FCD34D;
+    --oa-red-bg: #3D1C1F;    --oa-red-fg: #F19A9A;
+    --oa-grey-bg: #2B3138;   --oa-grey-fg: #C3CAD3;
+    --oa-purple-bg: #2E2350; --oa-purple-fg: #C9B3FF;
 }
 
 /* Page head. Azuriom's layout sets the title (<h1>) above the content without room for buttons:
-   a page that starts with .oa-actions turns the container into a grid, title and buttons in row one. */
+   a page that starts with .oa-actions turns the container into a grid, title and buttons in row one.
+   An .oa-badge (state of the page, e.g. "Active") sits right beside the title. */
 .content > .container-fluid:has(> .oa-actions) {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -29,16 +46,18 @@ body[data-bs-theme="dark"] {
     align-items: center;
 }
 
+.content > .container-fluid:has(> .oa-badge) { grid-template-columns: max-content max-content minmax(0, 1fr) auto; }
 .content > .container-fluid:has(> .oa-actions) > * { grid-column: 1 / -1; }
-.content > .container-fluid:has(> .oa-actions) > h1 { grid-column: 1; grid-row: 1; margin: 0 !important; }
-.content > .container-fluid > .oa-actions { grid-column: 2; grid-row: 1; }
+.content > .container-fluid:has(> .oa-actions) > h1 { grid-column: 1; grid-row: 1; margin: 0 !important; font-size: 1.625rem; font-weight: 800; letter-spacing: -.01em; color: var(--oa-strong); }
+.content > .container-fluid > .oa-badge { grid-column: 2; grid-row: 1; margin-left: -.25rem; }
+.content > .container-fluid > .oa-actions { grid-column: -2 / -1; grid-row: 1; }
 .content > .container-fluid > .oa-meta { grid-row: 2; }
 
 .oa-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: .5rem; }
 .oa-meta { margin: .25rem 0 1.5rem; font-size: .875rem; color: var(--oa-muted); }
 .oa-meta a { color: inherit; }
 
-.oa-actions .btn, .oa-card .btn:not(.btn-sm, .btn-link, .oa-seg > .btn, .oa-chips > .btn), .oa-btn {
+.oa-actions .btn, .oa-card .btn:not(:where(.btn-sm, .btn-link, .oa-seg > .btn, .oa-chips > .btn)), .oa-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -53,7 +72,8 @@ body[data-bs-theme="dark"] {
 .oa-actions .btn-outline-secondary { border-color: var(--bs-border-color); color: var(--bs-body-color); background: var(--bs-secondary-bg); }
 .oa-actions .btn-outline-secondary:hover { background: var(--oa-fill); }
 
-/* On a phone the buttons go to a bar along the bottom, the main one across the width. */
+/* On a phone the buttons go to a bar along the bottom, the main one across the width. A button with an
+   icon shows just the icon there, one without (Cancel) keeps its text. */
 @media (max-width: 767.98px) {
     .content > .container-fluid:has(> .oa-actions) { padding-bottom: 5rem !important; }
     .content > .container-fluid > .oa-actions {
@@ -67,8 +87,10 @@ body[data-bs-theme="dark"] {
         background: var(--bs-secondary-bg);
         box-shadow: 0 -4px 16px rgba(16, 24, 40, .12);
     }
-    .oa-actions .btn-primary { flex: 1; }
-    .oa-actions .oa-text {
+    .oa-actions .btn-primary { flex: 2; }
+    .oa-actions .btn-outline-secondary { border-color: transparent; background: var(--oa-fill); }
+    .oa-actions .btn-outline-secondary:not(:has(> .bi)) { flex: 1; }
+    .oa-actions .btn:not(.btn-primary):has(> .bi) .oa-text {
         position: absolute !important;
         width: 1px !important;
         height: 1px !important;
@@ -76,10 +98,10 @@ body[data-bs-theme="dark"] {
         clip: rect(0, 0, 0, 0) !important;
         white-space: nowrap !important;
     }
-    .oa-actions .btn-primary .oa-text { position: static !important; width: auto !important; height: auto !important; clip: auto !important; }
 }
 
-/* Two columns from xl: the content, and a side of 380 px for status, switches, preview and danger. */
+/* Two columns from xl: the content, and a side of 380 px for status, switches, preview and danger.
+   .oa-side-wide grows with the screen (a cover search needs the room). */
 .oa-layout { display: flex; flex-direction: column; gap: 1.25rem; }
 .oa-main, .oa-side { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
 
@@ -87,6 +109,7 @@ body[data-bs-theme="dark"] {
     .oa-layout { flex-direction: row; align-items: flex-start; gap: 1.5rem; }
     .oa-main { flex: 1; }
     .oa-side { flex: none; width: 23.75rem; }
+    .oa-side.oa-side-wide { width: clamp(23.75rem, 42%, 42rem); }
     .oa-side-sticky { position: sticky; top: 1.25rem; }
 }
 
@@ -110,8 +133,8 @@ body[data-bs-theme="dark"] {
 .oa-card .input-group > :not(:last-child) { border-top-right-radius: 0; border-bottom-right-radius: 0; }
 .oa-card .input-group-text { background: var(--oa-fill); color: var(--oa-muted); }
 .oa-field-pill { position: relative; }
-.oa-field-pill > .form-control { padding-right: 7rem; }
-.oa-field-pill > .oa-pill { position: absolute; top: 50%; right: .5rem; transform: translateY(-50%); pointer-events: none; }
+.oa-field-pill > .form-control { padding-right: 9rem; }
+.oa-field-pill > .oa-pill { position: absolute; top: 50%; right: .5rem; transform: translateY(-50%); height: 1.625rem; pointer-events: none; }
 
 /* Rows: a tile, title with one line below, and on the right what operates the row. */
 .oa-row { display: flex; align-items: center; gap: .875rem; padding: .875rem 0; border-top: 1px solid var(--oa-line); }
@@ -125,11 +148,12 @@ a.oa-row-title { text-decoration: none; }
 a.oa-row-title:hover { color: var(--bs-link-color); }
 
 /* Tones: an area and an ink that reads on it, light and dark. */
-.oa-tone-green { --oa-bg: var(--bs-success-bg-subtle); --oa-fg: var(--bs-success-text-emphasis); }
-.oa-tone-blue { --oa-bg: var(--bs-primary-bg-subtle); --oa-fg: var(--bs-primary-text-emphasis); }
-.oa-tone-amber { --oa-bg: var(--bs-warning-bg-subtle); --oa-fg: var(--bs-warning-text-emphasis); }
-.oa-tone-red { --oa-bg: var(--bs-danger-bg-subtle); --oa-fg: var(--bs-danger-text-emphasis); }
-.oa-tone-grey { --oa-bg: var(--bs-secondary-bg-subtle); --oa-fg: var(--bs-secondary-text-emphasis); }
+.oa-tone-green { --oa-bg: var(--oa-green-bg); --oa-fg: var(--oa-green-fg); }
+.oa-tone-blue { --oa-bg: var(--oa-blue-bg); --oa-fg: var(--oa-blue-fg); }
+.oa-tone-orange { --oa-bg: var(--oa-orange-bg); --oa-fg: var(--oa-orange-fg); }
+.oa-tone-amber { --oa-bg: var(--oa-amber-bg); --oa-fg: var(--oa-amber-fg); }
+.oa-tone-red { --oa-bg: var(--oa-red-bg); --oa-fg: var(--oa-red-fg); }
+.oa-tone-grey { --oa-bg: var(--oa-grey-bg); --oa-fg: var(--oa-grey-fg); }
 .oa-tone-purple { --oa-bg: var(--oa-purple-bg); --oa-fg: var(--oa-purple-fg); }
 
 .oa-tile {
@@ -141,11 +165,11 @@ a.oa-row-title:hover { color: var(--bs-link-color); }
     height: 2.625rem;
     border-radius: .625rem;
     font-size: 1.15rem;
-    background: var(--oa-bg, var(--bs-secondary-bg-subtle));
-    color: var(--oa-fg, var(--bs-secondary-text-emphasis));
+    background: var(--oa-bg, var(--oa-grey-bg));
+    color: var(--oa-fg, var(--oa-grey-fg));
 }
 
-.oa-pill {
+.oa-pill, .oa-badge {
     display: inline-flex;
     align-items: center;
     gap: .3rem;
@@ -156,9 +180,10 @@ a.oa-row-title:hover { color: var(--bs-link-color); }
     font-weight: 700;
     line-height: 1;
     white-space: nowrap;
-    background: var(--oa-bg, var(--bs-secondary-bg-subtle));
-    color: var(--oa-fg, var(--bs-secondary-text-emphasis));
+    background: var(--oa-bg, var(--oa-grey-bg));
+    color: var(--oa-fg, var(--oa-grey-fg));
 }
+.oa-badge { justify-self: start; height: 1.625rem; }
 
 /* Switch rows: the label spans the row, so all of it toggles. */
 .oa-switch { cursor: pointer; margin: 0; }
@@ -174,7 +199,7 @@ a.oa-row-title:hover { color: var(--bs-link-color); }
 .oa-seg-wide { display: grid; width: 100%; }
 
 /* Chips: a choice out of many, as round buttons. */
-.oa-chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+.oa-chips { display: flex; flex-wrap: wrap; gap: .375rem; }
 .oa-chips > .btn { display: inline-flex; align-items: center; min-height: 2.25rem; padding: 0 .875rem; border-radius: 999px; border: 1px solid var(--bs-border-color); font-size: .8125rem; font-weight: 600; color: var(--bs-body-color); background: var(--bs-secondary-bg); }
 .oa-chips > .btn-check:checked + .btn { border-color: var(--bs-primary); background: var(--bs-primary); color: #fff; }
 .oa-chips > .btn-check:focus-visible + .btn { box-shadow: 0 0 0 .2rem rgba(59, 125, 221, .4); }
@@ -189,9 +214,18 @@ a.oa-row-title:hover { color: var(--bs-link-color); }
 .oa-bar { height: .375rem; margin-top: .5rem; border-radius: 999px; background: var(--bs-border-color); overflow: hidden; }
 .oa-bar > span { display: block; height: 100%; border-radius: inherit; background: var(--bs-primary); }
 
-/* Buttons inside cards */
-.oa-btn-soft { border: 0; background: var(--oa-fill); color: var(--bs-primary-text-emphasis); }
-.oa-btn-soft:hover, .oa-btn-soft:focus-visible { background: var(--bs-primary-bg-subtle); color: var(--bs-primary-text-emphasis); }
+/* Buttons inside cards: soft (grey, blue ink: add something), neutral (grey: upload, refresh, copy,
+   a save beside the main one), tint (light blue: go on to a related page or action). */
+.oa-btn-soft, .oa-btn-neutral, .oa-btn-tint { border: 0; }
+.oa-btn-soft { background: var(--oa-fill); color: var(--oa-link); }
+.oa-btn-neutral { background: var(--oa-fill); color: var(--bs-body-color); }
+.oa-btn-tint { background: var(--oa-tint); color: var(--oa-link); }
+.oa-btn-soft:hover, .oa-btn-soft:focus-visible, .oa-btn-neutral:hover, .oa-btn-neutral:focus-visible { background: var(--oa-fill-hover); color: var(--oa-strong); }
+.oa-btn-soft:hover, .oa-btn-soft:focus-visible { color: var(--oa-link); }
+.oa-btn-tint:hover, .oa-btn-tint:focus-visible { background: var(--oa-tint-hover); color: var(--oa-link); }
+/* Removing something: red text at the foot of a card, or .oa-btn-danger-soft (after the icon buttons). */
+.oa-btn-danger-text { padding: 0; border: 0; background: none; font-size: .8125rem; font-weight: 600; color: var(--bs-danger); }
+.oa-btn-danger-text:hover { text-decoration: underline; color: var(--bs-danger); }
 .oa-icon-btn {
     flex: none;
     display: inline-flex;
@@ -208,21 +242,30 @@ a.oa-row-title:hover { color: var(--bs-link-color); }
     text-decoration: none;
 }
 .oa-icon-btn:hover, .oa-icon-btn:focus-visible { background: var(--oa-fill-hover); color: var(--oa-strong); }
-.oa-icon-btn.is-danger:hover, .oa-icon-btn.is-danger:focus-visible { background: var(--bs-danger-bg-subtle); color: var(--bs-danger-text-emphasis); }
-.oa-icon-btn.is-on { background: var(--bs-success-bg-subtle); color: var(--bs-success-text-emphasis); }
+.oa-icon-btn.is-danger:hover, .oa-icon-btn.is-danger:focus-visible { background: var(--oa-red-bg); color: var(--oa-red-fg); }
+.oa-icon-btn.is-on { background: var(--oa-green-bg); color: var(--oa-green-fg); }
+.oa-btn-danger-soft { border: 1px solid color-mix(in srgb, var(--oa-red-fg) 24%, var(--bs-secondary-bg)) !important; background: var(--bs-secondary-bg); color: var(--oa-red-fg); }
+.oa-btn-danger-soft:hover, .oa-btn-danger-soft:focus-visible, .btn-check:checked + .oa-btn-danger-soft { border-color: transparent !important; background: var(--oa-red-bg); color: var(--oa-red-fg); }
 
-/* Keys: never shown, a saved one is a box with "Replace". */
-.oa-secret { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem .75rem; min-height: 2.75rem; padding: 0 .375rem 0 .875rem; border: 1px solid var(--bs-border-color); border-radius: .5rem; background: var(--oa-fill); }
-.oa-secret > span { flex: 1; color: var(--oa-muted); font-size: .875rem; }
+/* Keys: never shown. A saved one is a dashed box with a lock, dots, "saved" and "Replace". */
+.oa-secret { display: flex; align-items: center; gap: .625rem; min-height: 2.75rem; padding: .25rem .375rem .25rem .75rem; border: 1px dashed color-mix(in srgb, var(--bs-border-color) 100%, var(--bs-body-color) 25%); border-radius: .5rem; background: var(--oa-fill); }
+.oa-secret > .bi { color: var(--oa-muted); }
+.oa-secret-dots { flex: 1; font-size: .875rem; letter-spacing: .2em; color: var(--bs-body-color); }
+.oa-secret-saved { font-size: .75rem; font-weight: 600; color: var(--oa-green-fg); }
+.oa-secret .btn { min-height: 1.875rem; padding: 0 .625rem; border: 0; border-radius: .375rem; font-size: .8125rem; font-weight: 600; background: var(--oa-grey-bg); color: var(--oa-link); }
 
-/* Guides: a row that opens. */
-.oa-guide { border-top: 1px solid var(--oa-line); }
-.oa-guide > summary { display: flex; align-items: center; gap: .5rem; min-height: 2.75rem; list-style: none; cursor: pointer; font-size: .875rem; font-weight: 600; color: var(--bs-link-color); }
+/* Guides: a row that opens: info icon, title, and "Show" / "Hide" on the right. */
+.oa-guide { margin-top: 1.125rem; border-top: 1px solid var(--oa-line); }
+.oa-guide > summary { display: flex; align-items: center; gap: .625rem; min-height: 2.75rem; padding-top: .25rem; list-style: none; cursor: pointer; font-size: .875rem; font-weight: 600; color: var(--oa-link); }
 .oa-guide > summary::-webkit-details-marker { display: none; }
-.oa-guide > summary::before { content: ""; width: .5rem; height: .5rem; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); transition: transform .15s; margin: 0 .25rem; }
-.oa-guide[open] > summary::before { transform: rotate(45deg); }
-.oa-guide ol { margin: .25rem 0 1rem; padding-left: 1.25rem; font-size: .875rem; }
-.oa-guide li + li { margin-top: .25rem; }
+.oa-guide > summary::after { content: attr(data-show); margin-left: auto; font-size: .75rem; font-weight: 500; color: var(--oa-muted); }
+.oa-guide[open] > summary::after { content: attr(data-hide); }
+.oa-guide ol { margin: .5rem 0 .75rem; padding-left: 1.25rem; font-size: .875rem; line-height: 1.7; color: var(--bs-body-color); }
+
+/* A value to copy: the field, read only, and a grey "Copy" beside it. */
+.oa-copy { display: flex; gap: .5rem; }
+.oa-copy > .form-control { flex: 1; min-width: 0; background: var(--oa-fill); }
+.oa-copy > .btn { flex: none; }
 
 /* Tabs of a list: underline, with a count. */
 .oa-tabs { display: flex; gap: 1.75rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--bs-border-color); overflow-x: auto; scrollbar-width: none; }
@@ -233,13 +276,14 @@ a.oa-row-title:hover { color: var(--bs-link-color); }
 /* Danger */
 .oa-danger-note { margin: .625rem 0 0; font-size: .75rem; text-align: center; color: var(--oa-muted); }
 
-/* Touch targets of 44 px on phones and tablets, small buttons and links in a card included. */
-@media (max-width: 767.98px) {
-    .oa-card .btn.btn-sm, .oa-seg > .btn, .oa-chips > .btn { min-height: 2.75rem; }
-    .oa-card-head > a { display: inline-flex; align-items: center; min-height: 2.75rem; }
-    .oa-tabs { flex-wrap: wrap; gap: 0 1.25rem; }
+/* Buttons inside a row are 38 px from tablets up, as in the design; phones keep 44 px. */
+@media (min-width: 768px) {
+    .oa-row .btn:not(:where(.btn-sm)) { min-height: 2.375rem; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .oa-guide > summary::before { transition: none; }
+/* Touch targets of 44 px on phones and tablets, small buttons and links in a card included. */
+@media (max-width: 767.98px) {
+    .oa-card .btn.btn-sm, .oa-seg > .btn, .oa-chips > .btn, .oa-secret .btn { min-height: 2.75rem; }
+    .oa-card-head > a, .oa-btn-danger-text { display: inline-flex; align-items: center; min-height: 2.75rem; }
+    .oa-tabs { flex-wrap: wrap; gap: 0 1.25rem; }
 }
