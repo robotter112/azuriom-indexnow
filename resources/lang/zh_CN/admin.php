@@ -40,4 +40,18 @@ return [
     'serve-sitemap-hint' => '仅适用于完全没有站点地图的网站。站点地图或 SEO 插件做得更好，而不支持 IndexNow 的谷歌需要它。列出本站的页面和文章。',
     'serve-sitemap-taken' => ':url 已由其他插件响应。你的不会被提供 — 关闭此项或卸载那个插件。',
     'serve-sitemap-live' => '你的站点地图位于 :url。请在 Google Search Console 中提交。',
+
+    // The admin page in the design language of the OnAir plugin family.
+    'active' => '已启用',
+    'inactive' => '已关闭',
+    'status' => '状态',
+    'key-file' => '密钥文件可访问',
+    'last' => '上次提交',
+    'never' => '尚未提交任何内容',
+    'all' => '提交所有地址',
+    'auto-sub' => '页面、文章或插件保存内容时立即提交',
+    'serve-sitemap-sub' => '仅在没有站点地图或 SEO 插件时',
+    'today' => '今天',
+    'reported-today' => '今日已提交',
+    'known' => '网站地址',
 ];

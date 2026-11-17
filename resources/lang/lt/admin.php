@@ -40,4 +40,18 @@ return [
     'serve-sitemap-hint' => 'Tik svetainėms, kurios visai neturi žemėlapio. Svetainės žemėlapio ar SEO papildinys tai padaro geriau — o Google, kuris IndexNow nepalaiko, jo reikalauja. Išvardija šios svetainės puslapius ir įrašus.',
     'serve-sitemap-taken' => 'Į :url jau atsako kitas papildinys. Jūsų neteikiamas — išjunkite tai arba pašalinkite kitą papildinį.',
     'serve-sitemap-live' => 'Jūsų svetainės žemėlapis pasiekiamas adresu :url. Pateikite jį Google Search Console.',
+
+    // The admin page in the design language of the OnAir plugin family.
+    'active' => 'Įjungta',
+    'inactive' => 'Išjungta',
+    'status' => 'Būsena',
+    'key-file' => 'Rakto failas pasiekiamas',
+    'last' => 'Paskutinis pranešimas',
+    'never' => 'Dar nieko nepranešta',
+    'all' => 'Pranešti visus adresus',
+    'auto-sub' => 'Kai tik puslapis, įrašas ar įskiepis ką nors išsaugo',
+    'serve-sitemap-sub' => 'Tik be svetainės žemėlapio ar SEO įskiepio',
+    'today' => 'Šiandien',
+    'reported-today' => 'Pranešta šiandien',
+    'known' => 'Svetainės adresai',
 ];

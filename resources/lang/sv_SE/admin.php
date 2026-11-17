@@ -40,4 +40,18 @@ return [
     'serve-sitemap-hint' => 'Bara för webbplatser som saknar webbplatskarta helt. Ett webbplatskarte- eller SEO-tillägg gör det bättre — och Google, som ignorerar IndexNow, behöver en. Listar sidorna och inläggen på den här webbplatsen.',
     'serve-sitemap-taken' => 'Ett annat tillägg svarar redan på :url. Din tillhandahålls inte — stäng av det här eller avinstallera det andra tillägget.',
     'serve-sitemap-live' => 'Din webbplatskarta finns på :url. Skicka in den i Google Search Console.',
+
+    // The admin page in the design language of the OnAir plugin family.
+    'active' => 'Aktiv',
+    'inactive' => 'Av',
+    'status' => 'Status',
+    'key-file' => 'Nyckelfilen nås',
+    'last' => 'Senast rapporterat',
+    'never' => 'Inget rapporterat ännu',
+    'all' => 'Rapportera alla adresser',
+    'auto-sub' => 'Så snart en sida, ett inlägg eller ett plugin sparar något',
+    'serve-sitemap-sub' => 'Bara utan sitemap- eller SEO-plugin',
+    'today' => 'Idag',
+    'reported-today' => 'Rapporterat idag',
+    'known' => 'Webbplatsens adresser',
 ];

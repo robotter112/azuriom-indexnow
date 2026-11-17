@@ -40,4 +40,18 @@ return [
     'serve-sitemap-hint' => 'Only for sites that have no sitemap at all. A sitemap or SEO plugin does this better — and Google, which ignores IndexNow, needs one. Lists the pages and posts of this site.',
     'serve-sitemap-taken' => 'Another plugin already answers :url. Yours is not being served — switch this off or uninstall the other plugin.',
     'serve-sitemap-live' => 'Your sitemap is live at :url. Submit it in Google Search Console.',
+
+    // The admin page in the design language of the OnAir plugin family.
+    'active' => 'Active',
+    'inactive' => 'Off',
+    'status' => 'Status',
+    'key-file' => 'Key file reachable',
+    'last' => 'Last report',
+    'never' => 'Nothing reported yet',
+    'all' => 'Report all addresses',
+    'auto-sub' => 'As soon as a page, a post or a plugin saves something',
+    'serve-sitemap-sub' => 'Only without a sitemap or SEO plugin',
+    'today' => 'Today',
+    'reported-today' => 'Reported today',
+    'known' => 'Addresses of the site',
 ];

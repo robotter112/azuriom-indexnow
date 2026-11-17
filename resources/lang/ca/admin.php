@@ -40,4 +40,18 @@ return [
     'serve-sitemap-hint' => 'Només per a llocs que no tenen cap sitemap. Un connector de sitemap o SEO ho fa millor, i Google, que ignora IndexNow, en necessita un. Llista les pàgines i entrades d\'aquest lloc.',
     'serve-sitemap-taken' => 'Un altre connector ja respon :url. El teu no se serveix: desactiva això o desinstal·la l\'altre connector.',
     'serve-sitemap-live' => 'El teu sitemap és a :url. Envia\'l a la Google Search Console.',
+
+    // The admin page in the design language of the OnAir plugin family.
+    'active' => 'Actiu',
+    'inactive' => 'Desactivat',
+    'status' => 'Estat',
+    'key-file' => 'Fitxer de clau accessible',
+    'last' => 'Últim enviament',
+    'never' => 'Encara no s’ha enviat res',
+    'all' => 'Enviar totes les adreces',
+    'auto-sub' => 'Tan bon punt una pàgina, una entrada o un plugin desa alguna cosa',
+    'serve-sitemap-sub' => 'Només sense plugin de sitemap o SEO',
+    'today' => 'Avui',
+    'reported-today' => 'Enviades avui',
+    'known' => 'Adreces del lloc',
 ];

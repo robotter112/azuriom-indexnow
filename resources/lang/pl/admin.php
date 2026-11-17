@@ -40,4 +40,18 @@ return [
     'serve-sitemap-hint' => 'Tylko dla witryn bez żadnej mapy. Wtyczka mapy witryny lub SEO zrobi to lepiej — a Google, które ignoruje IndexNow, jej potrzebuje. Wypisuje strony i wpisy tej witryny.',
     'serve-sitemap-taken' => 'Na :url odpowiada już inna wtyczka. Twoja nie jest udostępniana — wyłącz to albo odinstaluj tamtą wtyczkę.',
     'serve-sitemap-live' => 'Twoja mapa witryny jest pod :url. Prześlij ją w Google Search Console.',
+
+    // The admin page in the design language of the OnAir plugin family.
+    'active' => 'Aktywne',
+    'inactive' => 'Wyłączone',
+    'status' => 'Status',
+    'key-file' => 'Plik klucza dostępny',
+    'last' => 'Ostatnie zgłoszenie',
+    'never' => 'Jeszcze nic nie zgłoszono',
+    'all' => 'Zgłoś wszystkie adresy',
+    'auto-sub' => 'Gdy tylko strona, wpis lub wtyczka coś zapisze',
+    'serve-sitemap-sub' => 'Tylko bez wtyczki mapy strony lub SEO',
+    'today' => 'Dzisiaj',
+    'reported-today' => 'Zgłoszone dzisiaj',
+    'known' => 'Adresy witryny',
 ];

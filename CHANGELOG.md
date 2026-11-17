@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- The admin page has the look of the other OnAir plugins, in the light and the dark mode of Azuriom: status, settings and figures as cards, the save button at the top. It shows when the last report went out and how it was answered, and how many addresses were reported today.
+
 ## [2.2.0] - 2026-11-16
 
 IndexNow now covers every plugin and reports only what everyone can see.

@@ -40,4 +40,18 @@ return [
     'serve-sitemap-hint' => '사이트맵이 전혀 없는 사이트에만 필요합니다. 사이트맵이나 SEO 플러그인이 더 잘 처리하며, IndexNow를 지원하지 않는 구글에는 사이트맵이 필요합니다. 이 사이트의 페이지와 글을 나열합니다.',
     'serve-sitemap-taken' => ':url 은 이미 다른 플러그인이 처리합니다. 이 플러그인의 사이트맵은 제공되지 않습니다 — 끄거나 다른 플러그인을 제거하세요.',
     'serve-sitemap-live' => '사이트맵을 :url 에서 볼 수 있습니다. 구글 서치 콘솔에 제출하세요.',
+
+    // The admin page in the design language of the OnAir plugin family.
+    'active' => '활성',
+    'inactive' => '꺼짐',
+    'status' => '상태',
+    'key-file' => '키 파일 접근 가능',
+    'last' => '마지막 전송',
+    'never' => '아직 전송한 항목 없음',
+    'all' => '모든 주소 전송',
+    'auto-sub' => '페이지, 게시물 또는 플러그인이 저장하는 즉시',
+    'serve-sitemap-sub' => '사이트맵 또는 SEO 플러그인이 없을 때만',
+    'today' => '오늘',
+    'reported-today' => '오늘 전송함',
+    'known' => '사이트 주소',
 ];

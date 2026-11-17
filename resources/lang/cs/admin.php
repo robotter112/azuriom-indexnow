@@ -40,4 +40,18 @@ return [
     'serve-sitemap-hint' => 'Jen pro weby, které žádnou mapu stránek nemají. Plugin pro mapu stránek nebo SEO to zvládne lépe — a Google, který IndexNow ignoruje, ji potřebuje. Vypíše stránky a příspěvky tohoto webu.',
     'serve-sitemap-taken' => 'Na :url už odpovídá jiný plugin. Vaše se neposkytuje — vypněte to nebo odinstalujte druhý plugin.',
     'serve-sitemap-live' => 'Vaše mapa stránek je na :url. Zadejte ji v Google Search Console.',
+
+    // The admin page in the design language of the OnAir plugin family.
+    'active' => 'Aktivní',
+    'inactive' => 'Vypnuto',
+    'status' => 'Stav',
+    'key-file' => 'Soubor s klíčem je dostupný',
+    'last' => 'Poslední odeslání',
+    'never' => 'Zatím nic neodesláno',
+    'all' => 'Odeslat všechny adresy',
+    'auto-sub' => 'Jakmile stránka, příspěvek nebo plugin něco uloží',
+    'serve-sitemap-sub' => 'Jen bez pluginu pro sitemapu nebo SEO',
+    'today' => 'Dnes',
+    'reported-today' => 'Odesláno dnes',
+    'known' => 'Adresy webu',
 ];

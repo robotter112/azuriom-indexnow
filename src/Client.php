@@ -2,6 +2,7 @@
 
 namespace Azuriom\Plugin\Indexnow;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
@@ -91,15 +92,15 @@ class Client
                 'urlList' => $urls,
             ]);
         } catch (\Throwable $e) {
-            return ['ok' => false, 'reason' => 'unreachable', 'status' => 0, 'count' => count($urls)];
+            return self::remember(['ok' => false, 'reason' => 'unreachable', 'status' => 0, 'count' => count($urls)]);
         }
 
-        return [
+        return self::remember([
             'ok' => in_array($response->status(), [200, 202], true),
             'reason' => self::reasonFor($response->status()),
             'status' => $response->status(),
             'count' => count($urls),
-        ];
+        ]);
     }
 
     /**
@@ -181,6 +182,38 @@ class Client
             url(self::keyFileName($key)),
             $urls
         );
+    }
+
+    /**
+     * The last submission and the addresses accepted today, for the admin page. A cache that
+     * can't be written must not stop the submission it describes.
+     */
+    private static function remember(array $result): array
+    {
+        rescue(function () use ($result) {
+            Cache::forever('indexnow.last', ['at' => time(), 'ok' => $result['ok'], 'reason' => $result['reason'], 'status' => $result['status'], 'count' => $result['count']]);
+
+            if ($result['ok']) {
+                $today = 'indexnow.today.'.now()->toDateString();
+                Cache::add($today, 0, now()->addDays(2));
+                Cache::increment($today, $result['count']);
+            }
+        }, null, false);
+
+        return $result;
+    }
+
+    /**
+     * @return array{at: int, ok: bool, reason: string, status: int, count: int}|null
+     */
+    public static function last(): ?array
+    {
+        return Cache::get('indexnow.last');
+    }
+
+    public static function today(): int
+    {
+        return (int) Cache::get('indexnow.today.'.now()->toDateString(), 0);
     }
 
     /**

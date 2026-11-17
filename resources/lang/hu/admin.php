@@ -40,4 +40,18 @@ return [
     'serve-sitemap-hint' => 'Csak olyan oldalakhoz, amelyeknek egyáltalán nincs oldaltérképe. Egy oldaltérkép- vagy SEO-bővítmény ezt jobban csinálja — és a Google, amely az IndexNow-t figyelmen kívül hagyja, igényel egyet. Felsorolja az oldal lapjait és bejegyzéseit.',
     'serve-sitemap-taken' => 'A :url címre már egy másik bővítmény válaszol. A tiéd nem kerül kiszolgálásra — kapcsold ki ezt, vagy távolítsd el a másikat.',
     'serve-sitemap-live' => 'Az oldaltérképed elérhető itt: :url. Küldd be a Google Search Console-ba.',
+
+    // The admin page in the design language of the OnAir plugin family.
+    'active' => 'Aktív',
+    'inactive' => 'Kikapcsolva',
+    'status' => 'Állapot',
+    'key-file' => 'A kulcsfájl elérhető',
+    'last' => 'Utolsó bejelentés',
+    'never' => 'Még semmi nincs bejelentve',
+    'all' => 'Összes cím bejelentése',
+    'auto-sub' => 'Amint egy oldal, bejegyzés vagy bővítmény ment valamit',
+    'serve-sitemap-sub' => 'Csak oldaltérkép- vagy SEO-bővítmény nélkül',
+    'today' => 'Ma',
+    'reported-today' => 'Ma bejelentve',
+    'known' => 'Az oldal címei',
 ];

@@ -40,4 +40,18 @@ return [
     'serve-sitemap-hint' => 'Nur für Seiten, die gar keine Sitemap haben. Ein Sitemap- oder SEO-Plugin macht das besser – und Google, das IndexNow ignoriert, braucht eine. Listet die Seiten und Beiträge dieser Website.',
     'serve-sitemap-taken' => 'Ein anderes Plugin beantwortet :url bereits. Deine wird nicht ausgeliefert – schalte dies ab oder deinstalliere das andere Plugin.',
     'serve-sitemap-live' => 'Deine Sitemap ist unter :url erreichbar. Reiche sie in der Google Search Console ein.',
+
+    // The admin page in the design language of the OnAir plugin family.
+    'active' => 'Aktiv',
+    'inactive' => 'Aus',
+    'status' => 'Status',
+    'key-file' => 'Schlüsseldatei erreichbar',
+    'last' => 'Zuletzt gemeldet',
+    'never' => 'Noch nichts gemeldet',
+    'all' => 'Alle Adressen melden',
+    'auto-sub' => 'Sobald eine Seite, ein Beitrag oder ein Plugin etwas speichert',
+    'serve-sitemap-sub' => 'Nur ohne Sitemap- oder SEO-Plugin',
+    'today' => 'Heute',
+    'reported-today' => 'Heute gemeldet',
+    'known' => 'Adressen der Seite',
 ];

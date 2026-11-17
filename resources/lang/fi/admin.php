@@ -40,4 +40,18 @@ return [
     'serve-sitemap-hint' => 'Vain sivustoille, joilla ei ole lainkaan sivustokarttaa. Sivustokartta- tai SEO-lisäosa tekee tämän paremmin — ja Google, joka ei tue IndexNow\'ta, tarvitsee sellaisen. Listaa tämän sivuston sivut ja artikkelit.',
     'serve-sitemap-taken' => 'Osoitteeseen :url vastaa jo toinen lisäosa. Omaasi ei tarjoilla — kytke tämä pois tai poista toinen lisäosa.',
     'serve-sitemap-live' => 'Sivustokarttasi on osoitteessa :url. Lähetä se Google Search Consoleen.',
+
+    // The admin page in the design language of the OnAir plugin family.
+    'active' => 'Käytössä',
+    'inactive' => 'Pois',
+    'status' => 'Tila',
+    'key-file' => 'Avaintiedosto tavoitettavissa',
+    'last' => 'Viimeisin ilmoitus',
+    'never' => 'Mitään ei ole vielä ilmoitettu',
+    'all' => 'Ilmoita kaikki osoitteet',
+    'auto-sub' => 'Heti kun sivu, artikkeli tai lisäosa tallentaa jotain',
+    'serve-sitemap-sub' => 'Vain ilman sivukartta- tai SEO-lisäosaa',
+    'today' => 'Tänään',
+    'reported-today' => 'Ilmoitettu tänään',
+    'known' => 'Sivuston osoitteet',
 ];

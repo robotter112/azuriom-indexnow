@@ -30,6 +30,8 @@ class AdminController extends Controller
             'serveSitemap' => (bool) setting('indexnow.serve_sitemap'),
             'sitemapServedBy' => SitemapController::servedBy(),
             'ownSitemapUrl' => url('/sitemap.xml'),
+            'last' => Client::last(),
+            'today' => Client::today(),
         ]);
     }
 

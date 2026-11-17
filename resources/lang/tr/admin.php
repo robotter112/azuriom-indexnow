@@ -40,4 +40,18 @@ return [
     'serve-sitemap-hint' => 'Yalnızca hiç site haritası olmayan siteler için. Bir site haritası veya SEO eklentisi bunu daha iyi yapar — ve IndexNow\'u yok sayan Google buna ihtiyaç duyar. Bu sitenin sayfalarını ve yazılarını listeler.',
     'serve-sitemap-taken' => ':url adresine zaten başka bir eklenti yanıt veriyor. Seninki sunulmuyor — bunu kapat ya da diğer eklentiyi kaldır.',
     'serve-sitemap-live' => 'Site haritan :url adresinde. Google Search Console\'a gönder.',
+
+    // The admin page in the design language of the OnAir plugin family.
+    'active' => 'Etkin',
+    'inactive' => 'Kapalı',
+    'status' => 'Durum',
+    'key-file' => 'Anahtar dosyasına erişilebiliyor',
+    'last' => 'Son bildirim',
+    'never' => 'Henüz bir şey bildirilmedi',
+    'all' => 'Tüm adresleri bildir',
+    'auto-sub' => 'Bir sayfa, gönderi veya eklenti bir şey kaydettiği anda',
+    'serve-sitemap-sub' => 'Yalnızca site haritası veya SEO eklentisi yoksa',
+    'today' => 'Bugün',
+    'reported-today' => 'Bugün bildirilen',
+    'known' => 'Sitenin adresleri',
 ];

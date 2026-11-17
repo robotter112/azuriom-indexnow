@@ -40,4 +40,18 @@ return [
     'serve-sitemap-hint' => 'Alleen voor sites zonder enige sitemap. Een sitemap- of SEO-plugin doet dit beter — en Google, dat IndexNow negeert, heeft er een nodig. Toont de pagina\'s en berichten van deze site.',
     'serve-sitemap-taken' => 'Een andere plugin beantwoordt :url al. De jouwe wordt niet aangeboden: zet dit uit of verwijder de andere plugin.',
     'serve-sitemap-live' => 'Je sitemap staat op :url. Dien hem in bij Google Search Console.',
+
+    // The admin page in the design language of the OnAir plugin family.
+    'active' => 'Actief',
+    'inactive' => 'Uit',
+    'status' => 'Status',
+    'key-file' => 'Sleutelbestand bereikbaar',
+    'last' => 'Laatst gemeld',
+    'never' => 'Nog niets gemeld',
+    'all' => 'Alle adressen melden',
+    'auto-sub' => 'Zodra een pagina, bericht of plug-in iets opslaat',
+    'serve-sitemap-sub' => 'Alleen zonder sitemap- of SEO-plug-in',
+    'today' => 'Vandaag',
+    'reported-today' => 'Vandaag gemeld',
+    'known' => 'Adressen van de site',
 ];

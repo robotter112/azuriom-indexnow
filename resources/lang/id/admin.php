@@ -40,4 +40,18 @@ return [
     'serve-sitemap-hint' => 'Hanya untuk situs yang sama sekali tidak punya peta situs. Plugin peta situs atau SEO melakukannya lebih baik — dan Google, yang mengabaikan IndexNow, membutuhkannya. Mendaftar halaman dan pos situs ini.',
     'serve-sitemap-taken' => 'Plugin lain sudah menjawab :url. Milik Anda tidak disajikan — matikan ini atau hapus plugin tersebut.',
     'serve-sitemap-live' => 'Peta situs Anda tersedia di :url. Kirimkan di Google Search Console.',
+
+    // The admin page in the design language of the OnAir plugin family.
+    'active' => 'Aktif',
+    'inactive' => 'Mati',
+    'status' => 'Status',
+    'key-file' => 'File kunci dapat diakses',
+    'last' => 'Laporan terakhir',
+    'never' => 'Belum ada yang dilaporkan',
+    'all' => 'Laporkan semua alamat',
+    'auto-sub' => 'Begitu halaman, postingan, atau plugin menyimpan sesuatu',
+    'serve-sitemap-sub' => 'Hanya tanpa plugin sitemap atau SEO',
+    'today' => 'Hari ini',
+    'reported-today' => 'Dilaporkan hari ini',
+    'known' => 'Alamat situs',
 ];

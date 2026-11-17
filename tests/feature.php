@@ -86,6 +86,7 @@ check($reported() === [[route('posts.show', 'first-post')]], 'a published post i
 $two = $post('second-post');
 $three = $post('third-post');
 check($reported() === [[route('posts.show', 'second-post'), route('posts.show', 'third-post')]], 'what changes in one request goes out as one report');
+check(Azuriom\Plugin\Indexnow\Client::last()['count'] === 2 && Azuriom\Plugin\Indexnow\Client::last()['ok'] && Azuriom\Plugin\Indexnow\Client::today() >= 3, 'the admin page knows the last report and the addresses of today');
 
 $draft = $post('draft-post', '+1 week');
 check($reported() === [], 'a post that is not published yet is not reported');
