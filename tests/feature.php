@@ -215,5 +215,14 @@ $page->delete();
 $author->delete();
 $reported();
 
+// --- the admin page ------------------------------------------------------------
+
+// It only counts the addresses: the sitemap is not fetched over HTTP on every view.
+$seenBefore = Http::recorded()->count();
+app(Azuriom\Plugin\Indexnow\Controllers\Admin\AdminController::class)->index();
+app(Azuriom\Plugin\Indexnow\Controllers\Admin\AdminController::class)->index();
+$asked = Http::recorded()->slice($seenBefore)->filter(fn ($pair) => str_contains($pair[0]->url(), 'sitemap'))->count();
+check($asked <= 1, 'the admin page reads a sitemap at most once in ten minutes, not on every view'.$label);
+
 echo $failures === 0 ? "All feature checks passed$label.".PHP_EOL : "$failures feature check(s) failed$label.".PHP_EOL;
 exit($failures === 0 ? 0 : 1);

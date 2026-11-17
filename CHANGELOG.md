@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The admin page fetched the sitemap over HTTP on every view, which made it load half a
+  second and more slower than the other admin pages. Its own sitemap now comes from the
+  cache that serves `/sitemap.xml`, another one is read at most every ten minutes.
+
 ## [2.3.0] - 2026-11-17
 
 The admin page got a new look, and it tells you how your last report went.

@@ -18,7 +18,7 @@ class AdminController extends Controller
     {
         $key = setting('indexnow.key');
         $sitemapUrl = setting('indexnow.sitemap') ?: UrlSource::defaultSitemapUrl();
-        $collected = UrlSource::collect($sitemapUrl);
+        $collected = self::collected($sitemapUrl);
 
         return view('indexnow::admin.index', [
             'enabled' => (bool) $key,
@@ -132,6 +132,8 @@ class AdminController extends Controller
             'serve_sitemap' => ['nullable', 'boolean'],
         ]);
 
+        $sitemapBefore = setting('indexnow.sitemap') ?: UrlSource::defaultSitemapUrl();
+
         Setting::updateSettings([
             'indexnow.sitemap' => $validated['sitemap'] ?: null,
             'indexnow.auto' => $request->boolean('auto') ? '1' : '0',
@@ -139,6 +141,8 @@ class AdminController extends Controller
         ]);
 
         Cache::forget('indexnow.sitemap');
+        Cache::forget(self::collectedKey($sitemapBefore));
+        Cache::forget(self::collectedKey(setting('indexnow.sitemap') ?: UrlSource::defaultSitemapUrl()));
 
         // The route is registered from a file rather than this setting, because
         // settings are not loaded yet at that point. Keep the two in step and
@@ -156,5 +160,27 @@ class AdminController extends Controller
         }
 
         return to_route('indexnow.admin.index')->with('success', trans('indexnow::admin.saved'));
+    }
+
+    /**
+     * The addresses the admin page counts. The page used to fetch the sitemap over HTTP on
+     * every view: the site asking itself through its proxies took half a second and more.
+     * The sitemap this plugin serves comes from the cache that serves /sitemap.xml, any
+     * other one is read at most every ten minutes.
+     *
+     * @return array{urls: array<int, string>, source: string}
+     */
+    private static function collected(string $sitemapUrl): array
+    {
+        if (setting('indexnow.serve_sitemap') && SitemapController::servedBy() === 'self' && $sitemapUrl === UrlSource::defaultSitemapUrl()) {
+            return ['urls' => Cache::remember('indexnow.sitemap', now()->addHour(), fn () => UrlSource::fromCore()), 'source' => 'sitemap'];
+        }
+
+        return Cache::remember(self::collectedKey($sitemapUrl), now()->addMinutes(10), fn () => UrlSource::collect($sitemapUrl));
+    }
+
+    private static function collectedKey(string $sitemapUrl): string
+    {
+        return 'indexnow.collected.'.md5($sitemapUrl);
     }
 }
