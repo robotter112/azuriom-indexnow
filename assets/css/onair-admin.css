@@ -1,4 +1,4 @@
-/* onair-admin.css 1.0 – the admin pages of the OnAir plugin family in one design language.
+/* onair-admin.css 1.1 – the admin pages of the OnAir plugin family in one design language.
    Rules: ADMIN-DESIGN.md in the OnAir theme repo. Every plugin ships this same file, so each runs on its
    own; change it in all of them at once and raise the version. Colours come from the Bootstrap variables
    of Azuriom, so light and dark (data-bs-theme on <body>) both work. */
