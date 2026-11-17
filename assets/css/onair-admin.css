@@ -1,4 +1,4 @@
-/* onair-admin.css 1.2 – the admin pages of the OnAir plugin family in one design language.
+/* onair-admin.css 1.3 – the admin pages of the OnAir plugin family in one design language.
    Rules: ADMIN-DESIGN.md in the OnAir theme repo. Every plugin ships this same file, so each runs on its
    own; change it in all of them at once and raise the version. Neutral colours come from the Bootstrap
    variables of Azuriom, the tones of tiles and badges are pairs of their own with a dark value, so light
@@ -19,7 +19,7 @@ body {
     --oa-blue-bg: #E8F0FC;   --oa-blue-fg: #2A62B8;
     --oa-orange-bg: #FFF4E0; --oa-orange-fg: #B26A00;
     --oa-amber-bg: #FEF3C7;  --oa-amber-fg: #92400E;
-    --oa-red-bg: #FDECEC;    --oa-red-fg: #C62828;
+    --oa-red-bg: #FDECEC;    --oa-red-fg: #C62828;    --oa-red-fill: #C62828;
     --oa-grey-bg: #EEF2F7;   --oa-grey-fg: #4B5866;
     --oa-purple-bg: #F0E9FF; --oa-purple-fg: #7C3AED;
 }
@@ -31,7 +31,7 @@ body[data-bs-theme="dark"] {
     --oa-blue-bg: #1A2C48;   --oa-blue-fg: #8CB4F0;
     --oa-orange-bg: #3D2C12; --oa-orange-fg: #F2B562;
     --oa-amber-bg: #3A2F10;  --oa-amber-fg: #FCD34D;
-    --oa-red-bg: #3D1C1F;    --oa-red-fg: #F19A9A;
+    --oa-red-bg: #3D1C1F;    --oa-red-fg: #F19A9A;    --oa-red-fill: #D64545;
     --oa-grey-bg: #2B3138;   --oa-grey-fg: #C3CAD3;
     --oa-purple-bg: #2E2350; --oa-purple-fg: #C9B3FF;
 }
@@ -216,14 +216,30 @@ a.oa-row-title:hover { color: var(--bs-link-color); }
 
 /* Buttons inside cards: soft (grey, blue ink: add something), neutral (grey: upload, refresh, copy,
    a save beside the main one), tint (light blue: go on to a related page or action). */
-.oa-btn-soft, .oa-btn-neutral, .oa-btn-tint { border: 0; }
-.oa-btn-soft { background: var(--oa-fill); color: var(--oa-link); }
-.oa-btn-neutral { background: var(--oa-fill); color: var(--bs-body-color); }
-.oa-btn-tint { background: var(--oa-tint); color: var(--oa-link); }
-.oa-btn-soft:hover, .oa-btn-soft:focus-visible, .oa-btn-neutral:hover, .oa-btn-neutral:focus-visible { background: var(--oa-fill-hover); color: var(--oa-strong); }
-.oa-btn-soft:hover, .oa-btn-soft:focus-visible { color: var(--oa-link); }
-.oa-btn-tint:hover, .oa-btn-tint:focus-visible { background: var(--oa-tint-hover); color: var(--oa-link); }
-/* Removing something: red text at the foot of a card, or .oa-btn-danger-soft (after the icon buttons). */
+/* Button variants set Bootstrap's own button variables, so hover, focus, pressed and a chosen toggle (a label after
+   .btn-check, for which Bootstrap resets the hover) look the same everywhere. Each one keeps its colour on hover. */
+.oa-btn-soft, .oa-btn-neutral, .oa-btn-tint, .oa-btn-danger-soft {
+    color: var(--bs-btn-color);
+    background-color: var(--bs-btn-bg);
+    border: 1px solid var(--bs-btn-border-color);
+    --bs-btn-active-color: var(--bs-btn-hover-color);
+    --bs-btn-active-bg: var(--bs-btn-hover-bg);
+    --bs-btn-active-border-color: var(--bs-btn-hover-border-color);
+}
+.oa-btn-soft:hover, .oa-btn-soft:focus-visible, .btn-check + .oa-btn-soft:hover,
+.oa-btn-neutral:hover, .oa-btn-neutral:focus-visible, .btn-check + .oa-btn-neutral:hover,
+.oa-btn-tint:hover, .oa-btn-tint:focus-visible, .btn-check + .oa-btn-tint:hover,
+.oa-btn-danger-soft:hover, .oa-btn-danger-soft:focus-visible, .btn-check + .oa-btn-danger-soft:hover {
+    color: var(--bs-btn-hover-color);
+    background-color: var(--bs-btn-hover-bg);
+    border-color: var(--bs-btn-hover-border-color);
+}
+.oa-btn-soft { --bs-btn-color: var(--oa-link); --bs-btn-bg: var(--oa-fill); --bs-btn-border-color: transparent; --bs-btn-hover-color: var(--oa-link); --bs-btn-hover-bg: var(--oa-fill-hover); --bs-btn-hover-border-color: transparent; }
+.oa-btn-neutral { --bs-btn-color: var(--bs-body-color); --bs-btn-bg: var(--oa-fill); --bs-btn-border-color: transparent; --bs-btn-hover-color: var(--oa-strong); --bs-btn-hover-bg: var(--oa-fill-hover); --bs-btn-hover-border-color: transparent; }
+.oa-btn-tint { --bs-btn-color: var(--oa-link); --bs-btn-bg: var(--oa-tint); --bs-btn-border-color: transparent; --bs-btn-hover-color: var(--oa-link); --bs-btn-hover-bg: var(--oa-tint-hover); --bs-btn-hover-border-color: transparent; }
+/* Removing: white with a light red edge, filled red on hover and once chosen. */
+.oa-btn-danger-soft { --bs-btn-color: var(--oa-red-fg); --bs-btn-bg: var(--bs-secondary-bg); --bs-btn-border-color: color-mix(in srgb, var(--oa-red-fg) 30%, var(--bs-secondary-bg)); --bs-btn-hover-color: #fff; --bs-btn-hover-bg: var(--oa-red-fill); --bs-btn-hover-border-color: var(--oa-red-fill); }
+/* Removing something smaller: red text at the foot of a card. */
 .oa-btn-danger-text { padding: 0; border: 0; background: none; font-size: .8125rem; font-weight: 600; color: var(--bs-danger); }
 .oa-btn-danger-text:hover { text-decoration: underline; color: var(--bs-danger); }
 .oa-icon-btn {
@@ -244,8 +260,8 @@ a.oa-row-title:hover { color: var(--bs-link-color); }
 .oa-icon-btn:hover, .oa-icon-btn:focus-visible { background: var(--oa-fill-hover); color: var(--oa-strong); }
 .oa-icon-btn.is-danger:hover, .oa-icon-btn.is-danger:focus-visible { background: var(--oa-red-bg); color: var(--oa-red-fg); }
 .oa-icon-btn.is-on { background: var(--oa-green-bg); color: var(--oa-green-fg); }
-.oa-btn-danger-soft { border: 1px solid color-mix(in srgb, var(--oa-red-fg) 24%, var(--bs-secondary-bg)) !important; background: var(--bs-secondary-bg); color: var(--oa-red-fg); }
-.oa-btn-danger-soft:hover, .oa-btn-danger-soft:focus-visible, .btn-check:checked + .oa-btn-danger-soft { border-color: transparent !important; background: var(--oa-red-bg); color: var(--oa-red-fg); }
+.oa-icon-btn.oa-btn-danger-soft { color: var(--bs-btn-color); background-color: var(--bs-btn-bg); border: 1px solid var(--bs-btn-border-color); }
+.oa-icon-btn.oa-btn-danger-soft:hover, .oa-icon-btn.oa-btn-danger-soft:focus-visible { color: var(--bs-btn-hover-color); background-color: var(--bs-btn-hover-bg); border-color: var(--bs-btn-hover-border-color); }
 
 /* Keys: never shown. A saved one is a dashed box with a lock, dots, "saved" and "Replace". */
 .oa-secret { display: flex; align-items: center; gap: .625rem; min-height: 2.75rem; padding: .25rem .375rem .25rem .75rem; border: 1px dashed color-mix(in srgb, var(--bs-border-color) 100%, var(--bs-body-color) 25%); border-radius: .5rem; background: var(--oa-fill); }
