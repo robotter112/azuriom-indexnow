@@ -7,8 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-11-17
+
+The admin page got a new look, and it tells you how your last report went.
+
+### Added
+
+- **The last report at a glance.** When it went out, how many addresses it held and
+  what IndexNow answered, and how many addresses were reported today.
+
 ### Changed
-- The admin page has the look of the other OnAir plugins, in the light and the dark mode of Azuriom: status, settings and figures as cards, the save button at the top. It shows when the last report went out and how it was answered, and how many addresses were reported today.
+
+- **A clearer admin page.** Status, settings and figures as cards in the look of the
+  OnAir plugins, in the light and the dark mode of Azuriom and on a phone. The save
+  button sits at the top, the texts are short, in all 19 languages.
+
+### Upgrading
+
+Nothing to do: no migrations, no settings to change. Azuriom links the new
+stylesheet of the admin page when it installs the update.
+
+Azuriom 1.2.0 or newer, tested against 1.2.13.
 
 ## [2.2.0] - 2026-11-16
 
