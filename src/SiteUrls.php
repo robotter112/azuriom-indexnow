@@ -65,7 +65,17 @@ class SiteUrls
      */
     protected static function addFromPlugins(Collection $urls): void
     {
-        foreach (Event::dispatch('indexnow.urls') as $answer) {
+        // Each plugin on its own: one that fails (a stale route cache, a missing table) is left
+        // out, instead of taking the addresses of the site and of every other plugin with it.
+        foreach (Event::getListeners('indexnow.urls') as $listener) {
+            try {
+                $answer = $listener('indexnow.urls', []);
+            } catch (\Throwable $e) {
+                report($e);
+
+                continue;
+            }
+
             foreach ((array) $answer as $url) {
                 if (is_string($url) && Client::isOwnHost($url = Client::onSiteRoot($url))) {
                     $urls->push($url);

@@ -2,6 +2,7 @@
 
 namespace Azuriom\Plugin\Indexnow;
 
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -58,7 +59,7 @@ class Client
         try {
             // A key file is a plain file at the document root: a redirect only
             // ever leads somewhere else, so it counts as a wrong answer.
-            $response = Http::withoutRedirecting()->timeout(15)->get($url);
+            $response = Http::withoutRedirecting()->timeout(15)->withOptions(['stream' => true])->get($url);
         } catch (\Throwable $e) {
             return ['ok' => false, 'reason' => 'unreachable'];
         }
@@ -67,9 +68,33 @@ class Client
             return ['ok' => false, 'reason' => 'status', 'status' => $response->status()];
         }
 
-        return trim($response->body()) === $key
+        // A key file holds the key and perhaps a line break; anything much longer is not one.
+        return trim((string) self::bodyUpTo($response, 1024)) === $key
             ? ['ok' => true, 'reason' => 'ok']
             : ['ok' => false, 'reason' => 'content'];
+    }
+
+    /**
+     * The body of an answer requested with ['stream' => true], or null when it is longer than
+     * $max bytes. Reading stops at the limit, so neither a huge file nor a small compressed
+     * "bomb" can fill the memory before the size is known.
+     */
+    public static function bodyUpTo(Response $response, int $max): ?string
+    {
+        $stream = $response->toPsrResponse()->getBody();
+        $body = '';
+
+        while (! $stream->eof() && strlen($body) <= $max) {
+            $chunk = $stream->read(65536);
+
+            if ($chunk === '') {
+                break;
+            }
+
+            $body .= $chunk;
+        }
+
+        return strlen($body) <= $max ? $body : null;
     }
 
     /**

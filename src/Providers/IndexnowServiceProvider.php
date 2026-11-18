@@ -53,6 +53,9 @@ class IndexnowServiceProvider extends BasePluginServiceProvider
         // Other plugins hand over exact addresses without depending on this one:
         // event('indexnow.submit', [[$url, ...]]). Without IndexNow nobody listens.
         Event::listen('indexnow.submit', function ($urls) {
+            // What a plugin hands over may also be in the optional sitemap (indexnow.urls).
+            Cache::forget('indexnow.sitemap');
+
             if (is_array($urls)) {
                 Reporter::queue($urls, handed: true);
             }

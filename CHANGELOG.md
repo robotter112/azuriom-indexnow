@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Hardening from the security audit of November 2026, no known vulnerability.
+
+### Fixed
+
+- The optional sitemap is built again as soon as a post or page changes, or a plugin hands
+  over a changed address. A post that was unpublished, or a page that was disabled or given
+  roles, no longer stays listed for up to an hour.
+- A plugin whose list for the sitemap fails (for example after a stale route cache) is left
+  out; the addresses of the site and of all other plugins stay.
+
+### Security
+
+- Pages that the visibility check opens no longer start another report, even when they save
+  something of their plugin while being viewed.
+- One report spends at most ten seconds on visibility checks; after that the rules decide.
+  The check reads only the status of a page and never downloads the page itself.
+- The key file check and the sitemap reader stop reading at a size limit (1 KB for the key
+  file, 20 MB for a sitemap), also for compressed answers.
+
 ## [2.3.1] - 2026-11-18
 
 A security and robustness update. Recommended for every site.

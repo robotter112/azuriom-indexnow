@@ -13,6 +13,7 @@ use Azuriom\Models\User;
 use Azuriom\Plugin\Indexnow\Client;
 use Azuriom\Plugin\Indexnow\Reporter;
 use Azuriom\Plugin\Indexnow\SiteUrls;
+use Azuriom\Plugin\Indexnow\UrlSource;
 use Azuriom\Plugin\IndexnowDemo\Models\Item;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Cache;
@@ -49,6 +50,18 @@ $site = [];
 Http::fake(function ($request) use (&$status, &$site) {
     if (str_ends_with($request->url(), '/redirected.txt')) {
         return Http::response('', 302, ['Location' => url('/abcdef12.txt')]);
+    }
+
+    // Oversized answers for the size limits.
+    $loc = '<url><loc>http://localhost/x</loc></url></urlset>';
+    $fixed = [
+        url('/big-key.txt') => fn () => str_repeat('a', 4096),
+        url('/big-sitemap.xml') => fn () => '<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'.str_repeat(' ', UrlSource::MAX_BYTES).$loc,
+        url('/small-sitemap.xml') => fn () => '<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'.$loc,
+    ];
+
+    if (isset($fixed[$request->url()])) {
+        return Http::response($fixed[$request->url()](), 200);
     }
 
     if (str_starts_with($request->url(), url('/'))) {
@@ -306,6 +319,35 @@ $lock->release();
 check(in_array(Client::siteRoot().'/', Azuriom\Plugin\Indexnow\Controllers\SitemapController::urls() ?? [], true) && ! Cache::has('indexnow.sitemap.failed'), 'a build that works replaces the list and clears its mark');
 $xml = view('indexnow::sitemap', ['urls' => ['http://localhost/a&b']])->render();
 check(str_starts_with($xml, '<?xml version="1.0" encoding="UTF-8"?>') && str_contains($xml, '<loc>http://localhost/a&amp;b</loc>'), 'the sitemap file starts with its XML declaration, also with short_open_tag on (ini: '.(int) ini_get('short_open_tag').')');
+
+// The cached sitemap does not outlive a change of what it lists.
+Cache::put('indexnow.sitemap', ['http://localhost/stale'], 3600);
+$post('sitemap-refresh-'.uniqid());
+check(! Cache::has('indexnow.sitemap'), 'saving a post drops the cached sitemap, so a hidden post does not stay listed for an hour');
+$reported();
+Cache::put('indexnow.sitemap', ['http://localhost/stale'], 3600);
+event('indexnow.submit', [[url('/knowledge/setup')]]);
+check(! Cache::has('indexnow.sitemap'), 'so does an address a plugin hands over');
+$reported();
+
+// A page opened by the visibility check never starts the next check.
+$visitor = $app['request'];
+$app->instance('request', Illuminate\Http\Request::create('http://localhost/indexnow-demo', 'GET', [], [], [], ['HTTP_USER_AGENT' => Azuriom\Plugin\Indexnow\Reporter::PROBE_AGENT]));
+$post('saved-during-a-check-'.uniqid());
+event('indexnow.submit', [[url('/knowledge/during-a-check')]]);
+$app->instance('request', $visitor);
+check($reported() === [], 'what a page saves while the visibility check opens it reports nothing');
+
+// One plugin that fails does not take the other addresses with it.
+Event::listen('indexnow.urls', fn () => throw new RuntimeException('stale route cache'));
+$all = SiteUrls::all();
+check(in_array(url('/knowledge/setup'), $all, true) && in_array(Client::siteRoot().'/', $all, true), 'a plugin whose list fails is left out, the rest of the sitemap stays');
+Event::forget('indexnow.urls');
+
+// Bodies are read only up to a limit.
+check(Client::verifyKeyFile(str_repeat('a', 4096), url('/big-key.txt'))['ok'] === false, 'a key file far longer than a key is not read to its end');
+check(UrlSource::fromSitemap(url('/big-sitemap.xml')) === [], 'a sitemap over the size limit is not read');
+check(UrlSource::fromSitemap(url('/small-sitemap.xml')) === ['http://localhost/x'], 'a normal sitemap still is');
 
 // Switching on keeps the verified address; switching on again retires the old key file.
 $admin = app(Azuriom\Plugin\Indexnow\Controllers\Admin\AdminController::class);

@@ -43,6 +43,12 @@ class Reporter
     /** A plugin page is opened for the check at most once per CHECK_PAUSE, whatever it answered. */
     public const CHECK_PAUSE = 600;
 
+    /** Seconds one report may spend opening addresses; after that the rules alone decide. */
+    public const CHECK_BUDGET = 10;
+
+    /** How the visibility check introduces itself, so a page it opens never starts another report. */
+    public const PROBE_AGENT = 'IndexNow for Azuriom (visibility check)';
+
     /** @var array<string, true> plugin pages, reported at most once per PLUGIN_PAGE_PAUSE */
     private static array $paused = [];
 
@@ -65,6 +71,12 @@ class Reporter
 
     public static function changed(Model $record): void
     {
+        // The optional sitemap is kept for an hour; a post or page that changed (unpublished,
+        // disabled, given roles) must not stay listed until then, reporting on or off.
+        if ($record instanceof Post || $record instanceof Page) {
+            Cache::forget('indexnow.sitemap');
+        }
+
         if (! self::enabled()) {
             return;
         }
@@ -192,9 +204,10 @@ class Reporter
     public static function visible(array $urls, array $handed = []): array
     {
         $kept = [];
+        $deadline = microtime(true) + self::CHECK_BUDGET;
 
         foreach (array_values(array_filter($urls, fn (string $url) => Client::isOwnHost($url))) as $index => $url) {
-            $status = $index < self::MAX_CHECKS ? self::guestStatus($url) : null;
+            $status = $index < self::MAX_CHECKS && microtime(true) < $deadline ? self::guestStatus($url) : null;
 
             $keep = $status === null
                 ? ! isset($handed[$url]) && ! self::underMaintenance($url)
@@ -211,9 +224,11 @@ class Reporter
     private static function guestStatus(string $url): ?int
     {
         try {
+            // Only the status counts: streamed, the page itself is never downloaded.
             return Http::withoutRedirecting()
                 ->timeout(8)
-                ->withHeaders(['User-Agent' => 'IndexNow for Azuriom (visibility check)', 'Accept' => 'text/html'])
+                ->withOptions(['stream' => true])
+                ->withHeaders(['User-Agent' => self::PROBE_AGENT, 'Accept' => 'text/html'])
                 ->get($url)
                 ->status();
         } catch (Throwable) {
@@ -301,7 +316,10 @@ class Reporter
      */
     private static function enabled(): bool
     {
-        return (bool) setting('indexnow.key') && (bool) setting('indexnow.auto', true);
+        // A page the visibility check opens may save something of its plugin (a view counter):
+        // that must not start the next check, or the checks would never end.
+        return (bool) setting('indexnow.key') && (bool) setting('indexnow.auto', true)
+            && request()->userAgent() !== self::PROBE_AGENT;
     }
 
     /**

@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Http;
  */
 class UrlSource
 {
+    /** The largest sitemap read, in bytes (decoded). */
+    public const MAX_BYTES = 20 * 1024 * 1024;
+
     /**
      * Read the sitemap and return its URLs.
      *
@@ -31,7 +34,7 @@ class UrlSource
         try {
             // Redirects only while they stay on the site: the check above covers the
             // first address alone.
-            $response = Http::timeout(20)->withOptions(['allow_redirects' => [
+            $response = Http::timeout(20)->withOptions(['stream' => true, 'allow_redirects' => [
                 'max' => 3,
                 'protocols' => ['http', 'https'],
                 'on_redirect' => function ($request, $response, $uri) {
@@ -48,7 +51,11 @@ class UrlSource
             return [];
         }
 
-        return self::parse($response->body());
+        // A sitemap may hold at most 50,000 addresses; 20 MB is far beyond that, and a larger
+        // answer would only exhaust the memory while being parsed.
+        $xml = Client::bodyUpTo($response, self::MAX_BYTES);
+
+        return $xml !== null ? self::parse($xml) : [];
     }
 
     /**
