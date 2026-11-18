@@ -13,17 +13,20 @@ set -eu
 PLUGIN=$(cd "$(dirname "$0")/.." && pwd)
 WORK=${1:-$(mktemp -d)}
 VERSION=${AZURIOM_VERSION:-1.2.13}
-# SHA-256 of the official package; checked for the default version
-SHA256=${AZURIOM_SHA256:-3166f93903f678dbc44caf7ec289a04b3b46e35752c5e877fea1264d94309b69}
+# SHA-256 of the official package. Another version needs its own (AZURIOM_SHA256): without a
+# known checksum nothing is downloaded, let alone installed.
+if [ "$VERSION" = "1.2.13" ]; then
+    SHA256=${AZURIOM_SHA256:-3166f93903f678dbc44caf7ec289a04b3b46e35752c5e877fea1264d94309b69}
+else
+    SHA256=${AZURIOM_SHA256:?AZURIOM_SHA256 is needed for Azuriom $VERSION}
+fi
 
 php "$PLUGIN/tests/ClientTest.php"
 php "$PLUGIN/tests/UrlSourceTest.php"
 
 mkdir -p "$WORK/azuriom"
 curl -fsSL -o "$WORK/azuriom.zip" "https://github.com/Azuriom/Azuriom/releases/download/v$VERSION/Azuriom-$VERSION.zip"
-if [ "$VERSION" = "1.2.13" ] || [ -n "${AZURIOM_SHA256:-}" ]; then
-    echo "$SHA256  $WORK/azuriom.zip" | sha256sum -c --quiet
-fi
+echo "$SHA256  $WORK/azuriom.zip" | sha256sum -c --quiet
 unzip -q "$WORK/azuriom.zip" -d "$WORK/azuriom"
 cd "$WORK/azuriom"
 
