@@ -29,7 +29,17 @@ class UrlSource
         }
 
         try {
-            $response = Http::timeout(20)->get($sitemapUrl);
+            // Redirects only while they stay on the site: the check above covers the
+            // first address alone.
+            $response = Http::timeout(20)->withOptions(['allow_redirects' => [
+                'max' => 3,
+                'protocols' => ['http', 'https'],
+                'on_redirect' => function ($request, $response, $uri) {
+                    if (! Client::isOwnHost((string) $uri)) {
+                        throw new \RuntimeException('The sitemap redirects off this site.');
+                    }
+                },
+            ]])->get($sitemapUrl);
         } catch (\Throwable $e) {
             return [];
         }
@@ -94,7 +104,7 @@ class UrlSource
         } catch (\Throwable $e) {
             // A missing table or a renamed route must not break the submission;
             // the home page alone is still worth sending.
-            return [url('/')];
+            return [Client::siteRoot().'/'];
         }
     }
 
@@ -103,6 +113,6 @@ class UrlSource
      */
     public static function defaultSitemapUrl(): string
     {
-        return url('/sitemap.xml');
+        return Client::siteRoot().'/sitemap.xml';
     }
 }

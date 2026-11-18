@@ -11,6 +11,7 @@ use Azuriom\Models\Post;
 use Azuriom\Models\Setting;
 use Azuriom\Models\User;
 use Azuriom\Plugin\Indexnow\Client;
+use Azuriom\Plugin\Indexnow\Reporter;
 use Azuriom\Plugin\Indexnow\SiteUrls;
 use Azuriom\Plugin\IndexnowDemo\Models\Item;
 use Illuminate\Contracts\Console\Kernel;
@@ -46,7 +47,17 @@ function check(bool $ok, string $label): void
 $status = 200;
 $site = [];
 Http::fake(function ($request) use (&$status, &$site) {
+    if (str_ends_with($request->url(), '/redirected.txt')) {
+        return Http::response('', 302, ['Location' => url('/abcdef12.txt')]);
+    }
+
     if (str_starts_with($request->url(), url('/'))) {
+        $file = public_path(basename((string) parse_url($request->url(), PHP_URL_PATH)));
+
+        if (str_ends_with($request->url(), '.txt') && is_file($file)) {
+            return Http::response(file_get_contents($file), 200);
+        }
+
         $answer = $site[$request->url()] ?? 200;
 
         if ($answer === 'down') {
@@ -129,6 +140,7 @@ $item->update(['name' => 'Entry 2']);
 Item::create(['name' => 'Another']);
 check($reported() === [], 'a plugin page is reported at most once per pause, however much changes');
 Cache::forget('indexnow.reported.'.sha1(url('indexnow-demo')));
+Cache::forget('indexnow.reported.'.sha1(url('indexnow-demo')).'.checked');
 $item->delete();
 check($reported() === [[url('indexnow-demo')]], 'after the pause, deleting an entry reports the plugin page again');
 
@@ -156,12 +168,19 @@ foreach ([401, 403] as $answer) {
 }
 check($reported() === [], 'an address that answers 401 or 403 is not reported');
 Cache::forget('indexnow.reported.'.sha1(url('indexnow-demo')));
+Cache::forget('indexnow.reported.'.sha1(url('indexnow-demo')).'.checked');
 $site[url('indexnow-demo')] = 302;
 Item::create(['name' => 'Members only']);
 check($reported() === [], 'a plugin page behind a login is not reported');
+$opened = fn () => Http::recorded()->filter(fn ($pair) => $pair[0]->method() === 'GET' && $pair[0]->url() === url('indexnow-demo'))->count();
+$before = $opened();
+Item::create(['name' => 'Still members only']);
+Item::create(['name' => 'And again']);
+check($reported() === [] && $opened() === $before, 'a page that refused visitors is not opened again with every change (at most once per check pause)');
 unset($site[url('indexnow-demo')]);
+Cache::forget('indexnow.reported.'.sha1(url('indexnow-demo')).'.checked');
 Item::create(['name' => 'Public again']);
-check($reported() === [[url('indexnow-demo')]], 'once public, it is reported with the next change (a refused check starts no pause)');
+check($reported() === [[url('indexnow-demo')]], 'once public, it is reported with the next change after the check pause (a refused check starts no report pause)');
 
 $site[route('posts.show', 'rebuilt-post')] = 503;
 $rebuilt = $post('rebuilt-post');
@@ -176,6 +195,9 @@ check($reported() === [[route('posts.show', 'gone-post')]], 'a page that is gone
 $site[route('posts.show', 'unreachable-post')] = 'down';
 $post('unreachable-post');
 check($reported() === [[route('posts.show', 'unreachable-post')]], 'if the site cannot reach itself, the rules decide');
+$site[url('/knowledge/unchecked')] = 'down';
+event('indexnow.submit', [[url('/knowledge/unchecked')]]);
+check($reported() === [], 'an address handed over by a plugin that could not be checked stays out (no rules decide for it)');
 Setting::updateSettings(['maintenance.enabled' => '1', 'maintenance.paths' => ['/news/*']]);
 $site[route('posts.show', 'unreachable-maintained')] = 'down';
 $post('unreachable-maintained');
@@ -214,6 +236,87 @@ Post::whereIn('slug', ['first-post', 'second-post', 'draft-post', 'quiet-post', 
 $page->delete();
 $author->delete();
 $reported();
+
+// --- the site's own address, whatever the request says -------------------------
+
+// A request decides url(): its Host, a /index.php in the path, X-Forwarded-Proto.
+// Nothing IndexNow caches for everyone or reports may depend on that.
+$asRequest = function (string $address, callable $then) use ($app) {
+    $request = Illuminate\Http\Request::create($address, 'GET', [], [], [], [
+        'SCRIPT_NAME' => '/index.php', 'SCRIPT_FILENAME' => public_path('index.php'), 'PHP_SELF' => '/index.php',
+    ]);
+    $before = app('request');
+    $app->instance('request', $request);
+    app('url')->setRequest($request);
+
+    try {
+        return $then();
+    } finally {
+        $app->instance('request', $before);
+        app('url')->setRequest($before);
+    }
+};
+$site_ = Client::siteRoot();
+$onSite = fn (array $urls) => $urls !== [] && collect($urls)->every(fn ($url) => (str_starts_with($url, $site_.'/') || $url === $site_) && ! str_contains($url, 'ndex.php'));
+
+foreach (['http://evil.example/sitemap.xml', 'http://localhost/index.php/sitemap.xml', 'http://localhost/%69ndex.php/sitemap.xml'] as $address) {
+    Cache::forget('indexnow.sitemap');
+    $urls = $asRequest($address, fn () => Azuriom\Plugin\Indexnow\Controllers\SitemapController::urls());
+    check($onSite($urls) && $onSite(Azuriom\Plugin\Indexnow\Controllers\SitemapController::urls()), "the sitemap built for a request to $address lists only addresses of the site itself");
+}
+
+Cache::forget('indexnow.reported.'.sha1(url('indexnow-demo')));
+Cache::forget('indexnow.reported.'.sha1(url('indexnow-demo')).'.checked');
+$asRequest('http://10.0.0.5:8080/index.php/vote', fn () => event('indexnow.submit', [[url('/knowledge/forged')]]));
+$sent = $reported();
+$posts = Http::recorded()->filter(fn ($pair) => $pair[0]->method() === 'POST')->last();
+check($sent === [[$site_.'/knowledge/forged']] && $posts[0]->data()['keyLocation'] === Client::keyLocation(setting('indexnow.key'))
+    && Http::recorded()->every(fn ($pair) => ! str_contains($pair[0]->url(), '10.0.0.5') && ! str_contains($pair[0]->url(), 'ndex.php')),
+    'an address built during a request to another Host and /index.php is checked and reported on the site itself, with its key file there');
+Cache::forget('indexnow.reported.'.sha1(url('indexnow-demo')));
+Cache::forget('indexnow.reported.'.sha1(url('indexnow-demo')).'.checked');
+$asRequest('http://localhost/index.php/vote', fn () => Reporter::queueOncePerPause([url('indexnow-demo')]));
+$asRequest('http://localhost/%69ndex.php/vote', fn () => Reporter::queueOncePerPause([url('indexnow-demo')]));
+check($reported() === [[url('indexnow-demo')]], 'other spellings of the site\'s address are one page with one pause');
+
+check(! Client::isOwnHost(Client::siteRoot().':8099/sitemap.xml') && ! Client::isOwnHost('file://'.parse_url(Client::siteRoot(), PHP_URL_HOST).'/etc/passwd')
+    && Client::isOwnHost(Client::siteRoot().'/sitemap.xml'), 'another port of the site\'s own name is not the site');
+file_put_contents(public_path('abcdef12.txt'), 'abcdef12');
+$verified = Client::verifyKeyFile('abcdef12', url('/redirected.txt'));
+@unlink(public_path('abcdef12.txt'));
+check($verified['ok'] === false && ($verified['status'] ?? 0) === 302, 'the key file check does not follow redirects');
+try {
+    Client::keyFileName("abcdef12\n");
+    $refused = false;
+} catch (InvalidArgumentException) {
+    $refused = true;
+}
+check($refused, 'a key with a trailing line break is no key');
+
+// The sitemap: one build at a time, none right after one died, and a valid file.
+Cache::forget('indexnow.sitemap');
+Cache::forever('indexnow.sitemap.last', ['http://localhost/last-good']);
+Cache::put('indexnow.sitemap.failed', true, 60);
+check(Azuriom\Plugin\Indexnow\Controllers\SitemapController::urls() === ['http://localhost/last-good'], 'right after a build died, the sitemap serves the last list instead of building again');
+Cache::forget('indexnow.sitemap.failed');
+$lock = Cache::lock('indexnow.sitemap.build', 60);
+$lock->get();
+check(Azuriom\Plugin\Indexnow\Controllers\SitemapController::urls() === ['http://localhost/last-good'], 'while one build runs, others get the last list');
+$lock->release();
+check(in_array(Client::siteRoot().'/', Azuriom\Plugin\Indexnow\Controllers\SitemapController::urls() ?? [], true) && ! Cache::has('indexnow.sitemap.failed'), 'a build that works replaces the list and clears its mark');
+$xml = view('indexnow::sitemap', ['urls' => ['http://localhost/a&b']])->render();
+check(str_starts_with($xml, '<?xml version="1.0" encoding="UTF-8"?>') && str_contains($xml, '<loc>http://localhost/a&amp;b</loc>'), 'the sitemap file starts with its XML declaration, also with short_open_tag on (ini: '.(int) ini_get('short_open_tag').')');
+
+// Switching on keeps the verified address; switching on again retires the old key file.
+$admin = app(Azuriom\Plugin\Indexnow\Controllers\Admin\AdminController::class);
+$admin->enable();
+$first = setting('indexnow.key');
+$admin->enable();
+$second = setting('indexnow.key');
+check($first !== $second && ! is_file(public_path($first.'.txt')) && is_file(public_path($second.'.txt')) && setting('indexnow.site') === rtrim(url('/'), '/'),
+    'switching on again retires the old key file, and the verified address is kept as the site\'s address');
+$admin->disable();
+Setting::updateSettings(['indexnow.key' => Client::generateKey()]);
 
 // --- the admin page ------------------------------------------------------------
 

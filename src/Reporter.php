@@ -40,11 +40,17 @@ class Reporter
     /** Addresses opened per report; beyond that (a big import) the rules alone decide. */
     public const MAX_CHECKS = 25;
 
+    /** A plugin page is opened for the check at most once per CHECK_PAUSE, whatever it answered. */
+    public const CHECK_PAUSE = 600;
+
     /** @var array<string, true> plugin pages, reported at most once per PLUGIN_PAGE_PAUSE */
     private static array $paused = [];
 
     /** @var array<string, true> */
     private static array $queue = [];
+
+    /** @var array<string, true> addresses handed over by other plugins (indexnow.submit) */
+    private static array $handed = [];
 
     private static bool $flushing = false;
 
@@ -95,8 +101,9 @@ class Reporter
 
     /**
      * @param  array<int, mixed>  $urls
+     * @param  bool  $handed  handed over by another plugin, which IndexNow cannot check by rules
      */
-    public static function queue(array $urls): void
+    public static function queue(array $urls, bool $handed = false): void
     {
         if (! self::enabled()) {
             return;
@@ -104,7 +111,12 @@ class Reporter
 
         foreach ($urls as $url) {
             if (is_string($url) && $url !== '') {
+                $url = Client::onSiteRoot($url);
                 self::$queue[$url] = true;
+
+                if ($handed) {
+                    self::$handed[$url] = true;
+                }
             }
         }
 
@@ -144,8 +156,13 @@ class Reporter
     public static function queueOncePerPause(array $urls): void
     {
         // The pause starts when a page is really reported (flush()), so a page that
-        // was not public yet is checked again with the next change.
-        $urls = array_values(array_filter($urls, fn (string $url) => ! Cache::has(self::pauseKey($url))));
+        // was not public yet is checked again with a later change - but not with
+        // every one: a page that refuses visitors would be opened after each save,
+        // and a page whose view saves an entry of its plugin would make every check
+        // schedule the next one. Cache::add claims the check across requests.
+        $urls = array_map(fn (string $url) => Client::onSiteRoot($url), $urls);
+        $urls = array_values(array_filter($urls, fn (string $url) => ! Cache::has(self::pauseKey($url))
+            && Cache::add(self::pauseKey($url).'.checked', true, self::CHECK_PAUSE)));
 
         foreach ($urls as $url) {
             self::$paused[$url] = true;
@@ -165,19 +182,25 @@ class Reporter
      * maintenance (503) included, keep an address out. Only addresses of this site
      * are opened, without cookies and without following redirects. If the site
      * cannot reach itself, the rules that chose the address decide, and addresses
-     * under maintenance stay out.
+     * under maintenance stay out. Addresses handed over by other plugins have no
+     * rules here: unchecked, they stay out.
      *
      * @param  array<int, string>  $urls
+     * @param  array<string, true>  $handed
      * @return array<int, string>
      */
-    public static function visible(array $urls): array
+    public static function visible(array $urls, array $handed = []): array
     {
         $kept = [];
 
         foreach (array_values(array_filter($urls, fn (string $url) => Client::isOwnHost($url))) as $index => $url) {
             $status = $index < self::MAX_CHECKS ? self::guestStatus($url) : null;
 
-            if ($status === null ? ! self::underMaintenance($url) : in_array($status, self::REPORTABLE, true)) {
+            $keep = $status === null
+                ? ! isset($handed[$url]) && ! self::underMaintenance($url)
+                : in_array($status, self::REPORTABLE, true);
+
+            if ($keep) {
                 $kept[] = $url;
             }
         }
@@ -232,6 +255,8 @@ class Reporter
         self::$pages = [];
         $urls = array_keys(self::$queue);
         self::$queue = [];
+        $handed = self::$handed;
+        self::$handed = [];
         self::$flushing = false;
 
         // Pages as they are now, roles included. A page restricted to roles is never
@@ -241,7 +266,7 @@ class Reporter
                 $page = Page::find($id);
 
                 if ($page !== null && ! $page->roles()->exists()) {
-                    array_push($urls, ...array_filter([Client::urlFor($page), $former]));
+                    array_push($urls, ...array_map(fn (string $url) => Client::onSiteRoot($url), array_filter([Client::urlFor($page), $former])));
                 }
             } catch (Throwable $e) {
                 report($e);
@@ -251,7 +276,7 @@ class Reporter
         $paused = self::$paused;
         self::$paused = [];
 
-        $urls = self::visible(array_values(array_unique($urls)));
+        $urls = self::visible(array_values(array_unique($urls)), $handed);
 
         // A plugin page that goes out now starts its pause.
         $urls = array_values(array_filter($urls, fn (string $url) => ! isset($paused[$url])

@@ -22,6 +22,11 @@ unreachable, wrong status code, or altered content.
 That check matters: a key that cannot be verified makes every later submission
 fail with `403`, far away from its cause.
 
+The address the key file was confirmed at is kept as the site's address. Everything
+IndexNow builds afterwards — the optional sitemap, the checks and the reports — uses
+that address, never the one a request happens to arrive with (its Host header, a
+`/index.php` in the path or an `X-Forwarded-Proto` header).
+
 ## Automatic reporting
 
 With *Report changes automatically* on, every change is reported right away.

@@ -17,19 +17,26 @@ class AdminController extends Controller
     public function index()
     {
         $key = setting('indexnow.key');
+
+        // Switched on before 2.3.1, when the site's address was not kept yet: the
+        // admin's own request is the one to trust, not the next visitor's.
+        if ($key && ! setting('indexnow.site') && ($root = Client::requestRoot()) !== null) {
+            Setting::updateSettings(['indexnow.site' => $root]);
+        }
+
         $sitemapUrl = setting('indexnow.sitemap') ?: UrlSource::defaultSitemapUrl();
         $collected = self::collected($sitemapUrl);
 
         return view('indexnow::admin.index', [
             'enabled' => (bool) $key,
-            'keyUrl' => $key ? url(Client::keyFileName($key)) : null,
+            'keyUrl' => $key ? Client::keyLocation($key) : null,
             'sitemapUrl' => $sitemapUrl,
             'sitemapCount' => count($collected['urls']),
             'urlSource' => $collected['source'],
             'auto' => (bool) setting('indexnow.auto', true),
             'serveSitemap' => (bool) setting('indexnow.serve_sitemap'),
             'sitemapServedBy' => SitemapController::servedBy(),
-            'ownSitemapUrl' => url('/sitemap.xml'),
+            'ownSitemapUrl' => Client::siteRoot().'/sitemap.xml',
             'last' => Client::last(),
             'today' => Client::today(),
         ]);
@@ -53,7 +60,10 @@ class AdminController extends Controller
 
         file_put_contents($file, $key);
 
-        $url = url(Client::keyFileName($key));
+        // The address the key file is verified at becomes the site's address for
+        // everything IndexNow builds later (Client::siteRoot()).
+        $root = Client::requestRoot() ?? Client::siteRoot();
+        $url = $root.'/'.Client::keyFileName($key);
         $verification = Client::verifyKeyFile($key, $url);
 
         if (! $verification['ok']) {
@@ -65,7 +75,14 @@ class AdminController extends Controller
             ));
         }
 
-        Setting::updateSettings(['indexnow.key' => $key]);
+        // Switched on again: the old key must not stay valid.
+        $old = setting('indexnow.key');
+
+        if ($old && $old !== $key) {
+            @unlink(public_path(Client::keyFileName($old)));
+        }
+
+        Setting::updateSettings(['indexnow.key' => $key, 'indexnow.site' => $root]);
 
         return to_route('indexnow.admin.index')->with('success', trans('indexnow::admin.enabled'));
     }
@@ -78,7 +95,7 @@ class AdminController extends Controller
             @unlink(public_path(Client::keyFileName($key)));
         }
 
-        Setting::updateSettings(['indexnow.key' => null]);
+        Setting::updateSettings(['indexnow.key' => null, 'indexnow.site' => null]);
 
         return to_route('indexnow.admin.index')->with('success', trans('indexnow::admin.disabled'));
     }
@@ -103,10 +120,10 @@ class AdminController extends Controller
         }
 
         $result = Client::submit(
-            Client::hostFor($sitemapUrl),
+            Client::hostFor(Client::siteRoot()),
             $key,
-            url(Client::keyFileName($key)),
-            $urls
+            Client::keyLocation($key),
+            array_values(array_filter($urls, fn (string $url) => Client::isOwnHost($url)))
         );
 
         return to_route('indexnow.admin.index')->with(
@@ -173,7 +190,7 @@ class AdminController extends Controller
     private static function collected(string $sitemapUrl): array
     {
         if (setting('indexnow.serve_sitemap') && SitemapController::servedBy() === 'self' && $sitemapUrl === UrlSource::defaultSitemapUrl()) {
-            return ['urls' => Cache::remember('indexnow.sitemap', now()->addHour(), fn () => UrlSource::fromCore()), 'source' => 'sitemap'];
+            return ['urls' => SitemapController::urls() ?? [], 'source' => 'sitemap'];
         }
 
         return Cache::remember(self::collectedKey($sitemapUrl), now()->addMinutes(10), fn () => UrlSource::collect($sitemapUrl));

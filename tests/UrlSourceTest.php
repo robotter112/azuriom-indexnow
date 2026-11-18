@@ -25,6 +25,18 @@ if (! function_exists('url')) {
         return 'https://example.com'.$path;
     }
 }
+if (! function_exists('setting')) {
+    function setting(string $name, mixed $default = null): mixed
+    {
+        return $default;
+    }
+}
+if (! function_exists('config')) {
+    function config(string $name): mixed
+    {
+        return $name === 'app.url' ? 'https://example.com' : null;
+    }
+}
 
 $failures = 0;
 

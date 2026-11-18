@@ -54,7 +54,7 @@ class IndexnowServiceProvider extends BasePluginServiceProvider
         // event('indexnow.submit', [[$url, ...]]). Without IndexNow nobody listens.
         Event::listen('indexnow.submit', function ($urls) {
             if (is_array($urls)) {
-                Reporter::queue($urls);
+                Reporter::queue($urls, handed: true);
             }
         });
     }

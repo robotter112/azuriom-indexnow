@@ -1,0 +1,4 @@
+# Kept out of the release ZIP (git archive)
+/tests export-ignore
+/.gitignore export-ignore
+/.gitattributes export-ignore

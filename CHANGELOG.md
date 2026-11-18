@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.1] - 2026-11-18
+
+A security and robustness update. Recommended for every site.
+
 ### Changed
 
 - The admin page as designed: the state as a badge beside the title, a line on who reads
@@ -21,6 +25,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The admin page fetched the sitemap over HTTP on every view, which made it load half a
   second and more slower than the other admin pages. Its own sitemap now comes from the
   cache that serves `/sitemap.xml`, another one is read at most every ten minutes.
+- A plugin page that refuses visitors was opened again with every change of its plugin.
+  Each page is now checked at most once in ten minutes, whatever it answered.
+- On big sites the optional sitemap could run out of memory and then failed on every
+  request, the IndexNow admin page included. It now reads only the addresses, builds one
+  list at a time, keeps serving the last list while a new one is built, and does not
+  retry for ten minutes after a build that failed.
+- `/sitemap.xml` answered with an error on servers where PHP's `short_open_tag` is on.
+- Switching IndexNow on again left the old key file in place, so the old key stayed valid.
+- The release package no longer contains the tests.
+
+### Security
+
+- **The site's own address no longer comes from the request.** Addresses that IndexNow
+  caches for everyone, checks or reports are now always built on the address the key
+  file was verified at when IndexNow was switched on (sites switched on earlier take it
+  from the next visit of the IndexNow admin page, APP_URL until then). Before, a
+  crafted request could decide which address the optional sitemap listed for an hour,
+  and where checks and reports went.
+- **The sitemap address must really be this site.** The check now compares the port as
+  well, and a redirect is only followed while it stays on the site.
+- **The key file check follows no redirects.**
+- **Addresses handed over by other plugins that could not be checked are no longer
+  reported.**
+
+### Upgrading
+
+No migrations. Open *Admin → IndexNow* once after the update: that visit keeps the
+site's address for everything IndexNow builds (until then APP_URL from your `.env` is
+used). Clearing the cache once (*Settings → Performance → Clear cache*) drops a sitemap
+list built before the update.
+
+Azuriom 1.2.0 or newer, tested against 1.2.13.
 
 ## [2.3.0] - 2026-11-17
 

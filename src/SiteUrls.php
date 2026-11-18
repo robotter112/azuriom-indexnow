@@ -53,7 +53,9 @@ class SiteUrls
         self::addSuggestions($urls);
         self::addFromPlugins($urls);
 
-        return $urls->unique()->take(self::MAX_URLS)->values()->all();
+        // On the site's own address, whichever request builds the list: it is cached
+        // for everyone (see Client::siteRoot()).
+        return $urls->map(fn (string $url) => Client::onSiteRoot($url))->unique()->take(self::MAX_URLS)->values()->all();
     }
 
     /**
@@ -65,7 +67,7 @@ class SiteUrls
     {
         foreach (Event::dispatch('indexnow.urls') as $answer) {
             foreach ((array) $answer as $url) {
-                if (is_string($url) && Client::isOwnHost($url)) {
+                if (is_string($url) && Client::isOwnHost($url = Client::onSiteRoot($url))) {
                     $urls->push($url);
                 }
             }
@@ -160,16 +162,17 @@ class SiteUrls
     protected static function addPages(Collection $urls): void
     {
         // doesntHave('roles') keeps role-restricted pages out: they would only
-        // answer with a redirect to the login form anyway.
-        foreach (Page::enabled()->doesntHave('roles')->get() as $page) {
-            $urls->push(route('pages.show', $page->slug));
+        // answer with a redirect to the login form anyway. Only the slugs are read,
+        // and no more than fit: whole pages of a big site do not fit into memory.
+        foreach (Page::enabled()->doesntHave('roles')->limit(self::MAX_URLS)->pluck('slug') as $slug) {
+            $urls->push(route('pages.show', $slug));
         }
     }
 
     protected static function addPosts(Collection $urls): void
     {
-        foreach (Post::published()->get() as $post) {
-            $urls->push(route('posts.show', $post->slug));
+        foreach (Post::published()->latest('published_at')->limit(self::MAX_URLS)->pluck('slug') as $slug) {
+            $urls->push(route('posts.show', $slug));
         }
     }
 

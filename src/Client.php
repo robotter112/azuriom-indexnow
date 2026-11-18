@@ -41,7 +41,7 @@ class Client
         // public API that other code may call, and a stored setting is not a
         // trustworthy source of a file path - "../../.env" would otherwise become
         // a write and a delete outside the document root.
-        if (! preg_match('/^[a-f0-9]{8,128}$/i', $key)) {
+        if (! preg_match('/^[a-f0-9]{8,128}\z/i', $key)) {
             throw new \InvalidArgumentException('Invalid IndexNow key.');
         }
 
@@ -56,7 +56,9 @@ class Client
     public static function verifyKeyFile(string $key, string $url): array
     {
         try {
-            $response = Http::timeout(15)->get($url);
+            // A key file is a plain file at the document root: a redirect only
+            // ever leads somewhere else, so it counts as a wrong answer.
+            $response = Http::withoutRedirecting()->timeout(15)->get($url);
         } catch (\Throwable $e) {
             return ['ok' => false, 'reason' => 'unreachable'];
         }
@@ -170,18 +172,65 @@ class Client
             return ['ok' => false, 'reason' => 'not-enabled', 'status' => 0, 'count' => 0];
         }
 
-        $urls = array_values(array_unique(array_filter($urls, fn ($url) => is_string($url) && self::isOwnHost($url))));
+        $urls = array_values(array_unique(array_filter(
+            array_map(fn ($url) => is_string($url) ? self::onSiteRoot($url) : $url, $urls),
+            fn ($url) => is_string($url) && self::isOwnHost($url)
+        )));
 
         if ($urls === []) {
             return ['ok' => false, 'reason' => 'no-urls', 'status' => 0, 'count' => 0];
         }
 
-        return self::submit(
-            self::hostFor($urls[0]),
-            $key,
-            url(self::keyFileName($key)),
-            $urls
-        );
+        return self::submit(self::hostFor($urls[0]), $key, self::keyLocation($key), $urls);
+    }
+
+    /**
+     * Where the key file is published: always on the site's own address.
+     */
+    public static function keyLocation(string $key): string
+    {
+        return self::siteRoot().'/'.self::keyFileName($key);
+    }
+
+    /**
+     * The site's own address (scheme, host, port and the folder Azuriom lives in), never
+     * taken from the request that happens to run: its Host header, a /index.php in the
+     * path or an X-Forwarded-Proto header are chosen by whoever sends it, and what is
+     * built from them here ends up in caches for everyone and in reports to IndexNow.
+     *
+     * It is the address the key file was verified at when IndexNow was switched on,
+     * or APP_URL until then.
+     */
+    public static function siteRoot(): string
+    {
+        return rtrim((string) (setting('indexnow.site') ?: config('app.url')), '/');
+    }
+
+    /**
+     * The address this request runs under, without a /index.php that only named the
+     * front controller. Null when the request named it, which a person on the admin
+     * page never does.
+     */
+    public static function requestRoot(): ?string
+    {
+        $request = request();
+
+        return $request->getBaseUrl() === $request->getBasePath() ? rtrim(url('/'), '/') : null;
+    }
+
+    /**
+     * An address built with url() or route() in this request, moved onto siteRoot().
+     */
+    public static function onSiteRoot(string $url): string
+    {
+        $root = rtrim(url('/'), '/');
+        $site = self::siteRoot();
+
+        if ($root === $site || ! ($url === $root || str_starts_with($url, $root.'/') || str_starts_with($url, $root.'?'))) {
+            return $url;
+        }
+
+        return $site.substr($url, strlen($root));
     }
 
     /**
@@ -230,12 +279,17 @@ class Client
      * IndexNow only accepts URLs of the submitting host and answers 422
      * otherwise, so a sitemap elsewhere is useless - and fetching an arbitrary
      * address on request would turn the setting into a way of making the server
-     * call internal services on someone's behalf.
+     * call internal services on someone's behalf. Hence the port too: another
+     * port of the site's own name is another service.
      */
     public static function isOwnHost(string $url, ?string $siteUrl = null): bool
     {
+        $siteUrl ??= self::siteRoot();
         $host = self::hostFor($url);
 
-        return $host !== '' && $host === self::hostFor($siteUrl ?? url('/'));
+        return $host !== ''
+            && $host === self::hostFor($siteUrl)
+            && parse_url($url, PHP_URL_PORT) === parse_url($siteUrl, PHP_URL_PORT)
+            && in_array(strtolower((string) parse_url($url, PHP_URL_SCHEME)), ['http', 'https'], true);
     }
 }
