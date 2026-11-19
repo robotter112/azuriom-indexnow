@@ -223,24 +223,47 @@ class Client
      * path or an X-Forwarded-Proto header are chosen by whoever sends it, and what is
      * built from them here ends up in caches for everyone and in reports to IndexNow.
      *
-     * It is the address the key file was verified at when IndexNow was switched on,
-     * or APP_URL until then.
+     * It is APP_URL. The address the key file was verified at when IndexNow was switched
+     * on (an admin's own request) only refines it: the same host and port, with the scheme
+     * and folder the site really answers under. A stored address on another host, or one
+     * that names a script, is not used: whoever may switch IndexNow on must not be able
+     * to point the sitemap, the checks and the reports somewhere else.
      */
     public static function siteRoot(): string
     {
-        return rtrim((string) (setting('indexnow.site') ?: config('app.url')), '/');
+        $configured = rtrim((string) config('app.url'), '/');
+        $stored = rtrim((string) setting('indexnow.site'), '/');
+
+        return $stored !== '' && self::refines($stored, $configured) ? $stored : $configured;
     }
 
     /**
-     * The address this request runs under, without a /index.php that only named the
-     * front controller. Null when the request named it, which a person on the admin
-     * page never does.
+     * The address this request runs under, when it is a plain spelling of the site's own
+     * address: no script in the path (/index.php, however it is encoded) and the host and
+     * port of APP_URL. Null otherwise.
      */
     public static function requestRoot(): ?string
     {
-        $request = request();
+        $root = rtrim(url('/'), '/');
 
-        return $request->getBaseUrl() === $request->getBasePath() ? rtrim(url('/'), '/') : null;
+        return request()->getBaseUrl() === request()->getBasePath() && self::refines($root, (string) config('app.url')) ? $root : null;
+    }
+
+    /**
+     * Whether an address is the configured one with at most another scheme or folder:
+     * same host, same port (or none on both), nothing encoded and no script in its path.
+     */
+    private static function refines(string $root, string $configured): bool
+    {
+        $a = parse_url($root);
+        $b = parse_url($configured);
+
+        return isset($a['host'], $b['host'])
+            && strtolower($a['host']) === strtolower($b['host'])
+            && ($a['port'] ?? null) === ($b['port'] ?? null)
+            && in_array(strtolower($a['scheme'] ?? ''), ['http', 'https'], true)
+            && ! preg_match('/%|\.php/i', $a['path'] ?? '')
+            && ! isset($a['query']) && ! isset($a['fragment']) && ! isset($a['user']);
     }
 
     /**
@@ -250,8 +273,11 @@ class Client
     {
         $root = rtrim(url('/'), '/');
         $site = self::siteRoot();
+        $under = fn (string $base) => $url === $base || str_starts_with($url, $base.'/') || str_starts_with($url, $base.'?');
 
-        if ($root === $site || ! ($url === $root || str_starts_with($url, $root.'/') || str_starts_with($url, $root.'?'))) {
+        // Already there (this is applied more than once to an address): where the site lives in a
+        // folder of the request's root, moving it again would add the folder twice.
+        if ($root === $site || ! $under($root) || (str_starts_with($site, $root.'/') && $under($site))) {
             return $url;
         }
 

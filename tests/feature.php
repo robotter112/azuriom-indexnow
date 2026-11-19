@@ -358,6 +358,21 @@ $second = setting('indexnow.key');
 check($first !== $second && ! is_file(public_path($first.'.txt')) && is_file(public_path($second.'.txt')) && setting('indexnow.site') === rtrim(url('/'), '/'),
     'switching on again retires the old key file, and the verified address is kept as the site\'s address');
 $admin->disable();
+
+// The site's address is the configured one; a stored address only refines it (run-2).
+$configured = rtrim((string) config('app.url'), '/');
+$host = parse_url($configured, PHP_URL_HOST);
+$stored = function (?string $site) { Azuriom\Models\Setting::updateSettings(['indexnow.site' => $site]); return Client::siteRoot(); };
+check($stored('http://other-host.example') === $configured && $stored('http://'.$host.':8098') === $configured, 'a stored address on another host or port is not used');
+check($stored('http://'.$host.'/%69ndex.php') === $configured && $stored('http://'.$host.'/index.php') === $configured, 'nor is one that names the front controller, however it is spelled');
+check($stored('https://'.$host.'/folder') === 'https://'.$host.'/folder', 'the scheme and folder the site really answers under are kept');
+$once = Client::onSiteRoot(rtrim(url('/'), '/').'/news/a');
+check(parse_url(url('/'), PHP_URL_SCHEME) === 'https' || ($once === 'https://'.$host.'/folder/news/a' && Client::onSiteRoot($once) === $once), 'moving an address onto the site twice changes nothing the second time');
+$stored(null);
+Azuriom\Models\Setting::updateSettings(['indexnow.key' => str_repeat('a', 32)]);
+$admin->index();
+check(setting('indexnow.site') === null, 'opening the admin page stores nothing (a GET changes nothing)');
+Azuriom\Models\Setting::updateSettings(['indexnow.key' => null]);
 Setting::updateSettings(['indexnow.key' => Client::generateKey()]);
 
 // --- the admin page ------------------------------------------------------------

@@ -55,7 +55,10 @@ class SiteUrls
 
         // On the site's own address, whichever request builds the list: it is cached
         // for everyone (see Client::siteRoot()).
-        return $urls->map(fn (string $url) => Client::onSiteRoot($url))->unique()->take(self::MAX_URLS)->values()->all();
+        // Whatever is not on the site's own address after that (a spelling of the host the move
+        // above does not recognise) is left out rather than listed for everyone.
+        return $urls->map(fn (string $url) => Client::onSiteRoot($url))->filter(fn (string $url) => Client::isOwnHost($url))
+            ->unique()->take(self::MAX_URLS)->values()->all();
     }
 
     /**

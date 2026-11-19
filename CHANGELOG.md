@@ -11,6 +11,14 @@ Hardening from the security audit of November 2026, no known vulnerability.
 
 ### Fixed
 
+- The site's own address is the configured one (APP_URL). The address IndexNow was switched on
+  at only refines it (scheme and folder, same host and port), opening the admin page no longer
+  stores anything, and an address that names the front controller in any spelling is not used.
+  Before, a staff member with the IndexNow permission, or a link they were sent, could point the
+  sitemap, the checks and the reports at another address.
+- The sitemap leaves out every address that is not on the site's own host, whatever spelling of
+  the host a request arrives with.
+- Changing the sitemap switch rebuilds AzBoost's cached routes instead of dropping them.
 - The optional sitemap is built again as soon as a post or page changes, or a plugin hands
   over a changed address. A post that was unpublished, or a page that was disabled or given
   roles, no longer stays listed for up to an hour.

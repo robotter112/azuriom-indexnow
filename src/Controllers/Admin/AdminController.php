@@ -8,6 +8,7 @@ use Azuriom\Plugin\Indexnow\Client;
 use Azuriom\Plugin\Indexnow\Controllers\SitemapController;
 use Azuriom\Plugin\Indexnow\Providers\RouteServiceProvider;
 use Azuriom\Plugin\Indexnow\UrlSource;
+use Azuriom\Support\Optimizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
@@ -17,12 +18,6 @@ class AdminController extends Controller
     public function index()
     {
         $key = setting('indexnow.key');
-
-        // Switched on before 2.3.1, when the site's address was not kept yet: the
-        // admin's own request is the one to trust, not the next visitor's.
-        if ($key && ! setting('indexnow.site') && ($root = Client::requestRoot()) !== null) {
-            Setting::updateSettings(['indexnow.site' => $root]);
-        }
 
         $sitemapUrl = setting('indexnow.sitemap') ?: UrlSource::defaultSitemapUrl();
         $collected = self::collected($sitemapUrl);
@@ -96,6 +91,8 @@ class AdminController extends Controller
         }
 
         Setting::updateSettings(['indexnow.key' => null, 'indexnow.site' => null]);
+        Cache::forget('indexnow.sitemap');
+        Cache::forget('indexnow.sitemap.last');
 
         return to_route('indexnow.admin.index')->with('success', trans('indexnow::admin.disabled'));
     }
@@ -173,7 +170,9 @@ class AdminController extends Controller
                 @unlink($flag);
             }
 
-            Artisan::call('route:clear');
+            // The cached routes are built again, not just dropped: switching AzBoost's route cache
+            // off is not for whoever may change this setting.
+            app()->routesAreCached() ? app(Optimizer::class)->reloadRoutesCache() : Artisan::call('route:clear');
         }
 
         return to_route('indexnow.admin.index')->with('success', trans('indexnow::admin.saved'));
