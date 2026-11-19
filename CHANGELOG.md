@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Hardening from the security audit of November 2026, no known vulnerability.
+## [2.3.2] - 2026-11-19
+
+A security and robustness update from the second audit of November 2026. Recommended for every site.
 
 ### Fixed
 
