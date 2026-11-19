@@ -28,6 +28,12 @@ jobs:
   release:
     needs: tests
     runs-on: ubuntu-latest
+    # The one job that may write: it creates the release. It runs in the image the tests ran in,
+    # not in whatever the runner maps the label to.
+    permissions:
+      contents: write
+    container:
+      image: git.fastm.de/max/php-ci:8.3
 
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
@@ -41,6 +47,10 @@ jobs:
           TAG: ${{ github.ref_name }}
         run: |
           git fetch --force --tags origin
+          # The package is built from the commit the tests ran on, not from one the tag was moved to since.
+          if [ "$(git rev-parse "$TAG^{commit}")" != "$(git rev-parse HEAD)" ]; then echo "The tag no longer points at the tested commit."; exit 1; fi
+          # Nothing internal goes out, whatever .gitattributes may have forgotten.
+          if git archive --format=tar "$TAG" | tar -t | grep -E '^(\.git|tests/|market/|CLAUDE\.md|ROADMAP\.md|ADMIN-DESIGN\.md|SECURITY-RULES\.md)'; then echo "Internal files in the package."; exit 1; fi
           git archive --format=zip -o "indexnow-${TAG#v}.zip" "$TAG"
           git tag -l --format='%(contents:subject)' "$TAG" > title.txt
           git tag -l --format='%(contents:body)' "$TAG" > notes.txt
