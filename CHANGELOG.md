@@ -19,6 +19,12 @@ Hardening from the security audit of November 2026, no known vulnerability.
 - The sitemap leaves out every address that is not on the site's own host, whatever spelling of
   the host a request arrives with.
 - Changing the sitemap switch rebuilds AzBoost's cached routes instead of dropping them.
+- The requests the site makes to itself (key file, visibility checks, an own sitemap) keep
+  their limits on every server: the answer is cut off at its size limit while it arrives, a
+  packed answer is unpacked up to that limit only, and the time limit covers the whole
+  request. Before, a server without allow_url_fopen buffered the whole unpacked answer first.
+  A very large sitemap is read address by address, and one that cannot be read is not read
+  again on every view of the admin page.
 - The optional sitemap is built again as soon as a post or page changes, or a plugin hands
   over a changed address. A post that was unpublished, or a page that was disabled or given
   roles, no longer stays listed for up to an hour.

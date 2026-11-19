@@ -223,17 +223,8 @@ class Reporter
 
     private static function guestStatus(string $url): ?int
     {
-        try {
-            // Only the status counts: streamed, the page itself is never downloaded.
-            return Http::withoutRedirecting()
-                ->timeout(8)
-                ->withOptions(['stream' => true])
-                ->withHeaders(['User-Agent' => self::PROBE_AGENT, 'Accept' => 'text/html'])
-                ->get($url)
-                ->status();
-        } catch (Throwable) {
-            return null;
-        }
+        // Only the status counts: of the page itself at most a few kilobytes are taken.
+        return Client::fetch($url, 16384, 8, ['User-Agent' => self::PROBE_AGENT, 'Accept' => 'text/html'])['status'] ?? null;
     }
 
     /**

@@ -192,7 +192,18 @@ class AdminController extends Controller
             return ['urls' => SitemapController::urls() ?? [], 'source' => 'sitemap'];
         }
 
-        return Cache::remember(self::collectedKey($sitemapUrl), now()->addMinutes(10), fn () => UrlSource::collect($sitemapUrl));
+        $key = self::collectedKey($sitemapUrl);
+
+        if (is_array($known = Cache::get($key))) {
+            return $known;
+        }
+
+        // Noted before the sitemap is read: one that ends the request while being read is
+        // not read again on every view of this page.
+        Cache::put($key, ['urls' => [], 'source' => 'sitemap'], now()->addMinutes(10));
+        Cache::put($key, $collected = UrlSource::collect($sitemapUrl), now()->addMinutes(10));
+
+        return $collected;
     }
 
     private static function collectedKey(string $sitemapUrl): string

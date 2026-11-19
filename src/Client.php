@@ -56,28 +56,82 @@ class Client
      */
     public static function verifyKeyFile(string $key, string $url): array
     {
-        try {
-            // A key file is a plain file at the document root: a redirect only
-            // ever leads somewhere else, so it counts as a wrong answer.
-            $response = Http::withoutRedirecting()->timeout(15)->withOptions(['stream' => true])->get($url);
-        } catch (\Throwable $e) {
+        // A key file is a plain file at the document root: a redirect only ever leads
+        // somewhere else, so it counts as a wrong answer.
+        $answer = self::fetch($url, 1024, 15);
+
+        if ($answer === null) {
             return ['ok' => false, 'reason' => 'unreachable'];
         }
 
-        if ($response->status() !== 200) {
-            return ['ok' => false, 'reason' => 'status', 'status' => $response->status()];
+        if ($answer['status'] !== 200) {
+            return ['ok' => false, 'reason' => 'status', 'status' => $answer['status']];
         }
 
         // A key file holds the key and perhaps a line break; anything much longer is not one.
-        return trim((string) self::bodyUpTo($response, 1024)) === $key
+        return trim((string) $answer['body']) === $key
             ? ['ok' => true, 'reason' => 'ok']
             : ['ok' => false, 'reason' => 'content'];
     }
 
     /**
-     * The body of an answer requested with ['stream' => true], or null when it is longer than
-     * $max bytes. Reading stops at the limit, so neither a huge file nor a small compressed
-     * "bomb" can fill the memory before the size is known.
+     * A GET to the site itself whose limits hold however PHP makes requests. With cURL the
+     * answer is taken as it is sent (packed) and the transfer is cut off once more than $max
+     * bytes have arrived; it is unpacked up to $max bytes and no further; the time limit
+     * covers the whole request. Asking for a "stream" alone would not do: without
+     * allow_url_fopen there is none, and the whole unpacked answer would be buffered before
+     * any limit is looked at. Without cURL the answer is streamed and read up to the limit.
+     *
+     * @param  array<string, string>  $headers
+     * @param  array<string, mixed>|false  $redirects  Guzzle's allow_redirects
+     * @return array{status: int, body: ?string}|null  null when there was no answer; body null when it was too long
+     */
+    public static function fetch(string $url, int $max, int $seconds, array $headers = [], array|false $redirects = false): ?array
+    {
+        $curl = extension_loaded('curl');
+        $status = 0;
+        $long = false;
+        $options = ['allow_redirects' => $redirects, 'on_headers' => function ($response) use (&$status) {
+            $status = $response->getStatusCode();
+        }];
+
+        if ($curl) {
+            $headers += ['Accept-Encoding' => 'gzip'];
+            $options['decode_content'] = false;
+            $options['curl'] = [CURLOPT_NOPROGRESS => false, CURLOPT_XFERINFOFUNCTION => function ($handle, $total, $now) use ($max, &$long) {
+                return ($long = $long || $now > $max) ? 1 : 0;
+            }];
+        } else {
+            $options['stream'] = true;
+        }
+
+        try {
+            $response = Http::timeout($seconds)->withHeaders($headers)->withOptions($options)->get($url);
+        } catch (\Throwable $e) {
+            // Cut off for its length after the headers came: the status is known, the body is not kept.
+            return $long && $status > 0 ? ['status' => $status, 'body' => null] : null;
+        }
+
+        if (! $curl) {
+            return ['status' => $response->status(), 'body' => self::bodyUpTo($response, $max)];
+        }
+
+        $body = $response->body();
+        $encoding = strtolower(trim($response->header('Content-Encoding')));
+
+        if (strlen($body) > $max || ! in_array($encoding, ['', 'identity', 'gzip'], true)) {
+            $body = null;
+        } elseif ($encoding === 'gzip') {
+            $body = @gzdecode($body, $max);
+            $body = $body === false ? null : $body;
+        }
+
+        return ['status' => $response->status(), 'body' => $body];
+    }
+
+    /**
+     * The body of a streamed answer (see fetch()), or null when it is longer than $max bytes.
+     * Reading stops at the limit.
      */
     public static function bodyUpTo(Response $response, int $max): ?string
     {

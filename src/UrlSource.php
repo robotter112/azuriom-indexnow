@@ -31,31 +31,20 @@ class UrlSource
             return [];
         }
 
-        try {
-            // Redirects only while they stay on the site: the check above covers the
-            // first address alone.
-            $response = Http::timeout(20)->withOptions(['stream' => true, 'allow_redirects' => [
-                'max' => 3,
-                'protocols' => ['http', 'https'],
-                'on_redirect' => function ($request, $response, $uri) {
-                    if (! Client::isOwnHost((string) $uri)) {
-                        throw new \RuntimeException('The sitemap redirects off this site.');
-                    }
-                },
-            ]])->get($sitemapUrl);
-        } catch (\Throwable $e) {
-            return [];
-        }
+        // Redirects only while they stay on the site: the check above covers the first
+        // address alone. A sitemap may hold at most 50,000 addresses; an answer beyond
+        // MAX_BYTES is not one worth reading.
+        $answer = Client::fetch($sitemapUrl, self::MAX_BYTES, 20, [], [
+            'max' => 3,
+            'protocols' => ['http', 'https'],
+            'on_redirect' => function ($request, $response, $uri) {
+                if (! Client::isOwnHost((string) $uri)) {
+                    throw new \RuntimeException('The sitemap redirects off this site.');
+                }
+            },
+        ]);
 
-        if ($response->status() !== 200) {
-            return [];
-        }
-
-        // A sitemap may hold at most 50,000 addresses; 20 MB is far beyond that, and a larger
-        // answer would only exhaust the memory while being parsed.
-        $xml = Client::bodyUpTo($response, self::MAX_BYTES);
-
-        return $xml !== null ? self::parse($xml) : [];
+        return $answer !== null && $answer['status'] === 200 && $answer['body'] !== null ? self::parse($answer['body']) : [];
     }
 
     /**
@@ -70,12 +59,17 @@ class UrlSource
             return [];
         }
 
-        preg_match_all('/<loc>\s*([^<\s]+)\s*<\/loc>/i', $xml, $matches);
+        // One address at a time, up to the 50,000 a sitemap may hold: matching the whole file
+        // at once keeps every match in memory beside it.
+        $urls = [];
+        $offset = 0;
 
-        return array_values(array_unique(array_map(
-            fn ($url) => html_entity_decode($url, ENT_QUOTES | ENT_XML1, 'UTF-8'),
-            $matches[1] ?? []
-        )));
+        while (count($urls) < 50000 && preg_match('/<loc>\s*([^<\s]+)\s*<\/loc>/i', $xml, $match, PREG_OFFSET_CAPTURE, $offset)) {
+            $urls[html_entity_decode($match[1][0], ENT_QUOTES | ENT_XML1, 'UTF-8')] = true;
+            $offset = $match[0][1] + strlen($match[0][0]);
+        }
+
+        return array_map('strval', array_keys($urls));
     }
 
     /**
