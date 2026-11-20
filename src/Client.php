@@ -325,6 +325,9 @@ class Client
      */
     public static function onSiteRoot(string $url): string
     {
+        // route() writes the brackets of an IPv6 host percent-encoded, url() does not: both spellings
+        // are the request's root.
+        $url = (string) preg_replace('#^(https?://)%5B([0-9a-f:.]+)%5D#i', '$1[$2]', $url);
         $root = rtrim(url('/'), '/');
         $site = self::siteRoot();
         $under = fn (string $base) => $url === $base || str_starts_with($url, $base.'/') || str_starts_with($url, $base.'?');

@@ -369,6 +369,15 @@ check($stored('https://'.$host.'/folder') === 'https://'.$host.'/folder', 'the s
 $once = Client::onSiteRoot(rtrim(url('/'), '/').'/news/a');
 check(parse_url(url('/'), PHP_URL_SCHEME) === 'https' || ($once === 'https://'.$host.'/folder/news/a' && Client::onSiteRoot($once) === $once), 'moving an address onto the site twice changes nothing the second time');
 $stored(null);
+// A request that arrives with an IPv6 host in brackets: route() encodes the brackets, the move still recognises its root.
+$before = $app['request'];
+$bracketed = Illuminate\Http\Request::create('http://[2001:db8::1]/sitemap.xml');
+$app->instance('request', $bracketed);
+$app['url']->setRequest($bracketed);
+$moved = Client::onSiteRoot('http://%5B2001:db8::1%5D/news/a');
+$app->instance('request', $before);
+$app['url']->setRequest($before);
+check($moved === $configured.'/news/a', 'an address built under a bracketed host is moved onto the site like any other ('.$moved.')');
 Azuriom\Models\Setting::updateSettings(['indexnow.key' => str_repeat('a', 32)]);
 $admin->index();
 check(setting('indexnow.site') === null, 'opening the admin page stores nothing (a GET changes nothing)');
