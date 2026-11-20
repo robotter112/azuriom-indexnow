@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.3] - 2026-11-20
+
 ### Fixed
 
 - A request that reached the site under an IPv6 address in brackets could leave the posts and
