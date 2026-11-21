@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Switching between light and dark mode in the admin panel no longer lets buttons and fields fade over from the other mode for a moment.
+
 ## [2.3.3] - 2026-11-20
 
 ### Fixed

@@ -1,4 +1,4 @@
-/* onair-admin.css 1.4 – the admin pages of the OnAir plugin family in one design language.
+/* onair-admin.css 1.5 – the admin pages of the OnAir plugin family in one design language.
    Rules: ADMIN-DESIGN.md in the OnAir theme repo. Every plugin ships this same file, so each runs on its
    own; change it in all of them at once and raise the version. Neutral colours come from the Bootstrap
    variables of Azuriom, the tones of tiles and badges are pairs of their own with a dark value, so light
@@ -302,3 +302,7 @@ a.oa-row-title:hover { color: var(--bs-link-color); }
     .oa-card-head > a, .oa-btn-danger-text { display: inline-flex; align-items: center; min-height: 2.75rem; }
     .oa-tabs { flex-wrap: wrap; gap: 0 1.25rem; }
 }
+
+/* Azuriom switches light and dark mode in place. The script next to the link of this file marks <body> for one frame,
+   so no colour with a transition (buttons, fields) fades over from the other mode. */
+body.oa-theme-switch *, body.oa-theme-switch *::before, body.oa-theme-switch *::after { transition: none !important; }

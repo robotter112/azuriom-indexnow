@@ -27,6 +27,16 @@
 @endpush
 
 @push('footer-scripts')
+    {{-- Azuriom switches light and dark mode in place: for one frame nothing moves (onair-admin.css), so no colour
+         fades over from the other mode. --}}
+    <script>
+        new MutationObserver(function () {
+            document.body.classList.add('oa-theme-switch');
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () { document.body.classList.remove('oa-theme-switch'); });
+            });
+        }).observe(document.body, { attributes: true, attributeFilter: ['data-bs-theme'] });
+    </script>
     <script>
         document.querySelectorAll('[data-copy]').forEach((button) => button.addEventListener('click', function () {
             navigator.clipboard.writeText(button.dataset.copy).then(() => button.textContent = button.dataset.done);
