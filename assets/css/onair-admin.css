@@ -33,9 +33,7 @@ body[data-bs-theme="dark"] {
     --oa-purple-bg: #2E2350; --oa-purple-fg: #C9B3FF;
 }
 
-/* Page head. Azuriom's layout sets the title (<h1>) above the content without room for buttons:
-   a page that starts with .oa-actions turns the container into a grid, title and buttons in row one.
-   An .oa-badge (state of the page, e.g. "Active") sits right beside the title. */
+/* Page head: title and .oa-actions in one row, an .oa-badge beside the title. */
 .content > .container-fluid:has(> .oa-actions) {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -97,8 +95,7 @@ body[data-bs-theme="dark"] {
     }
 }
 
-/* Two columns from xl: the content, and a side for status, switches, preview and danger that grows with the screen,
-   380 px on a laptop up to 512 px from about 1920 px, so its rows keep their text on one line. */
+/* Two columns from xl. The side grows from 380 to 512 px. */
 .oa-layout { display: flex; flex-direction: column; gap: 1.25rem; }
 .oa-main, .oa-side { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
 
@@ -210,10 +207,8 @@ a.oa-row-title:hover { color: var(--bs-link-color); }
 .oa-bar { height: .375rem; margin-top: .5rem; border-radius: 999px; background: var(--bs-border-color); overflow: hidden; }
 .oa-bar > span { display: block; height: 100%; border-radius: inherit; background: var(--bs-primary); }
 
-/* Buttons inside cards: soft (grey, blue ink: add something), neutral (grey: upload, refresh, copy,
-   a save beside the main one), tint (light blue: go on to a related page or action). */
-/* Button variants set Bootstrap's own button variables, so hover, focus, pressed and a chosen toggle (a label after
-   .btn-check, for which Bootstrap resets the hover) look the same everywhere. Each one keeps its colour on hover. */
+/* Buttons inside cards: soft (add), neutral (secondary action), tint (go on to a related page). */
+/* Button variants through Bootstrap's button variables, so every state keeps its colour. */
 .oa-btn-soft, .oa-btn-neutral, .oa-btn-tint, .oa-btn-danger-soft {
     color: var(--bs-btn-color);
     background-color: var(--bs-btn-bg);
@@ -300,6 +295,5 @@ a.oa-row-title:hover { color: var(--bs-link-color); }
     .oa-tabs { flex-wrap: wrap; gap: 0 1.25rem; }
 }
 
-/* Azuriom switches light and dark mode in place. The script next to the link of this file marks <body> for one frame,
-   so no colour with a transition (buttons, fields) fades over from the other mode. */
+/* No colour transition for one frame while light and dark mode switch (class set by script). */
 body.oa-theme-switch *, body.oa-theme-switch *::before, body.oa-theme-switch *::after { transition: none !important; }
