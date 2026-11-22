@@ -19,6 +19,8 @@
         .indexnow-rows > .oa-row:last-child { padding-bottom: 0; }
         .indexnow-key { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .indexnow-served { display: flex; align-items: center; gap: .625rem; margin-top: .875rem; padding: .75rem .875rem; border-radius: .625rem; background: var(--oa-green-bg); color: var(--oa-green-fg); font-size: .8125rem; font-weight: 600; }
+        .indexnow-sitemap { flex-wrap: wrap; }
+        .indexnow-sitemap > .oa-field-pill { flex: 1 1 16rem; min-width: 0; }
         .indexnow-engines > div { display: flex; align-items: center; gap: .75rem; padding: .625rem 0; border-top: 1px solid var(--oa-line); font-size: .875rem; font-weight: 600; color: var(--oa-strong); }
         .indexnow-engines > div:first-child { border-top: 0; }
         .indexnow-engines > div:last-child { padding-bottom: 0; }
@@ -38,8 +40,9 @@
         }).observe(document.body, { attributes: true, attributeFilter: ['data-bs-theme'] });
     </script>
     <script>
-        document.querySelectorAll('[data-copy]').forEach((button) => button.addEventListener('click', function () {
-            navigator.clipboard.writeText(button.dataset.copy).then(() => button.textContent = button.dataset.done);
+        document.querySelectorAll('[data-copy], [data-copy-field]').forEach((button) => button.addEventListener('click', function () {
+            const text = button.dataset.copyField ? document.getElementById(button.dataset.copyField).value : button.dataset.copy;
+            navigator.clipboard.writeText(text).then(() => button.textContent = button.dataset.done);
         }));
     </script>
 @endpush
@@ -141,9 +144,12 @@
 
                     <div class="mt-3">
                         <label class="form-label" for="sitemap">{{ trans('indexnow::admin.sitemap') }}</label>
-                        <div class="oa-field-pill">
-                            <input type="url" class="form-control @error('sitemap') is-invalid @enderror" id="sitemap" name="sitemap" spellcheck="false" value="{{ old('sitemap', $sitemapUrl) }}">
-                            <span class="oa-pill {{ $source[1] }}">{{ trans('indexnow::admin.source-'.$source[0]) }}</span>
+                        <div class="oa-copy indexnow-sitemap">
+                            <div class="oa-field-pill">
+                                <input type="url" class="form-control @error('sitemap') is-invalid @enderror" id="sitemap" name="sitemap" spellcheck="false" value="{{ old('sitemap', $sitemapUrl) }}">
+                                <span class="oa-pill {{ $source[1] }}">{{ trans('indexnow::admin.source-'.$source[0]) }}</span>
+                            </div>
+                            <button type="button" class="btn oa-btn-neutral" data-copy-field="sitemap" data-done="{{ trans('indexnow::admin.copied') }}">{{ trans('indexnow::admin.copy') }}</button>
                         </div>
                         @error('sitemap')<span class="invalid-feedback d-block">{{ $message }}</span>@enderror
                     </div>
