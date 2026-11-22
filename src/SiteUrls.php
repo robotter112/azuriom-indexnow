@@ -146,6 +146,11 @@ class SiteUrls
                 continue;
             }
 
+            // A page that is not always there: its plugin lists it through "indexnow.urls" while it is.
+            if ($route->getAction('sitemap') === false) {
+                continue;
+            }
+
             if (Str::contains($route->uri(), '{')) {
                 continue; // needs a parameter, handled by the sources below
             }

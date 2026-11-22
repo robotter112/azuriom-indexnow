@@ -146,6 +146,13 @@ check($reported() === [[route('pages.show', 'public-page')]], 'deleting a public
 
 // --- entries of any other plugin ---------------------------------------------
 
+Illuminate\Support\Facades\Route::get('/indexnow-draft', ['uses' => fn () => '', 'sitemap' => false]);
+check(! in_array(url('indexnow-draft'), SiteUrls::all(), true), 'a route marked sitemap => false is not listed by itself'.$label);
+Event::listen('indexnow.urls', $vouched = fn () => ! empty($GLOBALS['draftPublic']) ? [url('indexnow-draft')] : []);
+$GLOBALS['draftPublic'] = true;
+check(in_array(Client::onSiteRoot(url('indexnow-draft')), SiteUrls::all(), true), 'it is listed while its plugin hands it over'.$label);
+$GLOBALS['draftPublic'] = false;
+
 check(SiteUrls::pluginPages('indexnow-demo') === [url('indexnow-demo')], 'the public pages of a plugin are found in the route table, without its admin pages');
 $item = Item::create(['name' => 'Entry']);
 check($reported() === [[url('indexnow-demo')]], 'an entry of a plugin that knows nothing about IndexNow reports the public pages of that plugin');
