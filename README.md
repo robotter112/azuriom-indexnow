@@ -77,7 +77,16 @@ event('indexnow.submit', [[route('myplugin.show', $item), route('myplugin.index'
 
 // For "Submit all URLs" and the optional sitemap:
 Event::listen('indexnow.urls', fn () => MyPlugin::publicUrls());
+
+// When they last changed, for <lastmod> (address => DateTimeInterface):
+Event::listen('indexnow.dates', fn () => MyPlugin::changeDates());
+
+// A page that is not always there: listed only while indexnow.urls returns it.
+Route::get('/draft', ['uses' => MyController::class.'@show', 'sitemap' => false]);
 ```
+
+State a date only if it is true. Google stops trusting the dates of a site whose
+dates move without a change, so a page without a known date goes without one.
 
 Only addresses of your own site are taken, and *Report changes automatically*
 decides as it does for pages and posts.
@@ -107,6 +116,11 @@ list, so plugins this one has never heard of are included too.
 Left out on purpose: redirects, role-restricted pages, private forums, search
 forms, and routes serving a file rather than a page such as another plugin's
 `sitemap.xml` or `llms.txt`.
+
+Each address carries the date of its last change (`lastmod`) where that is
+known: posts, pages, the home page and the list of posts, and what plugins
+state. There is no `changefreq` and no `priority`, Google ignores both. An
+unchanged sitemap answers a crawler that already has it with `304`.
 
 It is **off by default**. If a sitemap or SEO plugin is installed, prefer that
 one — it will keep pace with its own features, and two files disagreeing about

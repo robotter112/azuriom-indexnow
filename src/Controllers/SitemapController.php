@@ -3,8 +3,10 @@
 namespace Azuriom\Plugin\Indexnow\Controllers;
 
 use Azuriom\Http\Controllers\Controller;
+use Azuriom\Plugin\Indexnow\SiteUrls;
 use Azuriom\Plugin\Indexnow\UrlSource;
 use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
 /** Optional sitemap for sites without a sitemap plugin, off by default. */
@@ -12,7 +14,7 @@ class SitemapController extends Controller
 {
     private const CACHE_MINUTES = 60;
 
-    public function index()
+    public function index(Request $request)
     {
         abort_unless(setting('indexnow.serve_sitemap'), 404);
 
@@ -21,9 +23,13 @@ class SitemapController extends Controller
         // Only until the first list is built.
         abort_if($urls === null, 503);
 
-        return response()
-            ->view('indexnow::sitemap', ['urls' => $urls])
-            ->header('Content-Type', 'application/xml; charset=UTF-8');
+        $body = view('indexnow::sitemap', ['urls' => $urls, 'dates' => (array) Cache::get('indexnow.sitemap.dates', [])])->render();
+
+        // A crawler that has this very sitemap gets 304 instead of the list.
+        $response = response($body)->header('Content-Type', 'application/xml; charset=UTF-8')->setEtag(sha1($body), true);
+        $response->isNotModified($request);
+
+        return $response;
     }
 
     /**
@@ -45,6 +51,7 @@ class SitemapController extends Controller
         $build = function () {
             Cache::put('indexnow.sitemap.failed', true, now()->addMinutes(10));
             $urls = UrlSource::fromCore();
+            Cache::forever('indexnow.sitemap.dates', SiteUrls::dates($urls));
             Cache::put('indexnow.sitemap', $urls, now()->addMinutes(self::CACHE_MINUTES));
             Cache::forever('indexnow.sitemap.last', $urls);
             Cache::forget('indexnow.sitemap.failed');

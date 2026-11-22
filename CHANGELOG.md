@@ -7,12 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-11-22
+
 ### Added
+
+- The sitemap says when each page last changed (`lastmod`): posts, pages, the home page and the list
+  of posts, and what plugins state through the event `indexnow.dates`. A page without a known date
+  goes without one, since Google only trusts dates that are true.
+- An unchanged sitemap answers with `304` to a crawler that already has it (ETag).
+- A published or changed post also reports the list of posts and the home page, at most once an hour.
 - A button beside the sitemap address copies it, like the one of the key file.
 
+### Changed
+
+- The comments in the code are short.
+
 ### Fixed
-- A page that is not always there, such as a draft of another plugin, can stay out of the sitemap: a route with the action `'sitemap' => false` is only listed while its plugin hands it over through `indexnow.urls`.
-- Switching between light and dark mode in the admin panel no longer lets buttons and fields fade over from the other mode for a moment.
+
+- A page that is not always there, such as a draft of another plugin, can stay out of the sitemap: a
+  route with the action `'sitemap' => false` is only listed while its plugin hands it over through
+  `indexnow.urls`.
+- Switching between light and dark mode in the admin panel no longer lets buttons and fields fade
+  over from the other mode for a moment.
 
 ## [2.3.3] - 2026-11-20
 

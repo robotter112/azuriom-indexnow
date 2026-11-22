@@ -105,7 +105,7 @@ $post = fn (string $slug, string $when = '-1 day') => Post::forceCreate([
 // --- pages and posts ---------------------------------------------------------
 
 $one = $post('first-post');
-check($reported() === [[route('posts.show', 'first-post')]], 'a published post is reported when saved'.$label);
+check($reported() === [[route('posts.show', 'first-post'), route('posts.index'), Client::siteRoot().'/']], 'a published post is reported when saved, with the pages that list it'.$label);
 
 $two = $post('second-post');
 $three = $post('third-post');
@@ -344,6 +344,37 @@ $post('saved-during-a-check-'.uniqid());
 event('indexnow.submit', [[url('/knowledge/during-a-check')]]);
 $app->instance('request', $visitor);
 check($reported() === [], 'what a page saves while the visibility check opens it reports nothing');
+
+// When a page last changed, for the sitemap.
+$dated = $post('dated-post', '-3 days');
+$dated->timestamps = false;
+$dated->forceFill(['updated_at' => now()->subDays(2)->startOfSecond()])->save();
+$waited = $post('waited-post', '-1 hour');
+$waited->timestamps = false;
+$waited->forceFill(['updated_at' => now()->subDays(9)])->save();
+$stated = now()->subDays(40)->startOfSecond();
+Event::listen('indexnow.dates', fn () => [url('indexnow-demo') => $stated, url('never-listed') => $stated]);
+Event::listen('indexnow.dates', fn () => [url('indexnow-demo') => $stated->copy()->subDay()]);
+Event::listen('indexnow.dates', fn () => [url('indexnow-demo') => now()->addDay()]);
+Event::listen('indexnow.dates', fn () => throw new RuntimeException('a broken plugin'));
+$dates = SiteUrls::dates(SiteUrls::all());
+$on = fn (string $url) => isset($dates[$url]) ? Illuminate\Support\Carbon::parse($dates[$url])->getTimestamp() : null;
+check($on(Client::onSiteRoot(route('posts.show', 'dated-post'))) === $dated->fresh()->updated_at->getTimestamp(), 'a post is dated by its last change'.$label);
+check($on(Client::onSiteRoot(route('posts.show', 'waited-post'))) === $waited->fresh()->published_at->getTimestamp(), 'a scheduled post by the moment it appeared, if that is later');
+check($on(Client::onSiteRoot(route('posts.index'))) !== null && $on(Client::siteRoot().'/') !== null, 'the home page and the list of posts by their newest post');
+check($on(Client::onSiteRoot(url('indexnow-demo'))) === $stated->getTimestamp(), 'plugins state dates: the newest counts, none from the future, a broken one costs only its own');
+check(! isset($dates[Client::onSiteRoot(url('never-listed'))]), 'a date lists no address');
+
+Setting::updateSettings(['indexnow.serve_sitemap' => '1']);
+Cache::forget('indexnow.sitemap');
+$served = app(Azuriom\Plugin\Indexnow\Controllers\SitemapController::class)->index(Illuminate\Http\Request::create('http://localhost/sitemap.xml'));
+$etag = (string) $served->headers->get('ETag');
+check($etag !== '' && str_contains($served->getContent(), '<lastmod>'.$stated->toAtomString().'</lastmod>'), 'the sitemap carries the dates and an ETag');
+$again = app(Azuriom\Plugin\Indexnow\Controllers\SitemapController::class)->index(Illuminate\Http\Request::create('http://localhost/sitemap.xml', 'GET', [], [], [], ['HTTP_IF_NONE_MATCH' => $etag]));
+check($again->getStatusCode() === 304 && $again->getContent() === '', 'an unchanged sitemap answers 304');
+$dated->delete();
+$waited->delete();
+$reported();
 
 // One plugin that fails does not take the other addresses with it.
 Event::listen('indexnow.urls', fn () => throw new RuntimeException('stale route cache'));

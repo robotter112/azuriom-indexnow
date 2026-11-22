@@ -3,6 +3,9 @@
 @foreach ($urls as $url)
     <url>
         <loc>{{ $url }}</loc>
+@isset($dates[$url])
+        <lastmod>{{ $dates[$url] }}</lastmod>
+@endisset
     </url>
 @endforeach
 </urlset>

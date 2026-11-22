@@ -67,7 +67,12 @@ class Reporter
         }
 
         if ($record instanceof Post) {
-            self::queue([Client::urlFor($record), self::formerUrl($record)]);
+            $own = array_filter([Client::urlFor($record), self::formerUrl($record)]);
+            self::queue(array_values($own));
+
+            if ($own !== []) {
+                self::queueOncePerPause(self::postLists());
+            }
 
             return;
         }
@@ -92,6 +97,20 @@ class Reporter
 
         if ($plugin !== null && $plugin !== 'indexnow') {
             self::queueOncePerPause(SiteUrls::pluginPages($plugin));
+        }
+    }
+
+    /**
+     * The pages that list posts: the list itself and the home page.
+     *
+     * @return array<int, string>
+     */
+    private static function postLists(): array
+    {
+        try {
+            return [route('posts.index'), Client::siteRoot().'/'];
+        } catch (Throwable) {
+            return [];
         }
     }
 

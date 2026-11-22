@@ -4,6 +4,7 @@ namespace Azuriom\Plugin\Indexnow;
 
 use Azuriom\Models\Page;
 use Azuriom\Models\Post;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route as RouteFacade;
@@ -42,6 +43,67 @@ class SiteUrls
         // On the site's own address, since the list is cached for everyone. Others are left out.
         return $urls->map(fn (string $url) => Client::onSiteRoot($url))->filter(fn (string $url) => Client::isOwnHost($url))
             ->unique()->take(self::MAX_URLS)->values()->all();
+    }
+
+    /**
+     * When the listed addresses last changed, as far as that is known: posts, pages, the lists of posts
+     * and what plugins return for the event indexnow.dates. An unknown date is left out, never guessed.
+     *
+     * @param  array<int, string>  $urls
+     * @return array<string, string> address => W3C date
+     */
+    public static function dates(array $urls): array
+    {
+        $now = now()->getTimestamp();
+        $known = [];
+
+        $note = function (string $url, mixed $date) use (&$known, $now) {
+            if ($date instanceof \DateTimeInterface && ($time = $date->getTimestamp()) <= $now) {
+                $key = rtrim(Client::onSiteRoot($url), '/');
+                $known[$key] = max($known[$key] ?? 0, $time);
+            }
+        };
+
+        try {
+            $newest = null;
+
+            foreach (Post::published()->select(['id', 'slug', 'published_at', 'updated_at'])->latest('published_at')->limit(self::MAX_URLS)->toBase()->get() as $post) {
+                $changed = Carbon::parse(max((string) $post->published_at, (string) $post->updated_at));
+                $note(route('posts.show', $post->slug), $changed);
+                $newest = $newest === null || $changed > $newest ? $changed : $newest;
+            }
+
+            $note(route('posts.index'), $newest);
+            $note(url('/'), $newest);
+
+            foreach (Page::enabled()->doesntHave('roles')->select(['id', 'slug', 'updated_at'])->limit(self::MAX_URLS)->toBase()->get() as $page) {
+                $note(route('pages.show', $page->slug), $page->updated_at !== null ? Carbon::parse($page->updated_at) : null);
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        foreach (Event::getListeners('indexnow.dates') as $listener) {
+            try {
+                foreach ((array) $listener('indexnow.dates', []) as $url => $date) {
+                    if (is_string($url)) {
+                        $note($url, $date);
+                    }
+                }
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        $dates = [];
+
+        foreach ($urls as $url) {
+            if (($known[rtrim($url, '/')] ?? 0) > 0) {
+                $dates[$url] = Carbon::createFromTimestamp($known[rtrim($url, '/')], config('app.timezone'))->toAtomString();
+            }
+        }
+
+        return $dates;
     }
 
     /** Addresses other plugins return for the event indexnow.urls. */
