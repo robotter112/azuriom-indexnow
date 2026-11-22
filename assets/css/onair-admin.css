@@ -1,8 +1,5 @@
-/* onair-admin.css 1.5 – the admin pages of the OnAir plugin family in one design language.
-   Rules: ADMIN-DESIGN.md in the OnAir theme repo. Every plugin ships this same file, so each runs on its
-   own; change it in all of them at once and raise the version. Neutral colours come from the Bootstrap
-   variables of Azuriom, the tones of tiles and badges are pairs of their own with a dark value, so light
-   and dark (data-bs-theme on <body>) both work and icons keep their colour in both. */
+/* onair-admin.css 1.5 – shared stylesheet of the admin pages of the OnAir plugin family.
+   Neutral colours come from the Bootstrap variables of Azuriom, tones are pairs with a value for dark mode. */
 
 body {
     --oa-muted: color-mix(in srgb, var(--bs-body-color) 80%, var(--bs-secondary-bg));
