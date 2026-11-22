@@ -35,7 +35,6 @@ return [
     'serve-sitemap-taken' => ':url adresine zaten başka bir eklenti yanıt veriyor. Seninki sunulmuyor — bunu kapat ya da diğer eklentiyi kaldır.',
     'serve-sitemap-live' => ':url adresinde · Google Search Console’a gönder',
 
-    // The admin page in the design language of the OnAir plugin family.
     'active' => 'Etkin',
     'inactive' => 'Kapalı',
     'status' => 'Durum',

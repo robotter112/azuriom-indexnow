@@ -12,23 +12,9 @@ use Illuminate\Support\Str;
 use Throwable;
 
 /**
- * Reports what changed, for every part of the site:
- *
- * - pages and news posts by their own address - also when one is deleted, taken
- *   offline or renamed, so search engines forget the old address;
- * - entries of any other plugin by the public pages of that plugin (/games,
- *   /forum, /wiki ...), found in the route table, so plugins this one has never
- *   heard of are covered too. Such a page changes with every entry saved, so it
- *   is reported at most once per PLUGIN_PAGE_PAUSE;
- * - exact addresses a plugin hands over itself with event('indexnow.submit').
- *
- * Everything that changes during one request goes out together after the
- * response: one request to IndexNow, and never a delay for the person saving.
- *
- * Before it goes out, every address is opened the way a visitor who is not
- * logged in opens it (visible()): only what such a visitor gets as a page, or
- * as gone, is reported - never what needs a login or a role, and nothing under
- * maintenance.
+ * Reports changes after the response: pages and posts by their address (old ones included), entries of
+ * other plugins by the public pages of that plugin, and addresses handed over with indexnow.submit. Only
+ * what a visitor without login can open, or what is gone, is reported.
  */
 class Reporter
 {
@@ -37,16 +23,16 @@ class Reporter
     /** Answers worth reporting: a page for everyone (200), or gone for good (404, 410). */
     public const REPORTABLE = [200, 404, 410];
 
-    /** Addresses opened per report; beyond that (a big import) the rules alone decide. */
+    /** Addresses opened per report; beyond that only the rules decide. */
     public const MAX_CHECKS = 25;
 
     /** A plugin page is opened for the check at most once per CHECK_PAUSE, whatever it answered. */
     public const CHECK_PAUSE = 600;
 
-    /** Seconds one report may spend opening addresses; after that the rules alone decide. */
+    /** Seconds a report may spend opening addresses. */
     public const CHECK_BUDGET = 10;
 
-    /** How the visibility check introduces itself, so a page it opens never starts another report. */
+    /** User agent of the visibility check, whose requests never start a report. */
     public const PROBE_AGENT = 'IndexNow for Azuriom (visibility check)';
 
     /** @var array<string, true> plugin pages, reported at most once per PLUGIN_PAGE_PAUSE */
@@ -71,8 +57,7 @@ class Reporter
 
     public static function changed(Model $record): void
     {
-        // The optional sitemap is kept for an hour; a post or page that changed (unpublished,
-        // disabled, given roles) must not stay listed until then, reporting on or off.
+        // The cached sitemap must not keep a page that was just hidden.
         if ($record instanceof Post || $record instanceof Page) {
             Cache::forget('indexnow.sitemap');
         }
@@ -89,15 +74,14 @@ class Reporter
 
         if ($record instanceof Page) {
             if (! $record->exists) {
-                // Deleted: what was known before the database dropped its roles (deleting()).
+                // Deleted: use what deleting() noted.
                 self::queue([self::$deletedPages[$record->getKey()] ?? null]);
                 unset(self::$deletedPages[$record->getKey()]);
 
                 return;
             }
 
-            // Azuriom assigns the roles of a page only after saving it, so whether
-            // visitors may see it is decided when the report goes out (flush()).
+            // Roles are assigned after saving: visibility is decided in flush().
             self::$pages[$record->getKey()] ??= self::formerUrl($record);
             self::scheduleFlush();
 
@@ -137,10 +121,7 @@ class Reporter
         }
     }
 
-    /**
-     * A page is about to be deleted: note now whether visitors could open it. The
-     * database removes its roles together with it, so afterwards it would look public.
-     */
+    /** Note whether visitors could open a page before its roles are deleted with it. */
     public static function deleting(Model $record): void
     {
         if ($record instanceof Page && self::enabled()) {
@@ -167,11 +148,8 @@ class Reporter
      */
     public static function queueOncePerPause(array $urls): void
     {
-        // The pause starts when a page is really reported (flush()), so a page that
-        // was not public yet is checked again with a later change - but not with
-        // every one: a page that refuses visitors would be opened after each save,
-        // and a page whose view saves an entry of its plugin would make every check
-        // schedule the next one. Cache::add claims the check across requests.
+        // The pause starts when the page is reported. Cache::add claims the check across requests and
+        // prevents loops.
         $urls = array_map(fn (string $url) => Client::onSiteRoot($url), $urls);
         $urls = array_values(array_filter($urls, fn (string $url) => ! Cache::has(self::pauseKey($url))
             && Cache::add(self::pauseKey($url).'.checked', true, self::CHECK_PAUSE)));
@@ -189,13 +167,8 @@ class Reporter
     }
 
     /**
-     * The addresses a visitor who is not logged in gets as a page (200) or as gone
-     * (404, 410). A redirect (to the login form), 401, 403 and every other answer,
-     * maintenance (503) included, keep an address out. Only addresses of this site
-     * are opened, without cookies and without following redirects. If the site
-     * cannot reach itself, the rules that chose the address decide, and addresses
-     * under maintenance stay out. Addresses handed over by other plugins have no
-     * rules here: unchecked, they stay out.
+     * The addresses visitors without login get as a page (200) or as gone (404, 410). If the site cannot
+     * reach itself, the rules decide; handed-over addresses then stay out.
      *
      * @param  array<int, string>  $urls
      * @param  array<string, true>  $handed
@@ -223,14 +196,11 @@ class Reporter
 
     private static function guestStatus(string $url): ?int
     {
-        // Only the status counts: of the page itself at most a few kilobytes are taken.
+        // Only the status counts, a few kilobytes are enough.
         return Client::fetch($url, 16384, 8, ['User-Agent' => self::PROBE_AGENT, 'Accept' => 'text/html'])['status'] ?? null;
     }
 
-    /**
-     * Whether Azuriom shows its maintenance page at this address to visitors, by the
-     * same rules as its middleware: the whole site, or the listed paths.
-     */
+    /** Whether maintenance hides this address, by the rules of Azuriom's middleware. */
     private static function underMaintenance(string $url): bool
     {
         if (! setting('maintenance.enabled', false)) {
@@ -265,8 +235,8 @@ class Reporter
         self::$handed = [];
         self::$flushing = false;
 
-        // Pages as they are now, roles included. A page restricted to roles is never
-        // reported, not even its former address: that would make it known.
+        // Pages as they are now. A page restricted to roles is never reported, not even its former
+        // address.
         foreach ($pages as $id => $former) {
             try {
                 $page = Page::find($id);
@@ -301,22 +271,15 @@ class Reporter
         }
     }
 
-    /**
-     * Read on use, not at boot: Azuriom loads the settings only after the plugins
-     * have booted. On unless switched off, like the switch on the admin page shows it.
-     */
+    /** Not read at boot, where settings are not loaded yet. Default: on. */
     private static function enabled(): bool
     {
-        // A page the visibility check opens may save something of its plugin (a view counter):
-        // that must not start the next check, or the checks would never end.
+        // A visibility check must not start another one.
         return (bool) setting('indexnow.key') && (bool) setting('indexnow.auto', true)
             && request()->userAgent() !== self::PROBE_AGENT;
     }
 
-    /**
-     * The address a page or post had until this change, when visitors could open it:
-     * after unpublishing, disabling or a new slug, search engines should learn it is gone.
-     */
+    /** The former public address of a changed page or post. */
     private static function formerUrl(Model $record): ?string
     {
         try {

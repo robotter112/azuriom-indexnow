@@ -35,7 +35,6 @@ return [
     'serve-sitemap-taken' => 'Un altre connector ja respon :url. El teu no se serveix: desactiva això o desinstal·la l\'altre connector.',
     'serve-sitemap-live' => 'Disponible a :url · envia’l a la Google Search Console',
 
-    // The admin page in the design language of the OnAir plugin family.
     'active' => 'Actiu',
     'inactive' => 'Desactivat',
     'status' => 'Estat',

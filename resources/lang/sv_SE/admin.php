@@ -35,7 +35,6 @@ return [
     'serve-sitemap-taken' => 'Ett annat tillägg svarar redan på :url. Din tillhandahålls inte — stäng av det här eller avinstallera det andra tillägget.',
     'serve-sitemap-live' => 'Finns på :url · skicka in den i Google Search Console',
 
-    // The admin page in the design language of the OnAir plugin family.
     'active' => 'Aktiv',
     'inactive' => 'Av',
     'status' => 'Status',

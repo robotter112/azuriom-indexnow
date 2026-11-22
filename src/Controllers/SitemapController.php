@@ -7,15 +7,7 @@ use Azuriom\Plugin\Indexnow\UrlSource;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Support\Facades\Cache;
 
-/**
- * An optional sitemap, for sites that have no other plugin producing one.
- *
- * This exists for a single reason: Google does not take part in IndexNow, so on
- * a site with no sitemap at all there is no way to reach it. It is off by
- * default and stays off wherever a sitemap or SEO plugin is installed - that
- * plugin does the job better, and two files disagreeing about what is public
- * helps nobody.
- */
+/** Optional sitemap for sites without a sitemap plugin, off by default. */
 class SitemapController extends Controller
 {
     private const CACHE_MINUTES = 60;
@@ -26,7 +18,7 @@ class SitemapController extends Controller
 
         $urls = self::urls();
 
-        // Only before the very first list could be built, and while that build runs.
+        // Only until the first list is built.
         abort_if($urls === null, 503);
 
         return response()
@@ -35,12 +27,8 @@ class SitemapController extends Controller
     }
 
     /**
-     * The addresses of the sitemap, built at most once per CACHE_MINUTES for everyone.
-     *
-     * Visitors trigger the build, so it must not be theirs to repeat: one build at a
-     * time (the others get the last list), and a build that died - a memory limit
-     * or a time limit is no exception any catch could see - is not tried again for
-     * ten minutes. The mark is set before building and only removed when it worked.
+     * The addresses of the sitemap, built by one request at most once per CACHE_MINUTES. A failed build is
+     * retried after ten minutes.
      *
      * @return array<int, string>|null
      */
@@ -73,11 +61,7 @@ class SitemapController extends Controller
         return $urls === false ? Cache::get('indexnow.sitemap.last') : $urls;
     }
 
-    /**
-     * Which route actually answers /sitemap.xml - ours, another plugin's, or
-     * none. The admin page needs this to tell the truth rather than a guess:
-     * when two plugins register the same URI, the load order decides.
-     */
+    /** Which route answers /sitemap.xml: this plugin, another one or none. */
     public static function servedBy(): string
     {
         foreach (\Illuminate\Support\Facades\Route::getRoutes() as $route) {

@@ -8,14 +8,8 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 /**
- * IndexNow tells participating search engines that URLs changed, instead of
- * waiting for them to come around. Bing, Yandex, Seznam and Naver take part;
- * Google does not.
- *
- * The protocol is a shared secret in reverse: a key file has to sit at the
- * document root and answer with the key itself. If it does not, submissions are
- * refused - which is why setup verifies the file over HTTP before writing
- * anything into the settings.
+ * Client of the IndexNow protocol: submits changed addresses. A key file at the document root proves the
+ * site.
  */
 class Client
 {
@@ -37,11 +31,8 @@ class Client
 
     public static function keyFileName(string $key): string
     {
-        // The key ends up in public_path() and from there in file_put_contents()
-        // and unlink(). Today it can only come from generateKey(), but this is
-        // public API that other code may call, and a stored setting is not a
-        // trustworthy source of a file path - "../../.env" would otherwise become
-        // a write and a delete outside the document root.
+        // The key becomes a file name in public_path(): only the specified format, so no path can be
+        // injected.
         if (! preg_match('/^[a-f0-9]{8,128}\z/i', $key)) {
             throw new \InvalidArgumentException('Invalid IndexNow key.');
         }
@@ -56,8 +47,7 @@ class Client
      */
     public static function verifyKeyFile(string $key, string $url): array
     {
-        // A key file is a plain file at the document root: a redirect only ever leads
-        // somewhere else, so it counts as a wrong answer.
+        // A redirect is a wrong answer.
         $answer = self::fetch($url, 1024, 15);
 
         if ($answer === null) {
@@ -68,19 +58,15 @@ class Client
             return ['ok' => false, 'reason' => 'status', 'status' => $answer['status']];
         }
 
-        // A key file holds the key and perhaps a line break; anything much longer is not one.
+        // A key file holds the key and at most a line break.
         return trim((string) $answer['body']) === $key
             ? ['ok' => true, 'reason' => 'ok']
             : ['ok' => false, 'reason' => 'content'];
     }
 
     /**
-     * A GET to the site itself whose limits hold however PHP makes requests. With cURL the
-     * answer is taken as it is sent (packed) and the transfer is cut off once more than $max
-     * bytes have arrived; it is unpacked up to $max bytes and no further; the time limit
-     * covers the whole request. Asking for a "stream" alone would not do: without
-     * allow_url_fopen there is none, and the whole unpacked answer would be buffered before
-     * any limit is looked at. Without cURL the answer is streamed and read up to the limit.
+     * GET with a limit on size and time. cURL cuts off while receiving, since a stream without
+     * allow_url_fopen would buffer the whole answer.
      *
      * @param  array<string, string>  $headers
      * @param  array<string, mixed>|false  $redirects  Guzzle's allow_redirects
@@ -108,7 +94,7 @@ class Client
         try {
             $response = Http::timeout($seconds)->withHeaders($headers)->withOptions($options)->get($url);
         } catch (\Throwable $e) {
-            // Cut off for its length after the headers came: the status is known, the body is not kept.
+            // Too long: the status is kept, the body is not.
             return $long && $status > 0 ? ['status' => $status, 'body' => null] : null;
         }
 
@@ -226,8 +212,7 @@ class Client
     }
 
     /**
-     * Report a single address. Used by the automatic reporting, where failure
-     * must never disturb the save that triggered it.
+     * Report a single address. Never throws.
      *
      * @return array{ok: bool, reason: string, status: int, count: int}
      */
@@ -237,8 +222,7 @@ class Client
     }
 
     /**
-     * Report addresses handed over by other plugins. Only addresses of this
-     * site go out: IndexNow rejects a list for a host the key does not prove.
+     * Report addresses handed over by other plugins, only those of this site.
      *
      * @param  array<int, mixed>  $urls
      * @return array{ok: bool, reason: string, status: int, count: int}
@@ -272,16 +256,8 @@ class Client
     }
 
     /**
-     * The site's own address (scheme, host, port and the folder Azuriom lives in), never
-     * taken from the request that happens to run: its Host header, a /index.php in the
-     * path or an X-Forwarded-Proto header are chosen by whoever sends it, and what is
-     * built from them here ends up in caches for everyone and in reports to IndexNow.
-     *
-     * It is APP_URL. The address the key file was verified at when IndexNow was switched
-     * on (an admin's own request) only refines it: the same host and port, with the scheme
-     * and folder the site really answers under. A stored address on another host, or one
-     * that names a script, is not used: whoever may switch IndexNow on must not be able
-     * to point the sitemap, the checks and the reports somewhere else.
+     * The site's own address, from APP_URL and never from the request. The stored address may only refine
+     * scheme and folder on the same host and port.
      */
     public static function siteRoot(): string
     {
@@ -291,11 +267,7 @@ class Client
         return $stored !== '' && self::refines($stored, $configured) ? $stored : $configured;
     }
 
-    /**
-     * The address this request runs under, when it is a plain spelling of the site's own
-     * address: no script in the path (/index.php, however it is encoded) and the host and
-     * port of APP_URL. Null otherwise.
-     */
+    /** The root of this request if it is a plain spelling of the configured address, else null. */
     public static function requestRoot(): ?string
     {
         $root = rtrim(url('/'), '/');
@@ -304,8 +276,8 @@ class Client
     }
 
     /**
-     * Whether an address is the configured one with at most another scheme or folder:
-     * same host, same port (or none on both), nothing encoded and no script in its path.
+     * Whether an address differs from the configured one in scheme or folder only, without encoding or a
+     * script in its path.
      */
     private static function refines(string $root, string $configured): bool
     {
@@ -325,15 +297,13 @@ class Client
      */
     public static function onSiteRoot(string $url): string
     {
-        // route() writes the brackets of an IPv6 host percent-encoded, url() does not: both spellings
-        // are the request's root.
+        // route() percent-encodes the brackets of an IPv6 host, url() does not.
         $url = (string) preg_replace('#^(https?://)%5B([0-9a-f:.]+)%5D#i', '$1[$2]', $url);
         $root = rtrim(url('/'), '/');
         $site = self::siteRoot();
         $under = fn (string $base) => $url === $base || str_starts_with($url, $base.'/') || str_starts_with($url, $base.'?');
 
-        // Already there (this is applied more than once to an address): where the site lives in a
-        // folder of the request's root, moving it again would add the folder twice.
+        // Already moved: do not add the folder twice.
         if ($root === $site || ! $under($root) || (str_starts_with($site, $root.'/') && $under($site))) {
             return $url;
         }
@@ -342,8 +312,8 @@ class Client
     }
 
     /**
-     * The last submission and the addresses accepted today, for the admin page. A cache that
-     * can't be written must not stop the submission it describes.
+     * The last submission and today's count for the admin page. A failing cache does not stop a
+     * submission.
      */
     private static function remember(array $result): array
     {
@@ -382,13 +352,8 @@ class Client
     }
 
     /**
-     * Does this address belong to the site itself?
-     *
-     * IndexNow only accepts URLs of the submitting host and answers 422
-     * otherwise, so a sitemap elsewhere is useless - and fetching an arbitrary
-     * address on request would turn the setting into a way of making the server
-     * call internal services on someone's behalf. Hence the port too: another
-     * port of the site's own name is another service.
+     * Whether an address is on this site, port included. Also keeps the server from fetching internal
+     * services.
      */
     public static function isOwnHost(string $url, ?string $siteUrl = null): bool
     {

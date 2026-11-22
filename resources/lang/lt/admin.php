@@ -35,7 +35,6 @@ return [
     'serve-sitemap-taken' => 'Į :url jau atsako kitas papildinys. Jūsų neteikiamas — išjunkite tai arba pašalinkite kitą papildinį.',
     'serve-sitemap-live' => 'Pasiekiama adresu :url · pateikite jį Google Search Console',
 
-    // The admin page in the design language of the OnAir plugin family.
     'active' => 'Įjungta',
     'inactive' => 'Išjungta',
     'status' => 'Būsena',

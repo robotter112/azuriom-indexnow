@@ -35,7 +35,6 @@ return [
     'serve-sitemap-taken' => 'Na :url už odpovídá jiný plugin. Vaše se neposkytuje — vypněte to nebo odinstalujte druhý plugin.',
     'serve-sitemap-live' => 'Dostupná na :url · zadejte ji v Google Search Console',
 
-    // The admin page in the design language of the OnAir plugin family.
     'active' => 'Aktivní',
     'inactive' => 'Vypnuto',
     'status' => 'Stav',

@@ -37,12 +37,7 @@ class AdminController extends Controller
         ]);
     }
 
-    /**
-     * Turn it on: make a key, put the key file in place, and only save anything
-     * once the file has been confirmed reachable over HTTP. A key that cannot be
-     * verified would make every later submission fail with 403, so it is better
-     * to fail here, visibly, than silently later.
-     */
+    /** Switch on: create the key file and save only after it answers over HTTP. */
     public function enable()
     {
         $key = Client::generateKey();
@@ -55,8 +50,7 @@ class AdminController extends Controller
 
         file_put_contents($file, $key);
 
-        // The address the key file is verified at becomes the site's address for
-        // everything IndexNow builds later (Client::siteRoot()).
+        // The verified address refines Client::siteRoot().
         $root = Client::requestRoot() ?? Client::siteRoot();
         $url = $root.'/'.Client::keyFileName($key);
         $verification = Client::verifyKeyFile($key, $url);
@@ -70,7 +64,7 @@ class AdminController extends Controller
             ));
         }
 
-        // Switched on again: the old key must not stay valid.
+        // The old key stops being valid.
         $old = setting('indexnow.key');
 
         if ($old && $old !== $key) {
@@ -158,9 +152,7 @@ class AdminController extends Controller
         Cache::forget(self::collectedKey($sitemapBefore));
         Cache::forget(self::collectedKey(setting('indexnow.sitemap') ?: UrlSource::defaultSitemapUrl()));
 
-        // The route is registered from a file rather than this setting, because
-        // settings are not loaded yet at that point. Keep the two in step and
-        // drop the cached route table, which was built for the old state.
+        // The route depends on this file, as settings are not loaded when routes register.
         if ($request->boolean('serve_sitemap') !== $wasServing) {
             $flag = RouteServiceProvider::flagPath();
 
@@ -170,8 +162,7 @@ class AdminController extends Controller
                 @unlink($flag);
             }
 
-            // The cached routes are built again, not just dropped: switching AzBoost's route cache
-            // off is not for whoever may change this setting.
+            // Rebuild the route cache, do not switch it off.
             app()->routesAreCached() ? app(Optimizer::class)->reloadRoutesCache() : Artisan::call('route:clear');
         }
 
@@ -179,10 +170,8 @@ class AdminController extends Controller
     }
 
     /**
-     * The addresses the admin page counts. The page used to fetch the sitemap over HTTP on
-     * every view: the site asking itself through its proxies took half a second and more.
-     * The sitemap this plugin serves comes from the cache that serves /sitemap.xml, any
-     * other one is read at most every ten minutes.
+     * The addresses the admin page counts, cached for ten minutes unless this plugin serves the sitemap
+     * itself.
      *
      * @return array{urls: array<int, string>, source: string}
      */
@@ -198,8 +187,7 @@ class AdminController extends Controller
             return $known;
         }
 
-        // Noted before the sitemap is read: one that ends the request while being read is
-        // not read again on every view of this page.
+        // Marked before reading, so a failed read is not repeated on every view.
         Cache::put($key, ['urls' => [], 'source' => 'sitemap'], now()->addMinutes(10));
         Cache::put($key, $collected = UrlSource::collect($sitemapUrl), now()->addMinutes(10));
 

@@ -6,4 +6,4 @@
     </url>
 @endforeach
 </urlset>
-{{-- The declaration is split so that no PHP open tag stands in this file: with short_open_tag on, Blade would read it as PHP. It must stay the first output. --}}
+{{-- Split so that short_open_tag does not read it as PHP. Must stay the first output. --}}

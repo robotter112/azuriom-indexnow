@@ -35,7 +35,6 @@ return [
     'serve-sitemap-taken' => 'Osoitteeseen :url vastaa jo toinen lisäosa. Omaasi ei tarjoilla — kytke tämä pois tai poista toinen lisäosa.',
     'serve-sitemap-live' => 'Saatavilla osoitteessa :url · lähetä se Google Search Consoleen',
 
-    // The admin page in the design language of the OnAir plugin family.
     'active' => 'Käytössä',
     'inactive' => 'Pois',
     'status' => 'Tila',

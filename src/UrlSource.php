@@ -4,14 +4,7 @@ namespace Azuriom\Plugin\Indexnow;
 
 use Illuminate\Support\Facades\Http;
 
-/**
- * Where the URLs to submit come from.
- *
- * Deliberately the site's own sitemap.xml rather than a second crawl of the
- * database: whichever plugin produces that file has already decided what is
- * public and worth indexing, and duplicating that decision here would mean two
- * answers to the same question.
- */
+/** The addresses to submit, taken from the sitemap of the site. */
 class UrlSource
 {
     /** The largest sitemap read, in bytes (decoded). */
@@ -24,16 +17,12 @@ class UrlSource
      */
     public static function fromSitemap(string $sitemapUrl): array
     {
-        // Checked here as well as in the form: this is the point where the
-        // request actually goes out, and a setting written by anything other
-        // than that form would otherwise slip past.
+        // Checked here too, where the request goes out.
         if (! Client::isOwnHost($sitemapUrl)) {
             return [];
         }
 
-        // Redirects only while they stay on the site: the check above covers the first
-        // address alone. A sitemap may hold at most 50,000 addresses; an answer beyond
-        // MAX_BYTES is not one worth reading.
+        // Redirects only within the site, size limited to MAX_BYTES.
         $answer = Client::fetch($sitemapUrl, self::MAX_BYTES, 20, [], [
             'max' => 3,
             'protocols' => ['http', 'https'],
@@ -52,15 +41,12 @@ class UrlSource
      */
     public static function parse(string $xml): array
     {
-        // A sitemap index points at further sitemaps rather than at pages;
-        // following those is out of scope, so it yields nothing rather than
-        // submitting the sitemap files themselves as if they were pages.
+        // A sitemap index is not followed.
         if (preg_match('/<sitemapindex[\s>]/i', $xml)) {
             return [];
         }
 
-        // One address at a time, up to the 50,000 a sitemap may hold: matching the whole file
-        // at once keeps every match in memory beside it.
+        // One match at a time, to save memory.
         $urls = [];
         $offset = 0;
 
@@ -90,11 +76,7 @@ class UrlSource
     }
 
     /**
-     * Every publicly reachable address of this site, for sites without a
-     * sitemap.
-     *
-     * Gathered internally and handed straight to IndexNow, or served as the
-     * optional sitemap. Never a second sitemap.xml alongside another plugin's.
+     * Every public address of this site, for sites without a sitemap.
      *
      * @return array<int, string>
      */
@@ -103,8 +85,7 @@ class UrlSource
         try {
             return SiteUrls::all();
         } catch (\Throwable $e) {
-            // A missing table or a renamed route must not break the submission;
-            // the home page alone is still worth sending.
+            // The home page alone is still worth sending.
             return [Client::siteRoot().'/'];
         }
     }

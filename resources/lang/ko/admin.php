@@ -35,7 +35,6 @@ return [
     'serve-sitemap-taken' => ':url 은 이미 다른 플러그인이 처리합니다. 이 플러그인의 사이트맵은 제공되지 않습니다 — 끄거나 다른 플러그인을 제거하세요.',
     'serve-sitemap-live' => ':url 에서 볼 수 있음 · 구글 서치 콘솔에 제출하세요',
 
-    // The admin page in the design language of the OnAir plugin family.
     'active' => '활성',
     'inactive' => '꺼짐',
     'status' => '상태',

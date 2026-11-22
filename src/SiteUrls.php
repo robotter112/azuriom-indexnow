@@ -9,21 +9,10 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Support\Str;
 
-/**
- * Every publicly reachable address of this site.
- *
- * Used where there is no sitemap to read: as the list handed to IndexNow, and
- * as the content of the optional sitemap this plugin can serve. Both only come
- * into play on a site running no sitemap or SEO plugin - so when this runs at
- * all it has to be complete, or it offers nothing over the plugin it stands in
- * for.
- */
+/** Every public address of this site, for sites without a sitemap. */
 class SiteUrls
 {
-    /**
-     * The sitemap protocol allows 50 000 URLs per file. A site past that needs
-     * a <sitemapindex> with paginated children, which this does not build.
-     */
+    /** Limit of the sitemap protocol per file. */
     private const MAX_URLS = 50000;
 
     /**
@@ -31,10 +20,7 @@ class SiteUrls
      */
     private const PRIVATE_MIDDLEWARE = ['auth', 'guest', 'verified', 'admin-access', 'password.confirm', 'can:'];
 
-    /**
-     * URL segments never worth indexing even when reachable without an account:
-     * search forms, auth screens and machine endpoints.
-     */
+    /** URL segments that are never indexed. */
     private const SKIPPED_SEGMENTS = ['admin', 'api', 'install', 'user', 'profile', 'notifications', 'search', 'cart'];
 
     /**
@@ -53,23 +39,15 @@ class SiteUrls
         self::addSuggestions($urls);
         self::addFromPlugins($urls);
 
-        // On the site's own address, whichever request builds the list: it is cached
-        // for everyone (see Client::siteRoot()).
-        // Whatever is not on the site's own address after that (a spelling of the host the move
-        // above does not recognise) is left out rather than listed for everyone.
+        // On the site's own address, since the list is cached for everyone. Others are left out.
         return $urls->map(fn (string $url) => Client::onSiteRoot($url))->filter(fn (string $url) => Client::isOwnHost($url))
             ->unique()->take(self::MAX_URLS)->values()->all();
     }
 
-    /**
-     * Pages of plugins this list cannot know, such as the collections of OnAir
-     * Connect: a plugin answers the event "indexnow.urls" with its addresses.
-     * Addresses of other sites are left out.
-     */
+    /** Addresses other plugins return for the event indexnow.urls. */
     protected static function addFromPlugins(Collection $urls): void
     {
-        // Each plugin on its own: one that fails (a stale route cache, a missing table) is left
-        // out, instead of taking the addresses of the site and of every other plugin with it.
+        // A failing plugin costs only its own addresses.
         foreach (Event::getListeners('indexnow.urls') as $listener) {
             try {
                 $answer = $listener('indexnow.urls', []);
@@ -87,13 +65,7 @@ class SiteUrls
         }
     }
 
-    /**
-     * Every registered parameterless GET route a logged-out visitor can open -
-     * the home page plus the index page of every enabled plugin.
-     *
-     * Deliberately generic: a hardcoded list of known plugins goes stale with
-     * every plugin somebody else installs.
-     */
+    /** Every public GET route without parameters. */
     protected static function addStaticRoutes(Collection $urls): void
     {
         foreach (self::publicRoutes() as $route) {
@@ -102,9 +74,7 @@ class SiteUrls
     }
 
     /**
-     * The public pages of one plugin: its routes by name ("games.index") or by
-     * the first part of the address ("/games"). Reported when an entry of the
-     * plugin changes, since those pages list its entries.
+     * The public pages of a plugin, found by route name or first URL segment.
      *
      * @return array<int, string>
      */
@@ -133,20 +103,17 @@ class SiteUrls
                 continue;
             }
 
-            // Routes ending in a file extension serve a file, not a page:
-            // sitemap.xml, llms.txt and the like. Checking the extension rather
-            // than the route name also covers the ones another plugin registers
-            // - a sitemap listing another plugin's sitemap helps nobody.
+            // Files such as sitemap.xml or llms.txt are no pages.
             if (preg_match('/\.(xml|txt|json|rss|atom)$/i', $route->uri())) {
                 continue;
             }
 
-            // A redirect is not a page; search engines report those as errors.
+            // A redirect is not a page.
             if (Str::contains($route->getActionName(), 'RedirectController')) {
                 continue;
             }
 
-            // A page that is not always there: its plugin lists it through "indexnow.urls" while it is.
+            // Not always there: listed through indexnow.urls while it is.
             if ($route->getAction('sitemap') === false) {
                 continue;
             }
@@ -167,8 +134,7 @@ class SiteUrls
                 continue;
             }
 
-            // url('/') drops the trailing slash, which makes the home page look
-            // like a different address than the one linked everywhere else.
+            // url('/') drops the slash of the home page.
             $uri = $route->uri();
 
             $public[] = ['name' => $route->getName(), 'uri' => $uri, 'url' => $uri === '/' ? url('/').'/' : url($uri)];
@@ -179,9 +145,7 @@ class SiteUrls
 
     protected static function addPages(Collection $urls): void
     {
-        // doesntHave('roles') keeps role-restricted pages out: they would only
-        // answer with a redirect to the login form anyway. Only the slugs are read,
-        // and no more than fit: whole pages of a big site do not fit into memory.
+        // Without pages restricted to roles. Slugs only, to save memory.
         foreach (Page::enabled()->doesntHave('roles')->limit(self::MAX_URLS)->pluck('slug') as $slug) {
             $urls->push(route('pages.show', $slug));
         }
@@ -206,8 +170,7 @@ class SiteUrls
             ->filter(fn ($category) => empty($category->roles));
 
         foreach ($categories as $category) {
-            // The category route always redirects to its first page, so only
-            // the pages themselves are real addresses.
+            // A category redirects to its first page.
             foreach ($category->pages as $page) {
                 $urls->push(route('wiki.pages.show', [$category->slug, $page->slug]));
             }

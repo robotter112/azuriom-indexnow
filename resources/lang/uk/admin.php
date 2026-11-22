@@ -35,7 +35,6 @@ return [
     'serve-sitemap-taken' => 'На :url уже відповідає інший плагін. Ваша карта не віддається — вимкніть це або видаліть той плагін.',
     'serve-sitemap-live' => 'Доступна за :url · надішліть її в Google Search Console',
 
-    // The admin page in the design language of the OnAir plugin family.
     'active' => 'Увімкнено',
     'inactive' => 'Вимкнено',
     'status' => 'Статус',

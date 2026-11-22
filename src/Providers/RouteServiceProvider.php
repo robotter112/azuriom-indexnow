@@ -24,22 +24,13 @@ class RouteServiceProvider extends BaseRouteServiceProvider
 
     protected function mapPluginsRoutes(): void
     {
-        // Only registered when the option is on. Registering it unconditionally
-        // and answering 404 looked harmless but was not: two plugins claiming
-        // /sitemap.xml means the first one registered wins, and "indexnow"
-        // sorts before "seo" - so a dormant route took the address away from
-        // the plugin actually serving it.
-        //
-        // A file rather than the setting, because settings are not loaded yet
-        // when routes are registered - setting() returns null here even when
-        // the value is stored, which would leave the option permanently off.
+        // Registered only when switched on, so it never takes /sitemap.xml from another plugin. A file,
+        // because settings are not loaded yet.
         if (! file_exists(self::flagPath())) {
             return;
         }
 
-        // No prefix: a sitemap is only looked for at the document root. The
-        // core fallback route is registered with ->fallback() and never shadows
-        // this one.
+        // At the document root, without a prefix.
         Route::middleware('web')
             ->name($this->plugin->id.'.')
             ->group(plugin_path($this->plugin->id.'/routes/web.php'));

@@ -35,7 +35,6 @@ return [
     'serve-sitemap-taken' => ':url 已由其他插件响应。你的不会被提供 — 关闭此项或卸载那个插件。',
     'serve-sitemap-live' => '可在 :url 访问 · 请在 Google Search Console 中提交',
 
-    // The admin page in the design language of the OnAir plugin family.
     'active' => '已启用',
     'inactive' => '已关闭',
     'status' => '状态',

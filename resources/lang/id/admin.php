@@ -35,7 +35,6 @@ return [
     'serve-sitemap-taken' => 'Plugin lain sudah menjawab :url. Milik Anda tidak disajikan — matikan ini atau hapus plugin tersebut.',
     'serve-sitemap-live' => 'Tersedia di :url · kirimkan di Google Search Console',
 
-    // The admin page in the design language of the OnAir plugin family.
     'active' => 'Aktif',
     'inactive' => 'Mati',
     'status' => 'Status',

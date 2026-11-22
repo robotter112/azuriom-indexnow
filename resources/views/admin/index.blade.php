@@ -3,7 +3,7 @@
 @section('title', trans('indexnow::admin.title'))
 
 @php
-    // Where the addresses come from, as a badge in the field of the sitemap.
+    // Source of the addresses, shown in the sitemap field.
     $source = match (true) {
         $serveSitemap && $sitemapServedBy === 'self' => ['own', 'oa-tone-green'],
         $urlSource === 'sitemap' && $sitemapCount > 0 => ['found', 'oa-tone-green'],
@@ -29,8 +29,7 @@
 @endpush
 
 @push('footer-scripts')
-    {{-- Azuriom switches light and dark mode in place: for one frame nothing moves (onair-admin.css), so no colour
-         fades over from the other mode. --}}
+    {{-- No colour transition for one frame while light and dark mode switch. --}}
     <script>
         new MutationObserver(function () {
             document.body.classList.add('oa-theme-switch');

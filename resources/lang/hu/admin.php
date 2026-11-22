@@ -35,7 +35,6 @@ return [
     'serve-sitemap-taken' => 'A :url címre már egy másik bővítmény válaszol. A tiéd nem kerül kiszolgálásra — kapcsold ki ezt, vagy távolítsd el a másikat.',
     'serve-sitemap-live' => 'Elérhető itt: :url · küldd be a Google Search Console-ba',
 
-    // The admin page in the design language of the OnAir plugin family.
     'active' => 'Aktív',
     'inactive' => 'Kikapcsolva',
     'status' => 'Állapot',

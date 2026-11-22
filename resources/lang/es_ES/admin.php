@@ -35,7 +35,6 @@ return [
     'serve-sitemap-taken' => 'Otro plugin ya responde a :url. El tuyo no se sirve: desactiva esto o desinstala el otro plugin.',
     'serve-sitemap-live' => 'Disponible en :url · envíalo en Google Search Console',
 
-    // The admin page in the design language of the OnAir plugin family.
     'active' => 'Activo',
     'inactive' => 'Desactivado',
     'status' => 'Estado',

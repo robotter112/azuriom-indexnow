@@ -29,12 +29,7 @@ class IndexnowServiceProvider extends BasePluginServiceProvider
         $this->watchForChanges();
     }
 
-    /**
-     * Report what changed as soon as it is saved or deleted, which is what IndexNow
-     * is for - waiting for someone to press a button defeats the purpose. Every
-     * model is looked at, so pages, posts and the entries of every plugin are
-     * covered (see Reporter); the report goes out after the response.
-     */
+    /** Report every saved or deleted model after the response (see Reporter). */
     protected function watchForChanges(): void
     {
         Event::listen(['eloquent.saved: *', 'eloquent.deleted: *'], function (string $event, array $payload) {
@@ -43,17 +38,16 @@ class IndexnowServiceProvider extends BasePluginServiceProvider
             }
         });
 
-        // Before a page is gone together with its roles (see Reporter::deleting()).
+        // Before the roles of a page are deleted with it (see Reporter::deleting()).
         Event::listen('eloquent.deleting: *', function (string $event, array $payload) {
             if (($payload[0] ?? null) instanceof Model) {
                 Reporter::deleting($payload[0]);
             }
         });
 
-        // Other plugins hand over exact addresses without depending on this one:
-        // event('indexnow.submit', [[$url, ...]]). Without IndexNow nobody listens.
+        // Other plugins report addresses with event('indexnow.submit', [[$url, ...]]).
         Event::listen('indexnow.submit', function ($urls) {
-            // What a plugin hands over may also be in the optional sitemap (indexnow.urls).
+            // and list addresses with the event indexnow.urls.
             Cache::forget('indexnow.sitemap');
 
             if (is_array($urls)) {
@@ -67,10 +61,7 @@ class IndexnowServiceProvider extends BasePluginServiceProvider
      */
     protected function adminNavigation(): array
     {
-        // Azuriom can build its route cache from an outdated plugin list (AzBoost
-        // on, opcache_invalidate() disabled by the host), which leaves this route
-        // out. Linking to it anyway would break every admin page, so the entry
-        // waits until the repair below has taken effect.
+        // A stale route cache may lack this route: no link until it is repaired.
         if (! Route::has('indexnow.admin.index')) {
             $this->repairRouteCache();
 
@@ -87,26 +78,20 @@ class IndexnowServiceProvider extends BasePluginServiceProvider
         ];
     }
 
-    /**
-     * Rebuild a route cache that lacks this plugin, as "Reload AzBoost" does.
-     * What failed while enabling works now: this request already runs with the
-     * plugin, so the rebuild reads a plugin list that contains it.
-     */
+    /** Rebuild a route cache that lacks this plugin, as "Reload AzBoost" does. */
     protected function repairRouteCache(): void
     {
-        // At most every five minutes: the host may keep serving the old file
-        // from OPcache for a moment, and a rebuild takes a second or two.
+        // At most every five minutes.
         if (! $this->app->routesAreCached() || ! Cache::add('indexnow.route_repair', true, 300)) {
             return;
         }
 
-        // After the response, so the page that noticed it is not slowed down.
+        // After the response.
         $this->app->terminating(function () {
             try {
                 $this->app->make(Optimizer::class)->reloadRoutesCache();
             } catch (Throwable $e) {
-                // route:cache deletes the old file first, so the routes load
-                // uncached from now on, this plugin's included.
+                // route:cache deleted the old file first, so routes load uncached from here on.
                 report($e);
             }
         });
