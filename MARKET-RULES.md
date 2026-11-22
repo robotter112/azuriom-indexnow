@@ -66,7 +66,7 @@ Reference theme: https://github.com/AzuriomCommunity/Theme-DarkWave
 - Name, description and every file outside `lang/` in English; `lang/en` is mandatory.
 - Works with every game Azuriom supports; nothing game-specific is assumed.
 - No obfuscation, no licence check against any server.
-- Paid: price between $1 and $5, active support, regular updates while problems are open. At least one approved free extension per three paid ones.
+- Paid: plugins between $1 and $5; themes at the price level the market shows for themes. Active support, regular updates while problems are open. At least one approved free extension per three paid ones.
 
 ### Before every market upload
 
