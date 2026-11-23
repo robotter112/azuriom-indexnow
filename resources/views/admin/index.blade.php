@@ -5,39 +5,13 @@
 @php
     // Source of the addresses, shown in the sitemap field.
     $source = match (true) {
-        $serveSitemap && $sitemapServedBy === 'self' => ['own', 'oa-tone-green'],
-        $urlSource === 'sitemap' && $sitemapCount > 0 => ['found', 'oa-tone-green'],
-        default => ['none', 'oa-tone-amber'],
+        $serveSitemap && $sitemapServedBy === 'self' => ['own', 'bg-success-subtle text-success-emphasis'],
+        $urlSource === 'sitemap' && $sitemapCount > 0 => ['found', 'bg-success-subtle text-success-emphasis'],
+        default => ['none', 'bg-warning-subtle text-warning-emphasis'],
     };
 @endphp
 
-@push('styles')
-    {{-- The admin look of the OnAir plugin family (onair-admin.css, the same file in every plugin). --}}
-    <link href="{{ plugin_asset('indexnow', 'css/onair-admin.css') }}&p={{ filemtime(plugin_path('indexnow/assets/css/onair-admin.css')) }}" rel="stylesheet">
-    <style>
-        .indexnow-rows > .oa-row:first-of-type { border-top: 0; padding-top: .875rem; }
-        .indexnow-rows > .oa-row:last-child { padding-bottom: 0; }
-        .indexnow-key { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .indexnow-served { display: flex; align-items: center; gap: .625rem; margin-top: .875rem; padding: .75rem .875rem; border-radius: .625rem; background: var(--oa-green-bg); color: var(--oa-green-fg); font-size: .8125rem; font-weight: 600; }
-        .indexnow-sitemap { flex-wrap: wrap; }
-        .indexnow-sitemap > .oa-field-pill { flex: 1 1 16rem; min-width: 0; }
-        .indexnow-engines > div { display: flex; align-items: center; gap: .75rem; padding: .625rem 0; border-top: 1px solid var(--oa-line); font-size: .875rem; font-weight: 600; color: var(--oa-strong); }
-        .indexnow-engines > div:first-child { border-top: 0; }
-        .indexnow-engines > div:last-child { padding-bottom: 0; }
-        .indexnow-engines span:first-child { flex: 1; }
-    </style>
-@endpush
-
 @push('footer-scripts')
-    {{-- No colour transition for one frame while light and dark mode switch. --}}
-    <script>
-        new MutationObserver(function () {
-            document.body.classList.add('oa-theme-switch');
-            requestAnimationFrame(function () {
-                requestAnimationFrame(function () { document.body.classList.remove('oa-theme-switch'); });
-            });
-        }).observe(document.body, { attributes: true, attributeFilter: ['data-bs-theme'] });
-    </script>
     <script>
         document.querySelectorAll('[data-copy], [data-copy-field]').forEach((button) => button.addEventListener('click', function () {
             const text = button.dataset.copyField ? document.getElementById(button.dataset.copyField).value : button.dataset.copy;
@@ -47,35 +21,33 @@
 @endpush
 
 @section('content')
-    <span class="oa-badge {{ $enabled ? 'oa-tone-green' : 'oa-tone-grey' }}">{{ trans($enabled ? 'indexnow::admin.active' : 'indexnow::admin.inactive') }}</span>
-
-    <div class="oa-actions">
-        <button type="submit" form="indexnowSettings" class="btn btn-primary"><i class="bi bi-check-lg" aria-hidden="true"></i><span class="oa-text">{{ trans('indexnow::admin.save') }}</span></button>
+    <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
+        <span class="badge rounded-pill {{ $enabled ? 'bg-success-subtle text-success-emphasis' : 'bg-secondary-subtle text-secondary-emphasis' }}">{{ trans($enabled ? 'indexnow::admin.active' : 'indexnow::admin.inactive') }}</span>
+        <p class="text-body-secondary mb-0 me-auto">{{ trans('indexnow::admin.intro') }}</p>
+        <button type="submit" form="indexnowSettings" class="btn btn-primary"><i class="bi bi-check-lg" aria-hidden="true"></i> {{ trans('indexnow::admin.save') }}</button>
     </div>
 
-    <p class="oa-meta">{{ trans('indexnow::admin.intro') }}</p>
-
-    <div class="oa-layout">
-        <div class="oa-main">
-            <div class="card oa-card">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card mb-4">
                 <div class="card-body">
-                    <div class="oa-card-head mb-1"><h2>{{ trans('indexnow::admin.status') }}</h2></div>
+                    <h2 class="h5 fw-bold mb-2">{{ trans('indexnow::admin.status') }}</h2>
 
                     @if($enabled)
-                        <div class="oa-rows indexnow-rows">
-                            <div class="oa-row">
-                                <span class="oa-tile oa-tone-green" aria-hidden="true"><i class="bi bi-check-lg"></i></span>
-                                <span class="oa-row-main">
-                                    <span class="oa-row-title">{{ trans('indexnow::admin.key-file') }}</span>
-                                    <span class="oa-row-sub indexnow-key">{{ preg_replace('#^https?://#', '', $keyUrl) }}</span>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item bg-transparent px-0 d-flex align-items-center gap-3">
+                                <span class="d-inline-flex p-2 rounded-3 bg-success-subtle text-success-emphasis" aria-hidden="true"><i class="bi bi-check-lg fs-5"></i></span>
+                                <span class="flex-grow-1 overflow-hidden">
+                                    <span class="d-block fw-semibold">{{ trans('indexnow::admin.key-file') }}</span>
+                                    <span class="d-block small text-body-secondary text-truncate">{{ preg_replace('#^https?://#', '', $keyUrl) }}</span>
                                 </span>
-                                <button type="button" class="btn oa-btn-neutral" data-copy="{{ $keyUrl }}" data-done="{{ trans('indexnow::admin.copied') }}">{{ trans('indexnow::admin.copy') }}</button>
-                            </div>
-                            <div class="oa-row">
-                                <span class="oa-tile {{ $last === null || $last['ok'] ? 'oa-tone-blue' : 'oa-tone-amber' }}" aria-hidden="true"><i class="bi bi-clock"></i></span>
-                                <span class="oa-row-main">
-                                    <span class="oa-row-title">{{ trans('indexnow::admin.last') }}</span>
-                                    <span class="oa-row-sub">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-copy="{{ $keyUrl }}" data-done="{{ trans('indexnow::admin.copied') }}">{{ trans('indexnow::admin.copy') }}</button>
+                            </li>
+                            <li class="list-group-item bg-transparent px-0 d-flex align-items-center gap-3">
+                                <span class="d-inline-flex p-2 rounded-3 {{ $last === null || $last['ok'] ? 'bg-primary-subtle text-primary-emphasis' : 'bg-warning-subtle text-warning-emphasis' }}" aria-hidden="true"><i class="bi bi-clock fs-5"></i></span>
+                                <span class="flex-grow-1">
+                                    <span class="d-block fw-semibold">{{ trans('indexnow::admin.last') }}</span>
+                                    <span class="d-block small text-body-secondary">
                                         @if($last === null)
                                             {{ trans('indexnow::admin.never') }}
                                         @else
@@ -83,29 +55,29 @@
                                         @endif
                                     </span>
                                 </span>
-                            </div>
-                            <div class="oa-row flex-wrap">
-                                <span class="oa-tile oa-tone-orange" aria-hidden="true"><i class="bi bi-send"></i></span>
-                                <span class="oa-row-main">
-                                    <span class="oa-row-title">{{ trans('indexnow::admin.all') }}</span>
-                                    <span class="oa-row-sub">{{ trans_choice($urlSource === 'sitemap' ? 'indexnow::admin.all-sitemap' : 'indexnow::admin.all-core', $sitemapCount, ['count' => $sitemapCount]) }}</span>
+                            </li>
+                            <li class="list-group-item bg-transparent px-0 d-flex flex-wrap align-items-center gap-3">
+                                <span class="d-inline-flex p-2 rounded-3 bg-info-subtle text-info-emphasis" aria-hidden="true"><i class="bi bi-send fs-5"></i></span>
+                                <span class="flex-grow-1">
+                                    <span class="d-block fw-semibold">{{ trans('indexnow::admin.all') }}</span>
+                                    <span class="d-block small text-body-secondary">{{ trans_choice($urlSource === 'sitemap' ? 'indexnow::admin.all-sitemap' : 'indexnow::admin.all-core', $sitemapCount, ['count' => $sitemapCount]) }}</span>
                                 </span>
                                 <form action="{{ route('indexnow.admin.submit') }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="btn oa-btn-tint" @disabled($sitemapCount === 0)>{{ trans('indexnow::admin.submit-now') }}</button>
+                                    <button type="submit" class="btn btn-outline-primary" @disabled($sitemapCount === 0)>{{ trans('indexnow::admin.submit-now') }}</button>
                                 </form>
-                            </div>
-                        </div>
-                        <form action="{{ route('indexnow.admin.disable') }}" method="POST" class="text-end mt-3">
+                            </li>
+                        </ul>
+                        <form action="{{ route('indexnow.admin.disable') }}" method="POST" class="text-end mt-2">
                             @csrf
-                            <button type="submit" class="oa-btn-danger-text">{{ trans('indexnow::admin.disable') }}</button>
+                            <button type="submit" class="btn btn-link link-danger text-decoration-none">{{ trans('indexnow::admin.disable') }}</button>
                         </form>
                     @else
-                        <div class="oa-row border-0 pb-0 flex-wrap">
-                            <span class="oa-tile oa-tone-grey" aria-hidden="true"><i class="bi bi-lightning-charge"></i></span>
-                            <span class="oa-row-main">
-                                <span class="oa-row-title">{{ trans('indexnow::admin.off') }}</span>
-                                <span class="oa-row-sub">{{ trans('indexnow::admin.off-sub') }}</span>
+                        <div class="d-flex flex-wrap align-items-center gap-3">
+                            <span class="d-inline-flex p-2 rounded-3 bg-secondary-subtle text-secondary-emphasis" aria-hidden="true"><i class="bi bi-lightning-charge fs-5"></i></span>
+                            <span class="flex-grow-1">
+                                <span class="d-block fw-semibold">{{ trans('indexnow::admin.off') }}</span>
+                                <span class="d-block small text-body-secondary">{{ trans('indexnow::admin.off-sub') }}</span>
                             </span>
                             <form action="{{ route('indexnow.admin.enable') }}" method="POST">
                                 @csrf
@@ -116,39 +88,42 @@
                 </div>
             </div>
 
-            <form class="card oa-card" action="{{ route('indexnow.admin.update') }}" method="POST" id="indexnowSettings">
+            <form class="card" action="{{ route('indexnow.admin.update') }}" method="POST" id="indexnowSettings">
                 @csrf
                 <div class="card-body">
-                    <div class="oa-card-head mb-1"><h2>{{ trans('indexnow::admin.settings') }}</h2></div>
+                    <h2 class="h5 fw-bold mb-2">{{ trans('indexnow::admin.settings') }}</h2>
 
-                    <div class="oa-rows indexnow-rows">
-                        <input type="hidden" name="auto" value="0">
-                        <label class="oa-row oa-switch" for="auto">
-                            <span class="oa-row-main"><span class="oa-row-title">{{ trans('indexnow::admin.auto') }}</span><span class="oa-row-sub">{{ trans('indexnow::admin.auto-sub') }}</span></span>
-                            <span class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="auto" name="auto" value="1" @checked(old('auto', $auto))></span>
-                        </label>
-
-                        <input type="hidden" name="serve_sitemap" value="0">
-                        <label class="oa-row oa-switch" for="serve_sitemap">
-                            <span class="oa-row-main"><span class="oa-row-title">{{ trans('indexnow::admin.serve-sitemap') }}</span><span class="oa-row-sub">{{ trans('indexnow::admin.serve-sitemap-sub') }}</span></span>
-                            <span class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="serve_sitemap" name="serve_sitemap" value="1" @checked(old('serve_sitemap', $serveSitemap))></span>
-                        </label>
-                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item bg-transparent px-0">
+                            <input type="hidden" name="auto" value="0">
+                            <div class="form-check form-switch d-flex align-items-center gap-3 ps-0 mb-0">
+                                <label class="form-check-label flex-grow-1" for="auto"><span class="d-block fw-semibold">{{ trans('indexnow::admin.auto') }}</span><span class="d-block small text-body-secondary">{{ trans('indexnow::admin.auto-sub') }}</span></label>
+                                <input class="form-check-input fs-4 ms-0 flex-shrink-0" type="checkbox" role="switch" id="auto" name="auto" value="1" @checked(old('auto', $auto))>
+                            </div>
+                        </li>
+                        <li class="list-group-item bg-transparent px-0">
+                            <input type="hidden" name="serve_sitemap" value="0">
+                            <div class="form-check form-switch d-flex align-items-center gap-3 ps-0 mb-0">
+                                <label class="form-check-label flex-grow-1" for="serve_sitemap"><span class="d-block fw-semibold">{{ trans('indexnow::admin.serve-sitemap') }}</span><span class="d-block small text-body-secondary">{{ trans('indexnow::admin.serve-sitemap-sub') }}</span></label>
+                                <input class="form-check-input fs-4 ms-0 flex-shrink-0" type="checkbox" role="switch" id="serve_sitemap" name="serve_sitemap" value="1" @checked(old('serve_sitemap', $serveSitemap))>
+                            </div>
+                        </li>
+                    </ul>
 
                     @if($serveSitemap && $sitemapServedBy === 'other')
                         <div class="alert alert-warning small mt-3 mb-0">{{ trans('indexnow::admin.serve-sitemap-taken', ['url' => $ownSitemapUrl]) }}</div>
                     @elseif($serveSitemap && $sitemapServedBy === 'self')
-                        <div class="indexnow-served"><i class="bi bi-check-lg" aria-hidden="true"></i><span>{{ trans('indexnow::admin.serve-sitemap-live', ['url' => preg_replace('#^https?://#', '', $ownSitemapUrl)]) }}</span></div>
+                        <div class="alert alert-success small d-flex align-items-center gap-2 mt-3 mb-0"><i class="bi bi-check-lg" aria-hidden="true"></i><span>{{ trans('indexnow::admin.serve-sitemap-live', ['url' => preg_replace('#^https?://#', '', $ownSitemapUrl)]) }}</span></div>
                     @endif
 
                     <div class="mt-3">
-                        <label class="form-label" for="sitemap">{{ trans('indexnow::admin.sitemap') }}</label>
-                        <div class="oa-copy indexnow-sitemap">
-                            <div class="oa-field-pill">
-                                <input type="url" class="form-control @error('sitemap') is-invalid @enderror" id="sitemap" name="sitemap" spellcheck="false" value="{{ old('sitemap', $sitemapUrl) }}">
-                                <span class="oa-pill {{ $source[1] }}">{{ trans('indexnow::admin.source-'.$source[0]) }}</span>
-                            </div>
-                            <button type="button" class="btn oa-btn-neutral" data-copy-field="sitemap" data-done="{{ trans('indexnow::admin.copied') }}">{{ trans('indexnow::admin.copy') }}</button>
+                        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                            <label class="form-label mb-0" for="sitemap">{{ trans('indexnow::admin.sitemap') }}</label>
+                            <span class="badge rounded-pill {{ $source[1] }}">{{ trans('indexnow::admin.source-'.$source[0]) }}</span>
+                        </div>
+                        <div class="input-group">
+                            <input type="url" class="form-control @error('sitemap') is-invalid @enderror" id="sitemap" name="sitemap" spellcheck="false" value="{{ old('sitemap', $sitemapUrl) }}">
+                            <button type="button" class="btn btn-outline-secondary" data-copy-field="sitemap" data-done="{{ trans('indexnow::admin.copied') }}">{{ trans('indexnow::admin.copy') }}</button>
                         </div>
                         @error('sitemap')<span class="invalid-feedback d-block">{{ $message }}</span>@enderror
                     </div>
@@ -156,32 +131,32 @@
             </form>
         </div>
 
-        <div class="oa-side">
-            <div class="card oa-card">
+        <div class="col-lg-4">
+            <div class="card mb-4">
                 <div class="card-body">
-                    <div class="oa-card-head"><h2>{{ trans('indexnow::admin.today') }}</h2></div>
-                    <div class="oa-stats">
-                        <div class="oa-stat">
-                            <div class="oa-stat-label">{{ trans('indexnow::admin.reported') }}</div>
-                            <div class="oa-stat-value">{{ number_format($today) }}</div>
-                            <div class="oa-stat-note">{{ trans('indexnow::admin.reported-sub') }}</div>
+                    <h2 class="h5 fw-bold mb-3">{{ trans('indexnow::admin.today') }}</h2>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="small text-body-secondary">{{ trans('indexnow::admin.reported') }}</div>
+                            <div class="fs-3 fw-bold">{{ number_format($today) }}</div>
+                            <div class="small text-body-secondary">{{ trans('indexnow::admin.reported-sub') }}</div>
                         </div>
-                        <div class="oa-stat">
-                            <div class="oa-stat-label">{{ trans('indexnow::admin.known') }}</div>
-                            <div class="oa-stat-value">{{ number_format($sitemapCount) }}</div>
-                            <div class="oa-stat-note">{{ trans('indexnow::admin.known-sub') }}</div>
+                        <div class="col-6">
+                            <div class="small text-body-secondary">{{ trans('indexnow::admin.known') }}</div>
+                            <div class="fs-3 fw-bold">{{ number_format($sitemapCount) }}</div>
+                            <div class="small text-body-secondary">{{ trans('indexnow::admin.known-sub') }}</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="card oa-card">
+            <div class="card">
                 <div class="card-body">
-                    <div class="oa-card-head mb-1"><h2>{{ trans('indexnow::admin.engines') }}</h2></div>
-                    <div class="indexnow-engines">
-                        <div><span>Bing, Yandex, Seznam, Naver</span><span class="oa-pill oa-tone-green">{{ trans('indexnow::admin.instant') }}</span></div>
-                        <div><span>Google</span><span class="oa-pill oa-tone-grey">{{ trans('indexnow::admin.via-sitemap') }}</span></div>
-                    </div>
+                    <h2 class="h5 fw-bold mb-2">{{ trans('indexnow::admin.engines') }}</h2>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item bg-transparent px-0 d-flex align-items-center gap-3"><span class="flex-grow-1 fw-semibold">Bing, Yandex, Seznam, Naver</span><span class="badge rounded-pill bg-success-subtle text-success-emphasis">{{ trans('indexnow::admin.instant') }}</span></li>
+                        <li class="list-group-item bg-transparent px-0 d-flex align-items-center gap-3"><span class="flex-grow-1 fw-semibold">Google</span><span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis">{{ trans('indexnow::admin.via-sitemap') }}</span></li>
+                    </ul>
                 </div>
             </div>
         </div>
