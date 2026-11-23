@@ -124,9 +124,16 @@ class Reporter
             return;
         }
 
+        $excluded = SiteUrls::excluded();
+
         foreach ($urls as $url) {
             if (is_string($url) && $url !== '') {
                 $url = Client::onSiteRoot($url);
+
+                if (isset($excluded[rtrim($url, '/')])) {
+                    continue;
+                }
+
                 self::$queue[$url] = true;
 
                 if ($handed) {

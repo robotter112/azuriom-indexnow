@@ -40,9 +40,37 @@ class SiteUrls
         self::addSuggestions($urls);
         self::addFromPlugins($urls);
 
+        $excluded = self::excluded();
+
         // On the site's own address, since the list is cached for everyone. Others are left out.
         return $urls->map(fn (string $url) => Client::onSiteRoot($url))->filter(fn (string $url) => Client::isOwnHost($url))
+            ->reject(fn (string $url) => isset($excluded[rtrim($url, '/')]))
             ->unique()->take(self::MAX_URLS)->values()->all();
+    }
+
+    /**
+     * Addresses other plugins return for the event indexnow.exclude: pages that tell search engines
+     * not to index them (noindex), left out of the sitemap and of reports.
+     *
+     * @return array<string, true> address without trailing slash => true
+     */
+    public static function excluded(): array
+    {
+        $excluded = [];
+
+        foreach (Event::getListeners('indexnow.exclude') as $listener) {
+            try {
+                foreach ((array) $listener('indexnow.exclude', []) as $url) {
+                    if (is_string($url) && $url !== '') {
+                        $excluded[rtrim(Client::onSiteRoot($url), '/')] = true;
+                    }
+                }
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return $excluded;
     }
 
     /**

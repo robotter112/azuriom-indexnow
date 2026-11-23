@@ -81,6 +81,9 @@ Event::listen('indexnow.urls', fn () => MyPlugin::publicUrls());
 // When they last changed, for <lastmod> (address => DateTimeInterface):
 Event::listen('indexnow.dates', fn () => MyPlugin::changeDates());
 
+// Pages that carry noindex: left out of the sitemap and of reports.
+Event::listen('indexnow.exclude', fn () => [route('posts.index')]);
+
 // A page that is not always there: listed only while indexnow.urls returns it.
 Route::get('/draft', ['uses' => MyController::class.'@show', 'sitemap' => false]);
 ```

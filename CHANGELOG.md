@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Plugins and themes can name pages that carry `noindex` with the event `indexnow.exclude`. They stay out of the sitemap and are not reported.
+
 ### Changed
 - The admin page is built from the Bootstrap components of the Azuriom admin only, without a stylesheet of its own, so it follows the admin theme.
 

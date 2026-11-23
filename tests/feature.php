@@ -177,6 +177,12 @@ $all = SiteUrls::all();
 check(in_array(url('/knowledge/setup'), $all, true) && ! in_array('https://example.org/elsewhere', $all, true), 'a plugin adds its addresses to the sitemap and to "Submit all URLs"');
 check(in_array(url('indexnow-demo'), $all, true) && ! in_array(url('admin/indexnow-demo'), $all, true), 'the sitemap has the public plugin page, not its admin page');
 
+Event::listen('indexnow.exclude', fn () => [url('/knowledge/')]);
+$all = SiteUrls::all();
+check(! in_array(url('/knowledge'), $all, true) && in_array(url('/knowledge/setup'), $all, true), 'a page named by indexnow.exclude (noindex) leaves the sitemap, nothing else does');
+event('indexnow.submit', [[url('/knowledge'), url('/knowledge/setup')]]);
+check($reported() === [[url('/knowledge/setup')]], 'an excluded page is not reported either');
+
 // --- only what a visitor who is not logged in can open -------------------------
 
 $site[route('posts.show', 'login-post')] = 302;
