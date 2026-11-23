@@ -38,6 +38,7 @@ Reference theme: https://github.com/AzuriomCommunity/Theme-DarkWave
 - Plugins should avoid custom CSS as much as possible and use Bootstrap classes instead, so they integrate with existing and future themes.
 - Migrations adding columns to an existing table can be merged as long as no site has installed the plugin from the market. Once published, new columns go into new migrations.
 - Every uploaded update puts the extension back at the end of the review queue.
+- A theme layout may add elements around `@yield('content')` depending on the route, as long as this is unlikely to break with Azuriom or plugin updates (answer of the Azuriom team, 2026-11-23).
 
 ## How we apply them
 
@@ -58,6 +59,8 @@ Reference theme: https://github.com/AzuriomCommunity/Theme-DarkWave
 
 - Views only in `home.blade.php`, `layouts/*` and `elements/*`. Every other Azuriom or plugin page (posts, pages, auth, profile, notifications, errors, maintenance, plugin views) is styled through CSS only.
 - Anything that needs to change content or markup of those pages belongs in a plugin, not in the theme.
+- Route-dependent additions in `layouts/*` only around `@yield('content')`: they rely on route names and public model
+  data only, never on the markup of Azuriom or plugin views, and render nothing when the route or data is missing.
 - Bootstrap 5 without jQuery; icons from Bootstrap Icons as included in Azuriom.
 - Fonts are served locally; if an external provider is ever needed, Bunny Fonts only.
 
