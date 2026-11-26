@@ -11,6 +11,11 @@
     };
 @endphp
 
+{{-- The one rule of the admin page: side buttons, softer in light mode. --}}
+@push('styles')
+    <link href="{{ plugin_asset('indexnow', 'css/admin.css') }}&p={{ filemtime(plugin_path('indexnow/assets/css/admin.css')) }}" rel="stylesheet">
+@endpush
+
 @push('footer-scripts')
     <script>
         document.querySelectorAll('[data-copy], [data-copy-field]').forEach((button) => button.addEventListener('click', function () {
@@ -41,7 +46,7 @@
                                     <span class="d-block fw-semibold">{{ trans('indexnow::admin.key-file') }}</span>
                                     <span class="d-block small text-body-secondary text-truncate">{{ preg_replace('#^https?://#', '', $keyUrl) }}</span>
                                 </span>
-                                <button type="button" class="btn btn-sm btn-outline-secondary" data-copy="{{ $keyUrl }}" data-done="{{ trans('indexnow::admin.copied') }}">{{ trans('indexnow::admin.copy') }}</button>
+                                <button type="button" class="btn btn-sm btn-secondary indexnow-btn-side" data-copy="{{ $keyUrl }}" data-done="{{ trans('indexnow::admin.copied') }}">{{ trans('indexnow::admin.copy') }}</button>
                             </li>
                             <li class="list-group-item bg-transparent px-0 d-flex align-items-center gap-3">
                                 <span class="d-inline-flex p-2 rounded-3 {{ $last === null || $last['ok'] ? 'bg-primary-subtle text-primary-emphasis' : 'bg-warning-subtle text-warning-emphasis' }}" aria-hidden="true"><i class="bi bi-clock fs-5"></i></span>
@@ -64,13 +69,13 @@
                                 </span>
                                 <form action="{{ route('indexnow.admin.submit') }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="btn btn-outline-primary" @disabled($sitemapCount === 0)>{{ trans('indexnow::admin.submit-now') }}</button>
+                                    <button type="submit" class="btn btn-secondary indexnow-btn-side" @disabled($sitemapCount === 0)>{{ trans('indexnow::admin.submit-now') }}</button>
                                 </form>
                             </li>
                         </ul>
                         <form action="{{ route('indexnow.admin.disable') }}" method="POST" class="text-end mt-2">
                             @csrf
-                            <button type="submit" class="btn btn-link link-danger text-decoration-none">{{ trans('indexnow::admin.disable') }}</button>
+                            <button type="submit" class="btn btn-outline-danger">{{ trans('indexnow::admin.disable') }}</button>
                         </form>
                     @else
                         <div class="d-flex flex-wrap align-items-center gap-3">
@@ -123,7 +128,7 @@
                         </div>
                         <div class="input-group">
                             <input type="url" class="form-control @error('sitemap') is-invalid @enderror" id="sitemap" name="sitemap" spellcheck="false" value="{{ old('sitemap', $sitemapUrl) }}">
-                            <button type="button" class="btn btn-outline-secondary" data-copy-field="sitemap" data-done="{{ trans('indexnow::admin.copied') }}">{{ trans('indexnow::admin.copy') }}</button>
+                            <button type="button" class="btn btn-secondary indexnow-btn-side" data-copy-field="sitemap" data-done="{{ trans('indexnow::admin.copied') }}">{{ trans('indexnow::admin.copy') }}</button>
                         </div>
                         @error('sitemap')<span class="invalid-feedback d-block">{{ $message }}</span>@enderror
                     </div>

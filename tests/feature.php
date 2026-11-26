@@ -437,5 +437,11 @@ app(Azuriom\Plugin\Indexnow\Controllers\Admin\AdminController::class)->index();
 $asked = Http::recorded()->slice($seenBefore)->filter(fn ($pair) => str_contains($pair[0]->url(), 'sitemap'))->count();
 check($asked <= 1, 'the admin page reads a sitemap at most once in ten minutes, not on every view'.$label);
 
+// Side actions are Azuriom's grey button with the one small rule for light mode; no grey or blue outlines.
+$view = file_get_contents(plugin_path('indexnow/resources/views/admin/index.blade.php'));
+check(str_contains($view, "plugin_asset('indexnow', 'css/admin.css')") && substr_count($view, 'btn-secondary indexnow-btn-side') === 3
+    && ! preg_match('/btn-outline-(secondary|primary)|btn-link link-danger/', $view) && count(file(plugin_path('indexnow/assets/css/admin.css'))) <= 15,
+    'the admin page draws side buttons in Azuriom\'s grey with its small rule, dangerous ones outlined in red'.$label);
+
 echo $failures === 0 ? "All feature checks passed$label.".PHP_EOL : "$failures feature check(s) failed$label.".PHP_EOL;
 exit($failures === 0 ? 0 : 1);

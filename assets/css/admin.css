@@ -1,0 +1,13 @@
+/* Side actions: Azuriom's grey button (btn-secondary), softer in light mode.
+   Azuriom's admin theme sets the text of filled buttons to white without a variable, hence !important. */
+body:not([data-bs-theme=dark]) .indexnow-btn-side {
+    color: var(--bs-secondary-text-emphasis) !important;
+    --bs-btn-bg: var(--bs-secondary-bg-subtle);
+    --bs-btn-border-color: var(--bs-secondary-border-subtle);
+    --bs-btn-hover-bg: var(--bs-secondary-border-subtle);
+    --bs-btn-hover-border-color: var(--bs-secondary-border-subtle);
+    --bs-btn-active-bg: var(--bs-secondary-border-subtle);
+    --bs-btn-active-border-color: var(--bs-secondary-border-subtle);
+    --bs-btn-disabled-bg: var(--bs-secondary-bg-subtle);
+    --bs-btn-disabled-border-color: var(--bs-secondary-border-subtle);
+}

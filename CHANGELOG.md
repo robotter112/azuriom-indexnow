@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Plugins and themes can name pages that carry `noindex` with the event `indexnow.exclude`. They stay out of the sitemap and are not reported.
 
 ### Changed
-- The admin page is built from the Bootstrap components of the Azuriom admin only, without a stylesheet of its own, so it follows the admin theme.
+- The admin page is built from the Bootstrap components of the Azuriom admin only, so it follows the admin theme.
+- Admin buttons follow one rule: saving is blue, every other action ("Report now", "Copy") is Azuriom's grey button instead of a grey or blue outline (in light mode a softer grey, set by `assets/css/admin.css`, 13 lines of Bootstrap variables), and switching IndexNow off is outlined in red instead of red text.
 
 ## [2.4.0] - 2026-11-22
 
